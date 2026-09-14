@@ -16,22 +16,31 @@ jobs:
 
       - name: Extract Android project
         run: |
-          ZIP_FILE=$(find . -name "*.zip" -type f | head -1)
-          echo "Found: $ZIP_FILE"
+          ZIP_FILE=$(find . -name "SawariSetuAndroid_installable_build_v2.zip" -type f | head -1)
 
-          mkdir -p /tmp/sawari
-          unzip -q "$ZIP_FILE" -d /tmp/sawari
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ZIP file not found"
+            exit 1
+          fi
 
-          PROJECT_DIR=$(find /tmp/sawari -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
-          echo "Project: $PROJECT_DIR"
+          mkdir -p extracted
+          unzip -q "$ZIP_FILE" -d extracted
 
-          rm -rf SawariSetuAndroid/*
+          PROJECT_DIR=$(find extracted -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "Android project not found"
+            exit 1
+          fi
+
+          rm -rf SawariSetuAndroid
+          mkdir -p SawariSetuAndroid
           cp -a "$PROJECT_DIR"/. SawariSetuAndroid/
 
-      - name: Commit extracted project
+      - name: Save project to GitHub
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add SawariSetuAndroid
-          git commit -m "Extract Android project"
+          git commit -m "Extract Android project files" || echo "Nothing to commit"
           git push
