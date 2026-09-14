@@ -1,0 +1,37 @@
+name: Extract Sawari Setu Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: |
+          ZIP_FILE=$(find . -name "*.zip" -type f | head -1)
+          echo "Found: $ZIP_FILE"
+
+          mkdir -p /tmp/sawari
+          unzip -q "$ZIP_FILE" -d /tmp/sawari
+
+          PROJECT_DIR=$(find /tmp/sawari -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
+          echo "Project: $PROJECT_DIR"
+
+          rm -rf SawariSetuAndroid/*
+          cp -a "$PROJECT_DIR"/. SawariSetuAndroid/
+
+      - name: Commit extracted project
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add SawariSetuAndroid
+          git commit -m "Extract Android project"
+          git push
