@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -29,15 +29,44 @@ jobs:
 
       - name: Extract Sawari Setu project
         run: |
+          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" -type f | head -1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ZIP file not found"
+            exit 1
+          fi
+
+          rm -rf extracted
           mkdir extracted
-          unzip -q *.zip -d extracted
+          unzip -q "$ZIP_FILE" -d extracted
+
           echo "Extracted files:"
           find extracted -maxdepth 3 -type f | head -50
 
       - name: Find Android project
         run: |
-          PROJECT_DIR=$(find extracted -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
+          PROJECT_DIR=$(find extracted -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+
+          if [ -z "$PROJECT_DIR" ] || [ ! -d "$PROJECT_DIR" ]; then
+            echo "Android project not found"
+            exit 1
+          fi
+
+          echo "PROJECT_DIR=$PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Save Android project to GitHub
+        run: |
+          rm -rf SawariSetuAndroid
+          mkdir -p SawariSetuAndroid
+          cp -a "$PROJECT_DIR"/. SawariSetuAndroid/
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add SawariSetuAndroid
+          git diff --cached --quiet || git commit -m "Save Sawari Setu Android project"
+          git push
 
       - name: Build APK
         run: |
