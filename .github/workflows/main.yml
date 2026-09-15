@@ -27,25 +27,13 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Sawari Setu project
-        run: |
-          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" -type f | head -1)
-
-          if [ -z "$ZIP_FILE" ]; then
-            echo "ZIP file not found"
-            exit 1
-          fi
-
-          rm -rf extracted
-          mkdir extracted
-          unzip -q "$ZIP_FILE" -d extracted
-
-          echo "Extracted files:"
-          find extracted -maxdepth 3 -type f | head -50
-
       - name: Find Android project
         run: |
-          PROJECT_DIR=$(find extracted -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+          if [ -f "SawariSetuAndroid/settings.gradle" ] || [ -f "SawariSetuAndroid/settings.gradle.kts" ]; then
+            PROJECT_DIR="SawariSetuAndroid"
+          else
+            PROJECT_DIR=$(find . -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+          fi
 
           if [ -z "$PROJECT_DIR" ] || [ ! -d "$PROJECT_DIR" ]; then
             echo "Android project not found"
@@ -55,21 +43,30 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Save Android project to GitHub
+      - name: Create debug keystore and get SHA-1
         run: |
-          rm -rf SawariSetuAndroid
-          mkdir -p SawariSetuAndroid
-          cp -a "$PROJECT_DIR"/. SawariSetuAndroid/
+          mkdir -p ~/.config/.android
 
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          keytool -genkeypair \
+            -v \
+            -keystore ~/.config/.android/debug.keystore \
+            -storepass android \
+            -keypass android \
+            -alias AndroidDebugKey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
 
-          git add SawariSetuAndroid
-          git diff --cached --quiet || git commit -m "Save Sawari Setu Android project"
-          git push
-      - name: Get SHA- 1
-        run: |
-          gradle -p "$PROJECT_DIR" signingReport --no-daemon | grep -A 8 "Variant: debug"
+          echo "===== SHA-1 CERTIFICATE ====="
+
+          keytool -list -v \
+            -keystore ~/.config/.android/debug.keystore \
+            -storepass android \
+            -alias AndroidDebugKey | grep "SHA1:"
+
+          echo "============================="
+
       - name: Build APK
         run: |
           gradle -p "$PROJECT_DIR" assembleDebug --no-daemon --stacktrace
