@@ -16,19 +16,20 @@ jobs:
 
       - name: Extract Android project
         run: |
-          ZIP_FILE=$(find . -name "SawariSetuAndroid_installable_build_v2.zip" -type f | head -1)
+          ZIP_FILE=$(find . -name "*.zip" -type f | head -1)
 
           if [ -z "$ZIP_FILE" ]; then
             echo "ZIP file not found"
             exit 1
           fi
 
+          rm -rf extracted
           mkdir -p extracted
           unzip -q "$ZIP_FILE" -d extracted
 
-          PROJECT_DIR=$(find extracted -name settings.gradle -o -name settings.gradle.kts | head -1 | xargs dirname)
+          PROJECT_DIR=$(find extracted -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print -quit | xargs dirname)
 
-          if [ -z "$PROJECT_DIR" ]; then
+          if [ -z "$PROJECT_DIR" ] || [ ! -d "$PROJECT_DIR" ]; then
             echo "Android project not found"
             exit 1
           fi
@@ -42,5 +43,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add SawariSetuAndroid
-          git commit -m "Extract Android project files" || echo "Nothing to commit"
+          git commit -m "Save extracted Sawari Setu Android project" || echo "Nothing to commit"
           git push
