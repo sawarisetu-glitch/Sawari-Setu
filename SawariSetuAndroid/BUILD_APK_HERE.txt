@@ -1,0 +1,17 @@
+सवारी सेतु — APK BUILD
+
+इस ZIP को GitHub में डालने के बाद APK बनाने के लिए:
+
+1. GitHub में नया repository बनाएं: SawariSetu
+2. इस ZIP को extract करके पूरे SawariSetuAndroid folder की सभी files repository में upload करें.
+3. ऊपर Actions tab खोलें.
+4. “Build Sawari Setu APK” चुनें.
+5. “Run workflow” दबाएं.
+
+Build पूरा होने पर:
+Actions → latest successful run → Artifacts → sawari-setu-debug-apk
+
+Artifact में install करने योग्य app-debug.apk मिलेगा.
+
+ध्यान दें:
+यह अभी demo/prototype APK है. असली multi-user booking, OTP/SMS, live GPS driver matching, payment और production Play Store release के लिए backend और service configuration अलग से जोड़नी होगी.
