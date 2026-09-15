@@ -67,7 +67,9 @@ jobs:
           git add SawariSetuAndroid
           git diff --cached --quiet || git commit -m "Save Sawari Setu Android project"
           git push
-
+      - name: Get SHA- 1
+        run: |
+          gradle -p "$PROJECT_DIR" signingReport --no-daemon | grep -A 8 "Variant: debug"
       - name: Build APK
         run: |
           gradle -p "$PROJECT_DIR" assembleDebug --no-daemon --stacktrace
