@@ -35,50 +35,34 @@ jobs:
             PROJECT_DIR=$(find . -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
           fi
 
-          if [ -z "$PROJECT_DIR" ] || [ ! -d "$PROJECT_DIR" ]; then
-            echo "Android project not found"
-            exit 1
-          fi
-
           echo "PROJECT_DIR=$PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Create debug keystore and get SHA-1
+      - name: Configure AndroidX
         run: |
-          mkdir -p ~/.config/.android
+          echo "android.useAndroidX=true" >> "$PROJECT_DIR/gradle.properties"
+          echo "android.enableJetifier=true" >> "$PROJECT_DIR/gradle.properties"
 
-          keytool -genkeypair \
-            -v \
-            -keystore ~/.config/.android/debug.keystore \
-            -storepass android \
-            -keypass android \
-            -alias AndroidDebugKey \
+      - name: Create Debug Keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore "$PROJECT_DIR/debug.keystore" \
+            -alias androiddebugkey \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
-
-          echo "===== SHA-1 CERTIFICATE ====="
-
-          keytool -list -v \
-            -keystore ~/.config/.android/debug.keystore \
             -storepass android \
-            -alias AndroidDebugKey | grep "SHA1:"
-
-          echo "============================="
+            -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US"
 
       - name: Build APK
         run: |
-          gradle -p "$PROJECT_DIR" assembleDebug --no-daemon --stacktrace
-
-      - name: Check APK
-        run: |
-          find "$PROJECT_DIR" -name "*.apk" -type f
+          cd "$PROJECT_DIR"
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: sawari-setu-debug-apk
-          path: |
-            ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          name: app-debug
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
