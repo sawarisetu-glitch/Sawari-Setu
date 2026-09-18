@@ -30,14 +30,27 @@ jobs:
         run: |
           echo "Project files:"
           ls -la
-          echo "Android project:"
-          find . -maxdepth 2 -type f | sort | head -100
+          echo ""
+          echo "Searching for Gradle wrapper..."
+          find . -name "gradlew" -type f -print
 
-      - name: Give Gradle permission
-        run: chmod +x ./gradlew
+      - name: Give Gradle Permission
+        run: |
+          GRADLEW=$(find . -name "gradlew" -type f | head -1)
+
+          if [ -z "$GRADLEW" ]; then
+            echo "ERROR: gradlew file not found"
+            exit 1
+          fi
+
+          echo "Found Gradle wrapper: $GRADLEW"
+          chmod +x "$GRADLEW"
+          echo "GRADLEW=$GRADLEW" >> "$GITHUB_ENV"
 
       - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          echo "Building APK using: $GRADLEW"
+          "$GRADLEW" assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
