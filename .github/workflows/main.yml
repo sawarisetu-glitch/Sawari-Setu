@@ -1,4 +1,4 @@
-name: Build सवारी सेतु application
+name: Build सवारी सेतु Android APK
 
 on:
   workflow_dispatch:
@@ -31,31 +31,22 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
-      - name: Check project files
+      - name: Check Android project
         run: |
-          echo "Project files:"
-          find . -maxdepth 3 -type f | sort | head -200
-
-      - name: Find Android project
-        run: |
-          echo "Searching for Gradle project..."
-          find . -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts"
+          echo "Android project files:"
+          ls -la "Sawari Setu Android"
+          echo ""
+          echo "App files:"
+          ls -la "Sawari Setu Android/app"
 
       - name: Build APK
         run: |
-          if [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
-            gradle assembleDebug --stacktrace
-          elif [ -d "./android" ]; then
-            cd android
-            gradle assembleDebug --stacktrace
-          else
-            echo "ERROR: Android Gradle project not found"
-            exit 1
-          fi
+          cd "Sawari Setu Android"
+          gradle :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: '**/build/outputs/apk/debug/*.apk'
+          name: sawari-setu-debug-apk
+          path: 'Sawari Setu Android/app/build/outputs/apk/debug/*.apk'
           if-no-files-found: error
