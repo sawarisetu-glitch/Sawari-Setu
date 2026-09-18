@@ -34,35 +34,24 @@ jobs:
       - name: Find Android project
         run: |
           SETTINGS=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -1)
-
           if [ -z "$SETTINGS" ]; then
-            echo "ERROR: settings.gradle or settings.gradle.kts not found"
+            echo "ERROR: Android project not found"
             exit 1
           fi
-
           PROJECT_DIR=$(dirname "$SETTINGS")
-
-          echo "Android project found at:"
-          echo "$PROJECT_DIR"
-
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
-      - name: Check Android project
-        run: |
-          cd "$PROJECT_DIR"
-          echo "Android project contents:"
-          ls -la
+          echo "Found: $PROJECT_DIR"
 
       - name: Build APK
         run: |
           cd "$PROJECT_DIR"
 
-          echo "Enabling AndroidX..."
-          export ORG_GRADLE_PROJECT_android_useAndroidX=true
-          export ORG_GRADLE_PROJECT_android_enableJetifier=true
+          printf '\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n' >> gradle.properties
 
-          echo "Starting APK build..."
-          gradle :app:assembleDebug --stacktrace
+          gradle :app:assembleDebug \
+            -Pandroid.useAndroidX=true \
+            -Pandroid.enableJetifier=true \
+            --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
