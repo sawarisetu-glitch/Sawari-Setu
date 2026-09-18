@@ -1,45 +1,47 @@
-name: Build APK
+name: Build सवारी सेतु application
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
-      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: 12266719
+          packages: 'platform-tools'
 
       - name: Check project files
         run: |
-          echo "Project root:"
-          pwd
-          echo "Files:"
+          echo "Project files:"
           ls -la
-          echo "Gradle files:"
-          find . -maxdepth 2 -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts" \) -print
+          echo "Android project:"
+          find . -maxdepth 2 -type f | sort | head -100
+
+      - name: Give Gradle permission
+        run: chmod +x ./gradlew
 
       - name: Build APK
-        run: |
-          PROJECT_DIR="$GITHUB_WORKSPACE"
-          gradle -p "$PROJECT_DIR" assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: "**/build/outputs/apk/debug/*.apk"
+          path: '**/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
