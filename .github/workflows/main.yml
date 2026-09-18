@@ -31,22 +31,41 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
-      - name: Check Android project
+      - name: Find Android project
         run: |
-          echo "Android project files:"
-          ls -la "Sawari Setu Android"
+          echo "Current directory:"
+          pwd
           echo ""
-          echo "App files:"
-          ls -la "Sawari Setu Android/app"
+          echo "Repository files:"
+          find . -maxdepth 3 -type f | sort
+          echo ""
+          echo "Searching for Gradle project:"
+          find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print
 
       - name: Build APK
         run: |
-          cd "Sawari Setu Android"
+          SETTINGS=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -1)
+
+          if [ -z "$SETTINGS" ]; then
+            echo "ERROR: settings.gradle or settings.gradle.kts not found"
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$SETTINGS")
+
+          echo "Android project found at:"
+          echo "$PROJECT_DIR"
+
+          cd "$PROJECT_DIR"
+
+          echo "Project contents:"
+          ls -la
+
           gradle :app:assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: sawari-setu-debug-apk
-          path: 'Sawari Setu Android/app/build/outputs/apk/debug/*.apk'
+          path: '**/build/outputs/apk/debug/*.apk'
           if-no-files-found: error
