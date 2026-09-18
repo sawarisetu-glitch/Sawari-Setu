@@ -33,17 +33,6 @@ jobs:
 
       - name: Find Android project
         run: |
-          echo "Current directory:"
-          pwd
-          echo ""
-          echo "Repository files:"
-          find . -maxdepth 3 -type f | sort
-          echo ""
-          echo "Searching for Gradle project:"
-          find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print
-
-      - name: Build APK
-        run: |
           SETTINGS=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -1)
 
           if [ -z "$SETTINGS" ]; then
@@ -56,11 +45,23 @@ jobs:
           echo "Android project found at:"
           echo "$PROJECT_DIR"
 
-          cd "$PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-          echo "Project contents:"
+      - name: Check Android project
+        run: |
+          cd "$PROJECT_DIR"
+          echo "Android project contents:"
           ls -la
 
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+
+          echo "Enabling AndroidX..."
+          export ORG_GRADLE_PROJECT_android_useAndroidX=true
+          export ORG_GRADLE_PROJECT_android_enableJetifier=true
+
+          echo "Starting APK build..."
           gradle :app:assembleDebug --stacktrace
 
       - name: Upload APK
