@@ -29,29 +29,70 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.10.2'
+          gradle-version: '8.9'
 
       - name: Find Android project
+        shell: bash
         run: |
-          SETTINGS=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -1)
+          SETTINGS=$(find . -type f \
+            \( -name "settings.gradle" -o -name "settings.gradle.kts" \) \
+            -not -path "./.git/*" | head -1)
+
           if [ -z "$SETTINGS" ]; then
-            echo "ERROR: Android project not found"
+            echo "ERROR: Android project settings.gradle not found"
             exit 1
           fi
-          PROJECT_DIR=$(dirname "$SETTINGS")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Found: $PROJECT_DIR"
 
-      - name: Build APK
+          PROJECT_DIR=$(dirname "$SETTINGS")
+
+          echo "Android project found:"
+          echo "$PROJECT_DIR"
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Force AndroidX configuration
+        shell: bash
         run: |
           cd "$PROJECT_DIR"
 
+          echo "Project directory:"
+          pwd
+
+          echo "Checking gradle.properties..."
+
+          if [ -f gradle.properties ]; then
+            echo "gradle.properties found:"
+            cat gradle.properties
+          else
+            echo "gradle.properties not found. Creating it..."
+          fi
+
+          touch gradle.properties
+
+          sed -i '/^[[:space:]]*android\.useAndroidX[[:space:]]*=/d' gradle.properties
+          sed -i '/^[[:space:]]*android\.enableJetifier[[:space:]]*=/d' gradle.properties
+
           printf '\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n' >> gradle.properties
 
+          echo "Final AndroidX configuration:"
+          cat gradle.properties
+
+      - name: Build APK
+        shell: bash
+        run: |
+          cd "$PROJECT_DIR"
+
+          echo "Building from:"
+          pwd
+
+          export ORG_GRADLE_PROJECT_android_useAndroidX=true
+          export ORG_GRADLE_PROJECT_android_enableJetifier=true
+
           gradle :app:assembleDebug \
+            --no-daemon \
+            --stacktrace \
             -Pandroid.useAndroidX=true \
-            -Pandroid.enableJetifier=true \
-            --stacktrace
+            -Pandroid.enableJetifier=true
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
