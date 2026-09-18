@@ -26,31 +26,32 @@ jobs:
           cmdline-tools-version: 12266719
           packages: 'platform-tools'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
       - name: Check project files
         run: |
           echo "Project files:"
-          ls -la
-          echo ""
-          echo "Searching for Gradle wrapper..."
-          find . -name "gradlew" -type f -print
+          find . -maxdepth 3 -type f | sort | head -200
 
-      - name: Give Gradle Permission
+      - name: Find Android project
         run: |
-          GRADLEW=$(find . -name "gradlew" -type f | head -1)
-
-          if [ -z "$GRADLEW" ]; then
-            echo "ERROR: gradlew file not found"
-            exit 1
-          fi
-
-          echo "Found Gradle wrapper: $GRADLEW"
-          chmod +x "$GRADLEW"
-          echo "GRADLEW=$GRADLEW" >> "$GITHUB_ENV"
+          echo "Searching for Gradle project..."
+          find . -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts"
 
       - name: Build APK
         run: |
-          echo "Building APK using: $GRADLEW"
-          "$GRADLEW" assembleDebug --stacktrace
+          if [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
+            gradle assembleDebug --stacktrace
+          elif [ -d "./android" ]; then
+            cd android
+            gradle assembleDebug --stacktrace
+          else
+            echo "ERROR: Android Gradle project not found"
+            exit 1
+          fi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
