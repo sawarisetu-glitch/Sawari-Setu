@@ -242,10 +242,37 @@ const firebaseConfig = {
   measurementId: "G-567NSGD4R0"
 };
 
-firebase.initializeApp(firebaseConfig);
+let firebaseReady=false;
+let firebaseInitError="";
 
-const db = firebase.firestore();
-const bookingsRef = db.collection("bookings");
+try{
+
+  firebase.initializeApp(firebaseConfig);
+
+  const db = firebase.firestore();
+
+  /*
+    WebView/network compatibility.
+    This is set before Firestore is used.
+  */
+  db.settings({
+    experimentalForceLongPolling:true
+  });
+
+  window.db=db;
+  window.bookingsRef=db.collection("bookings");
+  firebaseReady=true;
+
+}catch(error){
+
+  console.error("Firebase initialization error:",error);
+
+  firebaseInitError=
+    (error && error.message)
+    ? error.message
+    : String(error);
+
+}
 
 
 /* ==============================
@@ -262,6 +289,36 @@ let S = JSON.parse(
 let firestoreBookings = [];
 
 let currentBookingId = S.currentBookingId || null;
+
+
+/* ==============================
+   FIREBASE ERROR DISPLAY
+   ============================== */
+
+function showFirebaseError(title,error){
+
+  let message=
+    (error && error.message)
+    ? error.message
+    : String(error || "Unknown error");
+
+  console.error(title,error);
+
+  let el=document.getElementById("booking");
+
+  if(el){
+
+    el.innerHTML=
+      '<div class="status danger">'+
+      '<b>❌ '+title+'</b><br>'+
+      '<span class="small">'+
+      message+
+      '</span>'+
+      '</div>';
+
+  }
+
+}
 
 
 /* ==============================
@@ -375,6 +432,7 @@ async function book(){
   let d=document.getElementById("dest").value.trim();
   let v=document.getElementById("vehicle").value;
   let f=fare();
+
   let pass=Math.max(
     1,
     +document.getElementById("passengers").value || 1
@@ -394,6 +452,18 @@ async function book(){
   if(mobile && !/^[0-9]{10}$/.test(mobile)){
 
     alert("मोबाइल नंबर 10 अंकों का होना चाहिए।");
+    return;
+
+  }
+
+
+  if(!firebaseReady || !window.bookingsRef){
+
+    showFirebaseError(
+      "Firebase शुरू नहीं हो पाया",
+      firebaseInitError || "Firebase Firestore उपलब्ध नहीं है।"
+    );
+
     return;
 
   }
@@ -425,13 +495,13 @@ async function book(){
     "🚕 "+v+" · "+
     (S.type==="share"?"🟢 Share":"🔵 Direct")+
     " · <b>₹"+f+"</b><br>"+
-    '<span class="small">Booking बनाई जा रही है...</span>'+
+    '<span class="small">Firebase में Booking भेजी जा रही है...</span>'+
     '</div>';
 
 
   try{
 
-    let docRef=await bookingsRef.add({
+    let docRef=await window.bookingsRef.add({
 
       ...r,
 
@@ -458,12 +528,6 @@ async function book(){
       '</div>';
 
 
-    /*
-      Demo में 1.2 सेकंड बाद Driver Found
-      होगा। अब यह बदलाव Firestore में जाएगा,
-      इसलिए दूसरे डिवाइस पर भी दिखाई देगा।
-    */
-
     setTimeout(function(){
 
       driverFound(docRef.id);
@@ -473,13 +537,10 @@ async function book(){
 
   }catch(error){
 
-    console.error(error);
-
-    document.getElementById("booking").innerHTML=
-      '<div class="status danger">'+
-      '<b>❌ Booking नहीं बन सकी।</b><br>'+
-      'Firebase/Firestore connection या Rules जाँचें।'+
-      '</div>';
+    showFirebaseError(
+      "Booking नहीं बन सकी",
+      error
+    );
 
   }
 
@@ -494,7 +555,7 @@ async function driverFound(id){
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await window.bookingsRef.doc(id).update({
 
       status:"Driver Found",
       driverName:"राम कुमार",
@@ -539,7 +600,7 @@ async function accept(id){
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await window.bookingsRef.doc(id).update({
 
       status:"Accepted",
       driverName:"राम कुमार",
@@ -560,9 +621,10 @@ async function accept(id){
 
   }catch(error){
 
-    console.error(error);
-
-    alert("Ride Accept नहीं हो सकी। Firestore Rules जाँचें।");
+    showFirebaseError(
+      "Ride Accept नहीं हो सकी",
+      error
+    );
 
   }
 
@@ -582,7 +644,7 @@ async function startRide(id){
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await window.bookingsRef.doc(id).update({
 
       status:"On the way",
       startedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -596,7 +658,10 @@ async function startRide(id){
 
   }catch(error){
 
-    console.error(error);
+    showFirebaseError(
+      "Ride Start नहीं हो सकी",
+      error
+    );
 
   }
 
@@ -616,7 +681,7 @@ async function completeRide(id){
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await window.bookingsRef.doc(id).update({
 
       status:"Completed",
       completedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -630,7 +695,10 @@ async function completeRide(id){
 
   }catch(error){
 
-    console.error(error);
+    showFirebaseError(
+      "Ride Complete नहीं हो सकी",
+      error
+    );
 
   }
 
@@ -650,7 +718,7 @@ async function reject(id){
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await window.bookingsRef.doc(id).update({
 
       status:"Rejected",
       rejectedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -659,7 +727,10 @@ async function reject(id){
 
   }catch(error){
 
-    console.error(error);
+    showFirebaseError(
+      "Ride Reject नहीं हो सकी",
+      error
+    );
 
   }
 
@@ -1011,77 +1082,93 @@ function renderAdmin(){
    FIRESTORE REAL-TIME LISTENER
    ============================== */
 
-bookingsRef.onSnapshot(
+if(firebaseReady && window.bookingsRef){
 
-  function(snapshot){
+  window.bookingsRef.onSnapshot(
 
-    firestoreBookings=snapshot.docs.map(function(doc){
+    function(snapshot){
 
-      let data=doc.data();
+      firestoreBookings=snapshot.docs.map(function(doc){
 
-      return {
-        ...data,
-        id:doc.id
-      };
+        let data=doc.data();
 
-    });
+        return {
+          ...data,
+          id:doc.id
+        };
 
-
-    firestoreBookings.sort(function(a,b){
-
-      let ta=0;
-      let tb=0;
+      });
 
 
-      if(a.createdAt){
+      firestoreBookings.sort(function(a,b){
 
-        if(typeof a.createdAt.toMillis==="function"){
-
-          ta=a.createdAt.toMillis();
-
-        }
-
-      }
+        let ta=0;
+        let tb=0;
 
 
-      if(b.createdAt){
+        if(a.createdAt){
 
-        if(typeof b.createdAt.toMillis==="function"){
+          if(typeof a.createdAt.toMillis==="function"){
 
-          tb=b.createdAt.toMillis();
+            ta=a.createdAt.toMillis();
+
+          }
 
         }
 
+
+        if(b.createdAt){
+
+          if(typeof b.createdAt.toMillis==="function"){
+
+            tb=b.createdAt.toMillis();
+
+          }
+
+        }
+
+
+        return tb-ta;
+
+      });
+
+
+      renderAdmin();
+      renderHistory();
+      renderDriverRide();
+      renderCurrentBooking();
+
+
+    },
+
+    function(error){
+
+      console.error("Firestore listener error:",error);
+
+      let message=
+        (error && error.message)
+        ? error.message
+        : String(error || "Unknown error");
+
+      let el=document.getElementById("booking");
+
+      if(el){
+
+        el.innerHTML=
+          '<div class="status danger">'+
+          '<b>❌ Firestore कनेक्शन में समस्या</b><br>'+
+          '<span class="small">'+
+          message+
+          '</span>'+
+          '</div>';
+
       }
 
+    }
 
-      return tb-ta;
+  );
 
-    });
-
-
-    renderAdmin();
-    renderHistory();
-    renderDriverRide();
-    renderCurrentBooking();
-
-
-  },
-
-  function(error){
-
-    console.error("Firestore listener error:",error);
-
-
-    document.getElementById("booking").innerHTML=
-      '<div class="status danger">'+
-      '<b>❌ Firestore से कनेक्शन नहीं हो पाया।</b><br>'+
-      'Firebase Firestore Rules और Internet connection जाँचें।'+
-      '</div>';
-
-  }
-
-);
+}
 
 
 /* ==============================
