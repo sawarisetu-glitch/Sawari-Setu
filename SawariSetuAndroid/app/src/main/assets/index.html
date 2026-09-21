@@ -223,12 +223,8 @@ input,select{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ccd
 
 <script>
 
-/* ==============================
-   FIREBASE CONFIGURATION
-   ============================== */
-
 const firebaseConfig = {
-  apiKey: "AIzaSyDT89G4KQ_cmppJK5S3xu70AVbz7V7AqXs",
+  apiKey: "AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",
   authDomain: "sawari-setu.firebaseapp.com",
   projectId: "sawari-setu",
   storageBucket: "sawari-setu.firebasestorage.app",
@@ -259,11 +255,9 @@ try{
 
   firebaseReady=true;
 
-  console.log("================================");
   console.log("SAWARI SETU FIREBASE READY");
   console.log("Project:",firebaseConfig.projectId);
   console.log("Collection: bookings");
-  console.log("================================");
 
 }catch(error){
 
@@ -276,11 +270,6 @@ try{
 
 }
 
-
-/* ==============================
-   LOCAL APP SETTINGS
-   ============================== */
-
 const KEY="sawari_setu_v2";
 
 let S=JSON.parse(
@@ -292,10 +281,6 @@ let firestoreBookings=[];
 
 let currentBookingId=S.currentBookingId || null;
 
-
-/* ==============================
-   FIREBASE ERROR DISPLAY
-   ============================== */
 
 function showFirebaseError(title,error){
 
@@ -323,10 +308,6 @@ function showFirebaseError(title,error){
 }
 
 
-/* ==============================
-   LOCAL SAVE
-   ============================== */
-
 function save(){
 
   localStorage.setItem(KEY,JSON.stringify({
@@ -342,10 +323,6 @@ function save(){
 
 }
 
-
-/* ==============================
-   TAB CHANGE
-   ============================== */
 
 function show(id,b){
 
@@ -370,10 +347,6 @@ function show(id,b){
 }
 
 
-/* ==============================
-   SHARE / DIRECT
-   ============================== */
-
 function setType(t){
 
   S.type=t;
@@ -388,10 +361,6 @@ function setType(t){
 
 }
 
-
-/* ==============================
-   FARE
-   ============================== */
 
 function fare(){
 
@@ -417,10 +386,6 @@ function fare(){
 
 }
 
-
-/* ==============================
-   BOOK RIDE
-   ============================== */
 
 async function book(){
 
@@ -459,10 +424,6 @@ async function book(){
 
   }
 
-
-  /* ==============================
-     FIREBASE PRE-CHECK
-     ============================== */
 
   if(!firebaseReady){
 
@@ -503,6 +464,7 @@ async function book(){
 
   let r={
     id:localId,
+    bookingId:localId,
     p:p,
     d:d,
     v:v,
@@ -528,15 +490,6 @@ async function book(){
     '</div>';
 
 
-  console.log("================================");
-  console.log("BOOKING WRITE START");
-  console.log("Firebase Ready:",firebaseReady);
-  console.log("Project ID:",firebaseConfig.projectId);
-  console.log("Collection: bookings");
-  console.log("Local Booking ID:",localId);
-  console.log("================================");
-
-
   try{
 
     let docRef=await bookingsRef.add({
@@ -548,14 +501,9 @@ async function book(){
     });
 
 
-    /* ==============================
-       FIRESTORE WRITE SUCCESS
-       ============================== */
-
-    console.log("================================");
     console.log("FIRESTORE WRITE SUCCESS");
-    console.log("Document ID:",docRef.id);
-    console.log("================================");
+    console.log("Local Booking ID:",localId);
+    console.log("Firestore Document ID:",docRef.id);
 
 
     currentBookingId=docRef.id;
@@ -573,9 +521,7 @@ async function book(){
       (S.type==="share"?"🟢 Share":"🔵 Direct")+
       " · <b>₹"+f+"</b><br>"+
       '<span class="small">'+
-      'Local ID: '+localId+
-      '<br>'+
-      'Firestore Document ID: '+docRef.id+
+      'Booking ID: '+localId+
       '</span>'+
       '</div>';
 
@@ -589,15 +535,7 @@ async function book(){
 
   }catch(error){
 
-    /* ==============================
-       FIRESTORE WRITE ERROR
-       ============================== */
-
-    console.error("================================");
-    console.error("FIRESTORE WRITE ERROR");
-    console.error(error);
-    console.error("================================");
-
+    console.error("FIRESTORE WRITE ERROR",error);
 
     showFirebaseError(
       "❌ Firestore में Booking नहीं लिखी गई",
@@ -608,10 +546,6 @@ async function book(){
 
 }
 
-
-/* ==============================
-   DRIVER FOUND
-   ============================== */
 
 async function driverFound(id){
 
@@ -648,24 +582,16 @@ async function driverFound(id){
 }
 
 
-/* ==============================
-   FIND BOOKING
-   ============================== */
-
 function findBooking(id){
 
   return firestoreBookings.find(function(x){
 
-    return x.id===id;
+    return x.firestoreId===id || x.id===id;
 
   });
 
 }
 
-
-/* ==============================
-   ACCEPT RIDE
-   ============================== */
 
 async function accept(id){
 
@@ -673,10 +599,11 @@ async function accept(id){
 
   if(!r)return;
 
+  let firestoreId=r.firestoreId || id;
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await bookingsRef.doc(firestoreId).update({
 
       status:"Accepted",
       driverName:"राम कुमार",
@@ -707,20 +634,17 @@ async function accept(id){
 }
 
 
-/* ==============================
-   START RIDE
-   ============================== */
-
 async function startRide(id){
 
   let r=findBooking(id);
 
   if(!r)return;
 
+  let firestoreId=r.firestoreId || id;
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await bookingsRef.doc(firestoreId).update({
 
       status:"On the way",
       startedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -744,20 +668,17 @@ async function startRide(id){
 }
 
 
-/* ==============================
-   COMPLETE RIDE
-   ============================== */
-
 async function completeRide(id){
 
   let r=findBooking(id);
 
   if(!r)return;
 
+  let firestoreId=r.firestoreId || id;
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await bookingsRef.doc(firestoreId).update({
 
       status:"Completed",
       completedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -781,20 +702,17 @@ async function completeRide(id){
 }
 
 
-/* ==============================
-   REJECT RIDE
-   ============================== */
-
 async function reject(id){
 
   let r=findBooking(id);
 
   if(!r)return;
 
+  let firestoreId=r.firestoreId || id;
 
   try{
 
-    await bookingsRef.doc(id).update({
+    await bookingsRef.doc(firestoreId).update({
 
       status:"Rejected",
       rejectedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -812,10 +730,6 @@ async function reject(id){
 
 }
 
-
-/* ==============================
-   DRIVER ONLINE / OFFLINE
-   ============================== */
 
 function toggleOnline(){
 
@@ -841,10 +755,6 @@ function toggleOnline(){
 }
 
 
-/* ==============================
-   CUSTOMER BOOKING DISPLAY
-   ============================== */
-
 function renderCurrentBooking(){
 
   let el=document.getElementById("booking");
@@ -867,6 +777,9 @@ function renderCurrentBooking(){
   }
 
 
+  let displayId=r.bookingId || r.id;
+
+
   if(r.status==="Searching"){
 
     el.innerHTML=
@@ -876,7 +789,7 @@ function renderCurrentBooking(){
       "🚕 "+r.v+" · "+
       (r.type==="share"?"🟢 Share":"🔵 Direct")+
       " · <b>₹"+r.f+"</b><br>"+
-      '<span class="small">Booking ID: '+r.id+'</span>'+
+      '<span class="small">Booking ID: '+displayId+'</span>'+
       '</div>';
 
   }
@@ -914,7 +827,7 @@ function renderCurrentBooking(){
       "📞 "+driverPhone+"<br>"+
       extra+
       '<br><span class="small">'+
-      statusText+" · ID: "+r.id+
+      statusText+" · Booking ID: "+displayId+
       '</span>'+
       '</div>';
 
@@ -922,10 +835,6 @@ function renderCurrentBooking(){
 
 }
 
-
-/* ==============================
-   DRIVER RIDE DISPLAY
-   ============================== */
 
 function renderDriverRide(){
 
@@ -962,16 +871,20 @@ function renderDriverRide(){
   }
 
 
+  let displayId=r.bookingId || r.id;
+
+
   if(r.status==="Searching" || r.status==="Driver Found"){
 
     el.innerHTML=
       '<div class="ride '+r.type+'">'+
       '<b>नई राइड</b><br>'+
+      "Booking ID: "+displayId+"<br>"+
       r.p+" → "+r.d+"<br>"+
       r.v+" · ₹"+r.f+"<br>"+
       "👥 यात्री: "+r.pass+"<br>"+
-      '<button onclick="accept(\''+r.id+'\')">Accept</button> '+
-      '<button class="danger" onclick="reject(\''+r.id+'\')">Reject</button>'+
+      '<button onclick="accept(\''+r.firestoreId+'\')">Accept</button> '+
+      '<button class="danger" onclick="reject(\''+r.firestoreId+'\')">Reject</button>'+
       '</div>';
 
   }
@@ -981,9 +894,10 @@ function renderDriverRide(){
 
     el.innerHTML=
       '<div class="status ok">'+
+      'Booking ID: '+displayId+'<br>'+
       '📍 Pickup: '+r.p+'<br>'+
       '➡️ Destination: '+r.d+'<br>'+
-      '<button onclick="startRide(\''+r.id+'\')">▶️ Ride Start</button>'+
+      '<button onclick="startRide(\''+r.firestoreId+'\')">▶️ Ride Start</button>'+
       '</div>';
 
   }
@@ -993,18 +907,15 @@ function renderDriverRide(){
 
     el.innerHTML=
       '<div class="status">'+
+      'Booking ID: '+displayId+'<br>'+
       '🚕 '+r.p+" → "+r.d+'<br>'+
-      '<button onclick="completeRide(\''+r.id+'\')">✅ Ride Complete</button>'+
+      '<button onclick="completeRide(\''+r.firestoreId+'\')">✅ Ride Complete</button>'+
       '</div>';
 
   }
 
 }
 
-
-/* ==============================
-   CUSTOMER HISTORY
-   ============================== */
 
 function renderHistory(){
 
@@ -1058,13 +969,15 @@ function renderHistory(){
 
   el.innerHTML=list.slice(0,8).map(function(r){
 
+    let displayId=r.bookingId || r.id;
+
     return '<div class="ride '+r.type+'">'+
       '<b>'+r.p+" → "+r.d+'</b><br>'+
       r.v+" · "+
       (r.type==="share"?"🟢 Share":"🔵 Direct")+
       " · ₹"+r.f+
       '<br><span class="small">'+
-      r.status+" · "+r.id+
+      r.status+" · Booking ID: "+displayId+
       '</span>'+
       '</div>';
 
@@ -1072,10 +985,6 @@ function renderHistory(){
 
 }
 
-
-/* ==============================
-   ADMIN PANEL
-   ============================== */
 
 function renderAdmin(){
 
@@ -1140,8 +1049,10 @@ function renderAdmin(){
     '</tr>'+
     firestoreBookings.slice(0,15).map(function(r){
 
+      let displayId=r.bookingId || r.id;
+
       return '<tr>'+
-      '<td>'+r.id+'</td>'+
+      '<td>'+displayId+'</td>'+
       '<td>'+r.p+" → "+r.d+'</td>'+
       '<td>'+r.type+'</td>'+
       '<td>₹'+r.f+'</td>'+
@@ -1153,10 +1064,6 @@ function renderAdmin(){
 
 }
 
-
-/* ==============================
-   FIRESTORE REAL-TIME LISTENER
-   ============================== */
 
 if(firebaseReady && bookingsRef){
 
@@ -1176,7 +1083,18 @@ if(firebaseReady && bookingsRef){
 
         return {
           ...data,
-          id:doc.id
+
+          /*
+           * IMPORTANT:
+           * bookingId = हमारी SS वाली customer ID
+           * firestoreId = Firestore की internal random ID
+           */
+
+          id:data.bookingId || data.id || doc.id,
+
+          bookingId:data.bookingId || data.id || doc.id,
+
+          firestoreId:doc.id
         };
 
       });
@@ -1259,19 +1177,11 @@ if(firebaseReady && bookingsRef){
 }
 
 
-/* ==============================
-   VEHICLE CHANGE
-   ============================== */
-
 document.getElementById("vehicle").addEventListener(
   "change",
   save
 );
 
-
-/* ==============================
-   INITIAL DISPLAY
-   ============================== */
 
 document.getElementById("onlineBtn").textContent=
   S.online ? "🟢 Online" : "🔴 Offline";
