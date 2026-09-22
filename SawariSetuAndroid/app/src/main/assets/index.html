@@ -1,3 +1,6 @@
+हाँ। मैं आपको पूरा एक साथ नया index.html code दे रहा हूँ। इसमें आपके वर्तमान code की टूटी हुई book() function को ठीक किया गया है और Driver/Admin के missing functions भी जोड़े गए हैं।
+पूरा पुराना index.html हटाकर नीचे वाला code एक ही बार में paste करें।
+Writing
 <!doctype html>
 <html lang="hi">
 <head>
@@ -117,11 +120,6 @@ select{
 
 .choice button.sel{
   outline:3px solid #0b6bcb;
-}
-
-.choice button.disabled{
-  opacity:.45;
-  cursor:not-allowed;
 }
 
 .status{
@@ -319,7 +317,6 @@ hr{
     width:60px;
     height:60px;
   }
-
 }
 </style>
 </head>
@@ -327,9 +324,7 @@ hr{
 <body>
 
 <div class="top">
-
   <div class="wrap">
-
     <div class="brand">
 
       <img
@@ -339,19 +334,14 @@ hr{
       >
 
       <div>
-
         <h1>सवारी सेतु</h1>
-
         <div class="brand-sub">
           आपकी सवारी, आपके पास
         </div>
-
       </div>
 
     </div>
-
   </div>
-
 </div>
 
 
@@ -391,7 +381,6 @@ hr{
 
       <h2>🚕 राइड बुक करें</h2>
 
-
       <label>📍 Pickup Location</label>
 
       <input
@@ -400,7 +389,6 @@ hr{
         placeholder="Pickup location डालें"
         oninput="routeChanged()"
       >
-
 
       <label>📍 Destination</label>
 
@@ -411,21 +399,16 @@ hr{
         oninput="routeChanged()"
       >
 
-
       <div class="map-box">
-
         <div id="map">
           🗺️ Google Maps route यहाँ दिखाई जाएगी
         </div>
-
       </div>
-
 
       <p class="small muted">
         अभी trial में road distance manually verify की जा सकती है।
         Google Routes API जोड़ने पर यही distance automatically आएगी।
       </p>
-
 
       <label>🛣️ Actual Road Distance (km)</label>
 
@@ -438,14 +421,12 @@ hr{
         oninput="updateFarePreview()"
       >
 
-
       <div
         id="distanceStatus"
         class="status"
       >
         Pickup और Destination डालकर distance भरें।
       </div>
-
 
       <label>राइड का प्रकार</label>
 
@@ -467,7 +448,6 @@ hr{
         </button>
 
       </div>
-
 
       <label>वाहन</label>
 
@@ -494,7 +474,6 @@ hr{
 
       </select>
 
-
       <div class="grid">
 
         <div>
@@ -510,7 +489,6 @@ hr{
           >
 
         </div>
-
 
         <div>
 
@@ -528,9 +506,7 @@ hr{
 
       </div>
 
-
       <div id="farePreview"></div>
-
 
       <button
         style="margin-top:14px;width:100%"
@@ -538,7 +514,6 @@ hr{
       >
         🚕 राइड बुक करें
       </button>
-
 
       <div id="booking"></div>
 
@@ -572,7 +547,6 @@ hr{
 
       <h2>🚕 Driver App</h2>
 
-
       <button
         id="onlineBtn"
         class="ok"
@@ -581,7 +555,6 @@ hr{
         🟢 Online
       </button>
 
-
       <div
         id="driverStatus"
         class="status"
@@ -589,9 +562,7 @@ hr{
         ड्राइवर ऑनलाइन है। नई राइड का इंतज़ार...
       </div>
 
-
       <div id="newRide"></div>
-
 
       <div class="card">
 
@@ -602,7 +573,6 @@ hr{
         </div>
 
       </div>
-
 
       <div class="card">
 
@@ -638,7 +608,6 @@ hr{
 
       <h2>🛠️ Admin Panel</h2>
 
-
       <div class="grid3">
 
         <div class="card">
@@ -651,7 +620,6 @@ hr{
 
         </div>
 
-
         <div class="card">
 
           <b>Bookings</b>
@@ -661,7 +629,6 @@ hr{
           </div>
 
         </div>
-
 
         <div class="card">
 
@@ -688,7 +655,6 @@ hr{
 
         </div>
 
-
         <div class="card">
 
           <b>Driver Payout</b>
@@ -704,7 +670,6 @@ hr{
 
       <h3>⚙️ Settings</h3>
 
-
       <label>Commission %</label>
 
       <input
@@ -715,7 +680,6 @@ hr{
         max="100"
         onchange="renderAdmin()"
       >
-
 
       <label>
 
@@ -729,7 +693,6 @@ hr{
 
       </label>
 
-
       <label>
 
         <input
@@ -742,9 +705,7 @@ hr{
 
       </label>
 
-
       <h3>📋 Booking History</h3>
-
 
       <div
         id="adminHistory"
@@ -757,7 +718,10 @@ hr{
 
   </section>
 
-</div><!-- ================= FIREBASE ================= -->
+</div>
+
+
+<!-- ================= FIREBASE ================= -->
 
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
@@ -812,7 +776,6 @@ try{
     error && error.message
       ? error.message
       : String(error);
-
 }
 
 
@@ -868,34 +831,22 @@ function calculateFare(
       let perPassenger=0;
 
       if(d<=1){
-
         perPassenger=10;
-
       }
       else if(d<=2){
-
         perPassenger=10;
-
       }
       else if(d<=4){
-
         perPassenger=20;
-
       }
       else if(d<=6){
-
         perPassenger=30;
-
       }
       else if(d<=8){
-
         perPassenger=40;
-
       }
       else if(d<=10){
-
         perPassenger=50;
-
       }
       else{
 
@@ -922,36 +873,22 @@ function calculateFare(
     let fare=0;
 
     if(d<=2){
-
       fare=40;
-
     }
     else if(d<=4){
-
       fare=60;
-
     }
     else if(d<=6){
-
       fare=75;
-
     }
     else if(d<=8){
-
       fare=90;
-
     }
     else if(d<=10){
-
       fare=105;
-
     }
     else{
-
-      fare=
-        105+
-        (d-10)*10;
-
+      fare=105+(d-10)*10;
     }
 
     return {
@@ -982,64 +919,38 @@ function calculateFare(
 
     }
 
-
     let fare=0;
 
     if(d<=5){
-
       fare=200;
-
     }
     else if(d<=10){
-
       fare=325;
-
     }
     else if(d<=20){
-
       fare=525;
-
     }
     else if(d<=30){
-
       fare=675;
-
     }
     else if(d<=40){
-
       fare=775;
-
     }
     else if(d<=50){
-
       fare=825;
-
     }
     else{
-
-      fare=
-        825+
-        (d-50)*5;
-
+      fare=825+(d-50)*5;
     }
-
 
     let water="";
 
-
     if(d>=100){
-
-      water=
-        "💧 2 लीटर पानी की बोतल FREE";
-
+      water="💧 2 लीटर पानी की बोतल FREE";
     }
     else if(d>=50){
-
-      water=
-        "💧 1 लीटर पानी की बोतल FREE";
-
+      water="💧 1 लीटर पानी की बोतल FREE";
     }
-
 
     return {
       ok:true,
@@ -1066,63 +977,38 @@ function calculateFare(
 
     }
 
-
     let fare=0;
 
-
     if(d<=2){
-
       fare=30;
-
     }
     else if(d<=5){
-
       fare=50;
-
     }
     else if(d<=10){
-
       fare=90;
-
     }
     else if(d<=15){
-
       fare=140;
-
     }
     else if(d<=20){
-
       fare=190;
-
     }
     else if(d<=25){
-
       fare=280;
-
     }
     else if(d<=30){
-
       fare=370;
-
     }
     else if(d<=40){
-
       fare=480;
-
     }
     else if(d<=50){
-
       fare=600;
-
     }
     else{
-
-      fare=
-        600+
-        (d-50)*12;
-
+      fare=600+(d-50)*12;
     }
-
 
     return {
       ok:true,
@@ -1149,85 +1035,50 @@ function calculateFare(
 
     }
 
-
     let fare=0;
 
-
     if(d<=5){
-
       fare=200;
-
     }
     else if(d<=10){
-
       fare=400;
-
     }
     else if(d<=20){
-
       fare=800;
-
     }
     else if(d<=30){
-
       fare=1200;
-
     }
     else if(d<=40){
-
       fare=1500;
-
     }
     else if(d<=50){
-
       fare=1800;
-
     }
     else if(d<=60){
-
       fare=2100;
-
     }
     else if(d<=70){
-
       fare=2400;
-
     }
     else if(d<=80){
-
       fare=2700;
-
     }
     else if(d<=100){
-
       fare=3200;
-
     }
     else{
-
-      fare=
-        3200+
-        (d-100)*30;
-
+      fare=3200+(d-100)*30;
     }
-
 
     let water="";
 
-
     if(d>=100){
-
-      water=
-        "💧 2 लीटर पानी की बोतल FREE";
-
+      water="💧 2 लीटर पानी की बोतल FREE";
     }
     else if(d>=50){
-
-      water=
-        "💧 1 लीटर पानी की बोतल FREE";
-
+      water="💧 1 लीटर पानी की बोतल FREE";
     }
-
 
     return {
       ok:true,
@@ -1253,39 +1104,26 @@ function calculateFare(
 function updateFarePreview(){
 
   let vehicle=
-    document
-      .getElementById("vehicle")
-      .value;
-
+    document.getElementById("vehicle").value;
 
   let distance=
     Number(
-      document
-        .getElementById("distanceKm")
-        .value
+      document.getElementById("distanceKm").value
     );
-
 
   let passengers=
     Math.max(
       1,
       Number(
-        document
-          .getElementById("passengers")
-          .value
+        document.getElementById("passengers").value
       )||1
     );
 
-
   let preview=
-    document
-      .getElementById("farePreview");
-
+    document.getElementById("farePreview");
 
   let distanceStatus=
-    document
-      .getElementById("distanceStatus");
-
+    document.getElementById("distanceStatus");
 
   if(!distance || distance<=0){
 
@@ -1298,7 +1136,6 @@ function updateFarePreview(){
 
   }
 
-
   let result=
     calculateFare(
       vehicle,
@@ -1307,7 +1144,6 @@ function updateFarePreview(){
       passengers
     );
 
-
   if(!result.ok){
 
     preview.innerHTML=
@@ -1315,7 +1151,6 @@ function updateFarePreview(){
       '<b>⚠️ '+
       result.message+
       '</b></div>';
-
 
     distanceStatus.innerHTML=
       "Distance: <b>"+
@@ -1326,15 +1161,12 @@ function updateFarePreview(){
 
   }
 
-
   distanceStatus.innerHTML=
     "🛣️ Actual Road Distance: <b>"+
     distance.toFixed(2)+
     " km</b>";
 
-
   let passengerText="";
-
 
   if(S.type==="share"){
 
@@ -1347,9 +1179,7 @@ function updateFarePreview(){
 
   }
 
-
   let water="";
-
 
   if(result.water){
 
@@ -1362,21 +1192,15 @@ function updateFarePreview(){
 
   }
 
-
   preview.innerHTML=
-
     '<div class="fare-preview">'+
-
     '<div class="small">'+
     "आपकी राइड का अनुमानित FINAL FARE"+
     "</div>"+
-
     '<div class="fare-number">₹'+
     result.fare+
     "</div>"+
-
     passengerText+
-
     '<div class="small">'+
     vehicle+
     " · "+
@@ -1386,9 +1210,7 @@ function updateFarePreview(){
         :"🔵 Direct Ride"
     )+
     "</div>"+
-
     water+
-
     "</div>";
 
 }
@@ -1397,6 +1219,20 @@ function updateFarePreview(){
 /* ================= VEHICLE / TYPE ================= */
 
 function vehicleChanged(){
+
+  let vehicle=
+    document.getElementById("vehicle").value;
+
+  if(
+    vehicle==="बाइक" ||
+    vehicle==="कार"
+  ){
+
+    setType("direct");
+
+    return;
+
+  }
 
   updateFarePreview();
 
@@ -1407,7 +1243,6 @@ function setType(t){
 
   S.type=t;
 
-
   document
     .getElementById("share")
     .classList.toggle(
@@ -1415,14 +1250,12 @@ function setType(t){
       t==="share"
     );
 
-
   document
     .getElementById("direct")
     .classList.toggle(
       "sel",
       t==="direct"
     );
-
 
   save();
 
@@ -1434,48 +1267,6 @@ function setType(t){
 function routeChanged(){
 
   updateFarePreview();
-
-}
-
-
-/* ================= FIREBASE ERROR ================= */
-
-function showFirebaseError(
-  title,
-  error
-){
-
-  let message=
-    error && error.message
-      ? error.message
-      : String(
-          error ||
-          "Unknown error"
-        );
-
-
-  console.error(
-    title,
-    error
-  );
-
-
-  let el=
-    document.getElementById("booking");
-
-
-  if(el){
-
-    el.innerHTML=
-      '<div class="status danger">'+
-      '<b>'+
-      title+
-      '</b><br>'+
-      '<span class="small">'+
-      message+
-      '</span></div>';
-
-  }
 
 }
 
@@ -1500,11 +1291,8 @@ function save(){
     })
   );
 
-
   renderAdmin();
-
   renderHistory();
-
   renderDriverRide();
 
 }
@@ -1529,27 +1317,19 @@ function show(id,b){
 
   });
 
-
   document
     .querySelectorAll(".tab")
     .forEach(function(x){
 
-      x.classList.remove(
-        "active"
-      );
+      x.classList.remove("active");
 
     });
 
-
   b.classList.add("active");
 
-
   renderAdmin();
-
   renderHistory();
-
   renderDriverRide();
-
   renderCurrentBooking();
 
 }
@@ -1560,18 +1340,14 @@ function show(id,b){
 async function book(){
 
   let allow=
-    document
-      .getElementById("allowBook");
-
+    document.getElementById("allowBook");
 
   if(
     allow &&
     !allow.checked
   ){
 
-    alert(
-      "नई Booking अभी बंद है."
-    );
+    alert("नई Booking अभी बंद है.");
 
     return;
 
@@ -1579,56 +1355,40 @@ async function book(){
 
 
   let p=
-    document
-      .getElementById("pickup")
-      .value
-      .trim();
-
+    document.getElementById("pickup")
+      .value.trim();
 
   let d=
-    document
-      .getElementById("dest")
-      .value
-      .trim();
-
+    document.getElementById("dest")
+      .value.trim();
 
   let v=
-    document
-      .getElementById("vehicle")
+    document.getElementById("vehicle")
       .value;
-
 
   let distance=
     Number(
-      document
-        .getElementById("distanceKm")
+      document.getElementById("distanceKm")
         .value
     );
-
 
   let pass=
     Math.max(
       1,
       Number(
-        document
-          .getElementById("passengers")
+        document.getElementById("passengers")
           .value
       )||1
     );
 
-
   let mobile=
-    document
-      .getElementById("mobile")
-      .value
-      .trim();
+    document.getElementById("mobile")
+      .value.trim();
 
 
   if(!p || !d){
 
-    alert(
-      "Pickup और Destination भरें."
-    );
+    alert("Pickup और Destination भरें.");
 
     return;
 
@@ -1637,9 +1397,7 @@ async function book(){
 
   if(!distance || distance<=0){
 
-    alert(
-      "Actual Road Distance (km) डालें."
-    );
+    alert("Actual Road Distance (km) डालें.");
 
     return;
 
@@ -1661,7 +1419,162 @@ async function book(){
 
 
   let result=
-    calculateFare/* ================= CUSTOMER CURRENT BOOKING ================= */
+    calculateFare(
+      v,
+      S.type,
+      distance,
+      pass
+    );
+
+
+  if(!result.ok){
+
+    alert(result.message);
+
+    return;
+
+  }
+
+
+  if(!firebaseReady || !bookingsRef){
+
+    alert(
+      "Firebase अभी तैयार नहीं है. थोड़ी देर बाद फिर कोशिश करें."
+    );
+
+    return;
+
+  }
+
+
+  let bookingId=
+    "SS"+
+    Date.now()
+      .toString()
+      .slice(-8);
+
+
+  let bookingData={
+
+    bookingId:bookingId,
+
+    p:p,
+
+    d:d,
+
+    v:v,
+
+    type:S.type,
+
+    distanceKm:Number(
+      distance.toFixed(2)
+    ),
+
+    pass:pass,
+
+    mobile:mobile,
+
+    f:Number(result.fare)||0,
+
+    waterBenefit:
+      result.water || "",
+
+    status:"Searching",
+
+    driverName:"",
+
+    driverPhone:"",
+
+    createdAt:
+      firebase.firestore.FieldValue.serverTimestamp(),
+
+    time:
+      new Date().toLocaleString("hi-IN")
+
+  };
+
+
+  try{
+
+    let docRef=
+      await bookingsRef.add(
+        bookingData
+      );
+
+
+    currentBookingId=
+      docRef.id;
+
+
+    S.currentBookingId=
+      currentBookingId;
+
+
+    save();
+
+
+    document.getElementById("booking").innerHTML=
+
+      '<div class="status">'+
+      '<b>✅ राइड बुक हो गई</b><br>'+
+      p+
+      " → "+
+      d+
+      "<br>"+
+      "🛣️ "+
+      distance.toFixed(2)+
+      " km<br>"+
+      "💰 ₹"+
+      result.fare+
+      '<br><span class="small">'+
+      "Booking ID: "+
+      bookingId+
+      "</span>"+
+      "</div>";
+
+  }catch(error){
+
+    console.error(
+      "BOOKING ERROR:",
+      error
+    );
+
+    document.getElementById("booking").innerHTML=
+
+      '<div class="status danger">'+
+      "<b>❌ Booking नहीं हो सकी</b><br>"+
+      '<span class="small">'+
+      (
+        error.message ||
+        String(error)
+      )+
+      "</span></div>";
+
+  }
+
+}
+
+
+/* ================= FIND BOOKING ================= */
+
+function findBooking(id){
+
+  return firestoreBookings.find(
+    function(r){
+
+      return(
+        r.firestoreId===id ||
+        r.id===id ||
+        r.bookingId===id
+      );
+
+    }
+  ) || null;
+
+}
+
+
+/* ================= CURRENT CUSTOMER BOOKING ================= */
 
 function renderCurrentBooking(){
 
@@ -1680,7 +1593,7 @@ function renderCurrentBooking(){
 
 
   let displayId=
-    r.bookingId || r.id;
+    r.bookingId || r.firestoreId || r.id;
 
 
   if(r.status==="Searching"){
@@ -1726,7 +1639,6 @@ function renderCurrentBooking(){
 
   }
 
-
   else if(
 
     r.status==="Driver Found" ||
@@ -1741,7 +1653,6 @@ function renderCurrentBooking(){
       r.driverName ||
       "राम कुमार";
 
-
     let driverPhone=
       r.driverPhone ||
       "98XXXXXX21";
@@ -1750,17 +1661,28 @@ function renderCurrentBooking(){
     let extra="";
 
 
-    if(r.status==="Driver Found"){
+    if(
+      r.status==="Driver Found" ||
+      r.status==="Accepted"
+    ){
 
       extra=
 
-        '<button onclick="alert(\'Production app में Call integration जोड़ी जाएगी.\')">'+
-        "Call"+
-        "</button> "+
+        '<div class="action-row">'+
 
-        '<button onclick="alert(\'Production app में WhatsApp integration जोड़ी जाएगी.\')">'+
-        "WhatsApp"+
-        "</button>";
+        '<button onclick="callDriver(\''+
+        driverPhone+
+        '\')">'+
+        "📞 Call"+
+        "</button>"+
+
+        '<button onclick="whatsappDriver(\''+
+        driverPhone+
+        '\')">'+
+        "💬 WhatsApp"+
+        "</button>"+
+
+        "</div>";
 
     }
 
@@ -1815,6 +1737,45 @@ function renderCurrentBooking(){
 }
 
 
+/* ================= DRIVER ================= */
+
+function toggleOnline(){
+
+  S.online=!S.online;
+
+  save();
+
+  let btn=
+    document.getElementById("onlineBtn");
+
+  let status=
+    document.getElementById("driverStatus");
+
+
+  if(S.online){
+
+    btn.textContent="🟢 Online";
+    btn.className="ok";
+
+    status.textContent=
+      "ड्राइवर ऑनलाइन है। नई राइड का इंतज़ार...";
+
+  }
+  else{
+
+    btn.textContent="🔴 Offline";
+    btn.className="";
+
+    status.textContent=
+      "ड्राइवर Offline है।";
+
+  }
+
+  renderDriverRide();
+
+}
+
+
 /* ================= DRIVER RIDE ================= */
 
 function renderDriverRide(){
@@ -1827,7 +1788,6 @@ function renderDriverRide(){
 
   let earnEl=
     document.getElementById("earn");
-
 
   if(earnEl){
 
@@ -1874,7 +1834,7 @@ function renderDriverRide(){
 
 
   let displayId=
-    r.bookingId || r.id;
+    r.bookingId || r.firestoreId || r.id;
 
 
   if(
@@ -2021,6 +1981,211 @@ function renderDriverRide(){
 }
 
 
+/* ================= ACCEPT ================= */
+
+async function accept(id){
+
+  if(!firebaseReady)return;
+
+  try{
+
+    await bookingsRef
+      .doc(id)
+      .update({
+
+        status:"Accepted",
+
+        driverName:"राम कुमार",
+
+        driverPhone:"98XXXXXX21",
+
+        acceptedAt:
+          firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+  }catch(error){
+
+    console.error(
+      "ACCEPT ERROR:",
+      error
+    );
+
+    alert(
+      "Ride Accept नहीं हुई: "+
+      error.message
+    );
+
+  }
+
+}
+
+
+/* ================= REJECT ================= */
+
+async function reject(id){
+
+  if(!firebaseReady)return;
+
+  try{
+
+    await bookingsRef
+      .doc(id)
+      .update({
+
+        status:"Rejected",
+
+        rejectedAt:
+          firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+  }catch(error){
+
+    console.error(
+      "REJECT ERROR:",
+      error
+    );
+
+    alert(
+      "Ride Reject नहीं हुई: "+
+      error.message
+    );
+
+  }
+
+}
+
+
+/* ================= START RIDE ================= */
+
+async function startRide(id){
+
+  if(!firebaseReady)return;
+
+  try{
+
+    await bookingsRef
+      .doc(id)
+      .update({
+
+        status:"On the way",
+
+        startedAt:
+          firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+  }catch(error){
+
+    console.error(
+      "START RIDE ERROR:",
+      error
+    );
+
+    alert(
+      "Ride start नहीं हुई: "+
+      error.message
+    );
+
+  }
+
+}
+
+
+/* ================= COMPLETE RIDE ================= */
+
+async function completeRide(id){
+
+  if(!firebaseReady)return;
+
+  let r=
+    findBooking(id);
+
+  try{
+
+    await bookingsRef
+      .doc(id)
+      .update({
+
+        status:"Completed",
+
+        completedAt:
+          firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+
+    if(r){
+
+      S.earn=
+        Number(S.earn||0)+
+        Number(r.f||0);
+
+      save();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "COMPLETE RIDE ERROR:",
+      error
+    );
+
+    alert(
+      "Ride complete नहीं हुई: "+
+      error.message
+    );
+
+  }
+
+}
+
+
+/* ================= CALL / WHATSAPP ================= */
+
+function callDriver(phone){
+
+  if(!phone || phone==="98XXXXXX21"){
+
+    alert(
+      "Production version में driver का वास्तविक mobile number यहाँ आएगा."
+    );
+
+    return;
+
+  }
+
+  window.location.href=
+    "tel:"+phone;
+
+}
+
+
+function whatsappDriver(phone){
+
+  if(!phone || phone==="98XXXXXX21"){
+
+    alert(
+      "Production version में driver का WhatsApp number यहाँ आएगा."
+    );
+
+    return;
+
+  }
+
+  let clean=
+    phone.replace(/\D/g,"");
+
+  window.open(
+    "https://wa.me/91"+clean,
+    "_blank"
+  );
+
+}
+
+
 /* ================= HISTORY ================= */
 
 function renderHistory(){
@@ -2046,7 +2211,6 @@ function renderHistory(){
 
   let mobileInput=
     document.getElementById("mobile");
-
 
   if(mobileInput){
 
@@ -2091,8 +2255,9 @@ function renderHistory(){
       .map(function(r){
 
         let displayId=
-          r.bookingId || r.id;
-
+          r.bookingId ||
+          r.firestoreId ||
+          r.id;
 
         return(
 
@@ -2163,7 +2328,6 @@ function renderAdmin(){
   let cpInput=
     document.getElementById("cp");
 
-
   let cp=
     cpInput
       ?Number(cpInput.value)||10
@@ -2190,7 +2354,6 @@ function renderAdmin(){
   let revEl=
     document.getElementById("rev");
 
-
   if(revEl){
 
     revEl.textContent=
@@ -2202,7 +2365,6 @@ function renderAdmin(){
   let commEl=
     document.getElementById("comm");
 
-
   if(commEl){
 
     commEl.textContent=
@@ -2213,7 +2375,6 @@ function renderAdmin(){
 
   let payoutEl=
     document.getElementById("payout");
-
 
   if(payoutEl){
 
@@ -2227,7 +2388,6 @@ function renderAdmin(){
     document.getElementById(
       "adminHistory"
     );
-
 
   if(!adminHistory)return;
 
@@ -2248,8 +2408,9 @@ function renderAdmin(){
       .map(function(r){
 
         let displayId=
-          r.bookingId || r.id;
-
+          r.bookingId ||
+          r.firestoreId ||
+          r.id;
 
         let statusClass="";
 
@@ -2384,7 +2545,6 @@ function startFirestoreListener(){
                 let data=
                   doc.data() || {};
 
-
                 return{
 
                   firestoreId:doc.id,
@@ -2405,13 +2565,11 @@ function startFirestoreListener(){
                   ?a.createdAt.toMillis()
                   :0;
 
-
               let tb=
                 b.createdAt &&
                 b.createdAt.toMillis
                   ?b.createdAt.toMillis()
                   :0;
-
 
               return tb-ta;
 
@@ -2544,5 +2702,3 @@ document.addEventListener(
 
 </body>
 </html>
-
-  
