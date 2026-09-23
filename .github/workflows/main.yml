@@ -77,13 +77,30 @@ jobs:
           echo "Final AndroidX configuration:"
           cat gradle.properties
 
-      - name: Get SHA-1
+      - name: Create debug keystore and get SHA-1
         shell: bash
         run: |
           cd "$PROJECT_DIR"
 
-          echo "Getting Android signing SHA-1..."
-          gradle :app:signingReport --no-daemon
+          mkdir -p "$HOME/.config/.android"
+
+          keytool -genkeypair \
+            -v \
+            -keystore "$HOME/.config/.android/debug.keystore" \
+            -storepass android \
+            -alias AndroidDebugKey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+          echo "SHA-1:"
+          keytool -list \
+            -v \
+            -keystore "$HOME/.config/.android/debug.keystore" \
+            -storepass android \
+            -alias AndroidDebugKey | grep "SHA1:"
 
       - name: Build APK
         shell: bash
