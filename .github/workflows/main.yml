@@ -77,6 +77,14 @@ jobs:
           echo "Final AndroidX configuration:"
           cat gradle.properties
 
+      - name: Get SHA-1
+        shell: bash
+        run: |
+          cd "$PROJECT_DIR"
+
+          echo "Getting Android signing SHA-1..."
+          gradle :app:signingReport --no-daemon
+
       - name: Build APK
         shell: bash
         run: |
