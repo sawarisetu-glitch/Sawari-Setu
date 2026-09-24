@@ -28,15 +28,17 @@ function setRideType(type){localState.rideType=type;$('shareBtn').classList.togg
 function setMapMessage(msg){$('mapMessage').textContent=msg;$('mapMessage').style.display='flex';}
 function initMap(){if(map)return;if(typeof L==='undefined'){setMapMessage('Map library load नहीं हुई। Internet connection जाँचें।');return;}map=L.map('map').setView([25.366,81.879],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);setTimeout(()=>map.invalidateSize(),100);}
 async function searchPlaces(q){
-  const params=new URLSearchParams({format:'jsonv2',limit:'8',addressdetails:'1',countrycodes:'in',q:q});
-  if(currentGpsOrigin){
-    params.set('lat',String(currentGpsOrigin.lat));
-    params.set('lon',String(currentGpsOrigin.lon));
-    params.set('bounded','0');
-  }
-  const r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'}});
-  if(!r.ok)throw Error('Location service unavailable');
-  return await r.json();
+  const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',countrycodes:'in',q:q});
+  if(currentGpsOrigin){params.set('lat',String(currentGpsOrigin.lat));params.set('lon',String(currentGpsOrigin.lon));}
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'}});
+    if(r.ok){const d=await r.json();if(d.length)return d;}
+  }catch(e){}
+  const p=new URLSearchParams({q:q,limit:'10',lang:'en'});
+  const r2=await fetch('https://photon.komoot.io/api/?'+p.toString(),{headers:{Accept:'application/json'}});
+  if(!r2.ok)throw Error('Location service unavailable');
+  const j=await r2.json();
+  return (j.features||[]).map(f=>({lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],name:f.properties.name||q,display_name:[f.properties.name,f.properties.city,f.properties.state,f.properties.country].filter(Boolean).join(', '),address:{state:f.properties.state||'',county:f.properties.county||'',state_district:f.properties.district||''}}));
 }
 async function geocodePlace(q){
   const d=await searchPlaces(q);
@@ -77,11 +79,7 @@ async function loadSuggestions(field,q){
   try{
     if(suggestionController)suggestionController.abort();
     suggestionController=new AbortController();
-    const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',countrycodes:'in',q:q});
-    if(currentGpsOrigin){params.set('lat',String(currentGpsOrigin.lat));params.set('lon',String(currentGpsOrigin.lon));}
-    const r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'},signal:suggestionController.signal});
-    if(!r.ok)throw Error();
-    const data=await r.json();
+    const data=await searchPlaces(q);
     if(seq!==suggestionSeq)return;
     data.sort((a,b)=>locationScore(b,field,q)-locationScore(a,field,q));
     window._placeResults=window._placeResults||{};window._placeResults[field]=data;
@@ -104,23 +102,31 @@ function clearRoute(){if(!map)return;if(routeLayer){map.removeLayer(routeLayer);
 async function calculateRoute(){if(routeBusy)return;const pt=$('pickup').value.trim(),dt=$('destination').value.trim();if(!dt||(!pt&&!currentGpsOrigin)){setMapMessage('Pickup और Destination डालें।');return;}const key=(currentGpsOrigin?currentGpsOrigin.lat+','+currentGpsOrigin.lon:pt)+'||'+dt;if(key===lastRouteKey&&currentDistanceKm)return;routeBusy=true;setMapMessage('सड़क की दूरी निकाली जा रही है...');try{initMap();let o=currentGpsOrigin||await geocodePlace(pt),d=await geocodePlace(dt);const r=await fetch('https://router.project-osrm.org/route/v1/driving/'+o.lon+','+o.lat+';'+d.lon+','+d.lat+'?overview=full&geometries=geojson');if(!r.ok)throw Error('Routing service unavailable');const j=await r.json();if(j.code!=='Ok'||!j.routes||!j.routes.length)throw Error('Road route नहीं मिला');currentDistanceKm=Math.round(j.routes[0].distance/10)/100;$('distanceKm').value=currentDistanceKm.toFixed(2)+' km';updateFarePreview();clearRoute();routeLayer=L.geoJSON(j.routes[0].geometry).addTo(map);pickupMarker=L.marker([o.lat,o.lon]).addTo(map).bindPopup('Pickup');destinationMarker=L.marker([d.lat,d.lon]).addTo(map).bindPopup('Destination');map.fitBounds(routeLayer.getBounds(),{padding:[20,20]});$('mapMessage').style.display='none';lastRouteKey=key;$('customerStatus').innerHTML='<div class="status success">📏 सड़क की दूरी: '+currentDistanceKm.toFixed(2)+' km</div>';}catch(e){currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();setMapMessage('Route नहीं मिला: '+e.message);}finally{routeBusy=false;}}
 function routeChanged(){currentGpsOrigin=null;lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();clearTimeout(routeTimer);routeTimer=setTimeout(calculateRoute,900);}
 async function useCurrentLocation(){
+  initMap();
+  setMapMessage('📍 आपकी असली current location खोजी जा रही है...');
+  if(window.AndroidLocation&&AndroidLocation.requestLocation){
+    AndroidLocation.requestLocation();
+    return;
+  }
   if(!navigator.geolocation){alert('इस फोन में GPS उपलब्ध नहीं है।');return;}
-  initMap();setMapMessage('📍 GPS से आपकी असली current location खोजी जा रही है...');
-  navigator.geolocation.getCurrentPosition(async p=>{
-    const acc=Math.round(p.coords.accuracy||0);
-    currentGpsOrigin={lat:p.coords.latitude,lon:p.coords.longitude,accuracy:acc};
-    const a=await reverseGeocode(currentGpsOrigin.lat,currentGpsOrigin.lon);
-    $('pickup').value=a||currentGpsOrigin.lat.toFixed(6)+', '+currentGpsOrigin.lon.toFixed(6);
-    $('pickupSuggestions').innerHTML='';
-    lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();
-    map.setView([currentGpsOrigin.lat,currentGpsOrigin.lon],16);
-    $('customerStatus').innerHTML='<div class="status success">📍 GPS Location मिली<br>'+escapeHtml(a||'Coordinates')+'<br><span class="small">Accuracy: लगभग '+acc+' m</span></div>';
-    calculateRoute();
-  },e=>{
-    const msg=e.code===1?'Location permission नहीं मिली।':e.code===2?'GPS signal/location उपलब्ध नहीं है।':'GPS location मिलने में समय लग गया।';
+  navigator.geolocation.getCurrentPosition(onLocationSuccess,e=>{
+    const msg=e.code===1?'Location permission नहीं मिली।':e.code===2?'GPS signal/location उपलब्ध नहीं है।':'GPS location मिलने में समय लग रहा है।';
     alert(msg);setMapMessage('📍 '+msg);
   },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
 }
+function onLocationSuccess(p){
+  const acc=Math.round(p.coords.accuracy||0);
+  currentGpsOrigin={lat:+p.coords.latitude,lon:+p.coords.longitude,accuracy:acc};
+  const coords=currentGpsOrigin.lat.toFixed(6)+', '+currentGpsOrigin.lon.toFixed(6);
+  $('pickup').value=coords;
+  $('pickupSuggestions').innerHTML='';
+  lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();
+  map.setView([currentGpsOrigin.lat,currentGpsOrigin.lon],16);
+  $('customerStatus').innerHTML='<div class="status success">📍 GPS Location मिली<br>'+coords+'<br><span class="small">Accuracy: लगभग '+acc+' m</span></div>';
+  calculateRoute();
+}
+window.onNativeLocation=function(lat,lon,accuracy){onLocationSuccess({coords:{latitude:lat,longitude:lon,accuracy:accuracy}});};
+
 
 function calculateFare(v,t,d,p){p=Math.max(1,+p||1);if(!d)return{ok:false,amount:0,info:'दूरी आने के बाद automatic fare'};let a=0,i='';if(v==='e-rickshaw'){if(t==='Share'){if(d<=2)a=10;else if(d<=4)a=20;else if(d<=6)a=30;else if(d<=8)a=40;else if(d<=10)a=50;else return{ok:false,amount:0,info:'E-Rickshaw Share 10 km से ऊपर उपलब्ध नहीं है.'};}else{if(d<=2)a=40;else if(d<=4)a=60;else if(d<=6)a=75;else if(d<=8)a=90;else if(d<=10)a=105;else a=105+(d-10)*10;}}else if(v==='auto'){if(t==='Share')a=d*10*p;else{if(d<=5)a=200;else if(d<=10)a=325;else if(d<=20)a=525;else if(d<=30)a=675;else if(d<=40)a=775;else if(d<=50)a=825;else a=825+(d-50)*5;if(d>=100)i='2L free water included.';else if(d>=50)i='1L free water included.';}}else if(v==='bike'){if(t==='Share')return{ok:false,amount:0,info:'Bike/Scooty Share उपलब्ध नहीं है.'};if(d<=2)a=30;else if(d<=5)a=50;else if(d<=10)a=90;else if(d<=15)a=140;else if(d<=20)a=190;else if(d<=25)a=280;else if(d<=30)a=370;else if(d<=40)a=480;else if(d<=50)a=600;else a=600+(d-50)*12;}else{if(t==='Share')return{ok:false,amount:0,info:'Car Share उपलब्ध नहीं है.'};if(d<=5)a=200;else if(d<=10)a=400;else if(d<=20)a=800;else if(d<=30)a=1200;else if(d<=40)a=1500;else if(d<=50)a=1800;else if(d<=60)a=2100;else if(d<=70)a=2400;else if(d<=80)a=2700;else if(d<=100)a=3200;else a=3200+(d-100)*30;if(d>=100)i='2L free water included.';else if(d>=50)i='1L free water included.';}return{ok:true,amount:Math.round(a),info:i};}
 function updateFarePreview(){const r=calculateFare($('vehicle').value,localState.rideType,currentDistanceKm,$('passengers').value);currentFare=r.amount;$('fareAmount').textContent='₹'+currentFare;$('fareInfo').textContent=r.info||(currentDistanceKm?currentDistanceKm.toFixed(2)+' km':'');}
