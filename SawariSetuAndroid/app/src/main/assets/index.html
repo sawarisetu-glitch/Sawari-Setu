@@ -492,7 +492,7 @@ button{
    =========================================================
    यहाँ केवल अपनी Web API key डालनी है।
 */
-const GOOGLE_MAPS_API_KEY = "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU";
+const GOOGLE_MAPS_API_KEY = "PASTE_WEB_API_KEY_HERE";
 
 
 /* =========================================================
@@ -625,18 +625,47 @@ function saveLocal(){
    ========================================================= */
 
 function loadGoogleMaps(){
-  if(!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes("PASTE_")){
-    document.getElementById("mapMessage").textContent="Google Maps API key उपलब्ध नहीं है।";
+
+const GOOGLE_MAPS_API_KEY = 
+  "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU;
+
+    document.getElementById("mapMessage").innerHTML =
+      "Google Maps Web API key डालने के बाद Map और GPS चालू होगा।";
+
     return;
   }
-  if(window.google && window.google.maps){ initializeGoogleMap(); return; }
-  if(document.getElementById("googleMapsScript")) return;
-  const script=document.createElement("script");
-  script.id="googleMapsScript";
-  script.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(GOOGLE_MAPS_API_KEY);
-  script.async=true; script.defer=true;
-  script.onload=function(){ initializeGoogleMap(); };
-  script.onerror=function(){ document.getElementById("mapMessage").textContent="Google Maps लोड नहीं हुआ। API key/Maps JavaScript API जाँचें।"; };
+
+  if(window.google && window.google.maps){
+    initializeGoogleMap();
+    return;
+  }
+
+  const old = document.getElementById("googleMapsScript");
+
+  if(old) return;
+
+  const script = document.createElement("script");
+
+  script.id = "googleMapsScript";
+
+  script.src =
+    "https://maps.googleapis.com/maps/api/js?key=" +
+    encodeURIComponent(GOOGLE_MAPS_API_KEY) +
+    "&libraries=geometry";
+
+  script.async = true;
+  script.defer = true;
+
+  script.onload = function(){
+    initializeGoogleMap();
+  };
+
+  script.onerror = function(){
+
+    document.getElementById("mapMessage").innerHTML =
+      "Google Maps लोड नहीं हो पाया। API key और Maps JavaScript API की settings जाँचें।";
+  };
+
   document.head.appendChild(script);
 }
 
@@ -680,115 +709,11 @@ function initializeGoogleMap(){
    ========================================================= */
 
 function useCurrentLocation(){
-  if(!navigator.geolocation){ alert("इस फोन में GPS उपलब्ध नहीं है।"); return; }
-  const msg=document.getElementById("mapMessage");
-  msg.style.display="flex"; msg.textContent="📍 वर्तमान लोकेशन प्राप्त हो रही है...";
-  navigator.geolocation.getCurrentPosition(function(pos){
-    currentGpsOrigin={lat:pos.coords.latitude,lng:pos.coords.longitude};
-    if(map){ map.setCenter(currentGpsOrigin); map.setZoom(16); }
-    if(window.google && google.maps){
-      if(window.gpsMarker) window.gpsMarker.setMap(null);
-      window.gpsMarker=new google.maps.Marker({map:map,position:currentGpsOrigin,title:"आपकी वर्तमान लोकेशन"});
-      const geocoder=new google.maps.Geocoder();
-      geocoder.geocode({location:currentGpsOrigin},function(results,status){
-        if(status==="OK" && results[0]) document.getElementById("pickup").value=results[0].formatted_address;
-        calculateRoute(currentGpsOrigin);
-      });
-    } else calculateRoute(currentGpsOrigin);
-    msg.style.display="none";
-  },function(err){
-    msg.style.display="flex";
-    msg.textContent="लोकेशन नहीं मिल सकी: "+(err.message||"GPS error");
-  },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
-}
 
-function routeChanged(){
-  clearTimeout(routeTimer);
-  routeTimer=setTimeout(function(){ if(googleReady) calculateRoute(currentGpsOrigin); },500);
-}
+  if(!navigator.geolocation){
 
-function calculateRoute(gpsOrigin){
-  if(!googleReady || !map || !window.google) return;
-  const destination=document.getElementById("destination").value.trim();
-  const origin=gpsOrigin || document.getElementById("pickup").value.trim();
-  if(!origin || !destination) return;
-  if(routeBusy) return;
-  const key=JSON.stringify([origin,destination]);
-  if(key===lastRouteKey && currentDistanceKm>0) return;
-  routeBusy=true; lastRouteKey=key;
-  if(!window.directionsService) window.directionsService=new google.maps.DirectionsService();
-  if(!directionsRenderer) directionsRenderer=new google.maps.DirectionsRenderer({map:map,suppressMarkers:false});
-  directionsService.route({origin:origin,destination:destination,travelMode:google.maps.TravelMode.DRIVING},function(result,status){
-    routeBusy=false;
-    if(status!=="OK" || !result || !result.routes || !result.routes[0]){
-      currentDistanceKm=0; document.getElementById("distanceKm").value=""; updateFarePreview();
-      document.getElementById("mapMessage").style.display="flex";
-      document.getElementById("mapMessage").textContent="Route नहीं मिला: "+status; return;
-    }
-    directionsRenderer.setDirections(result);
-    let meters=0; result.routes[0].legs.forEach(function(leg){meters+=leg.distance.value||0;});
-    currentDistanceKm=meters/1000;
-    document.getElementById("distanceKm").value=currentDistanceKm.toFixed(2);
-    updateFarePreview();
-    document.getElementById("mapMessage").style.display="none";
-  });
-}
-
-function calculateFare(vehicle,type,distance,passengers){
-  const d=parseFloat(distance), p=Math.max(1,parseInt(passengers)||1);
-  if(!isFinite(d)||d<=0) return {ok:false,message:"Valid distance डालें."};
-  let fare=0,info="";
-  if(vehicle==="e-rickshaw") {
-    if(type==="Share"){ if(d>10)return {ok:false,message:"E-Rickshaw Share 10 km से ऊपर उपलब्ध नहीं है."}; fare=Math.ceil(d/2)*10; if(d<=2)fare=10; else if(d<=4)fare=20; else if(d<=6)fare=30; else if(d<=8)fare=40; else fare=50; }
-    else { fare=d<=2?40:d<=4?60:d<=6?75:d<=8?90:d<=10?105:105+(d-10)*10; }
-  } else if(vehicle==="auto"){
-    if(type==="Share") fare=d*10*p;
-    else fare=d<=5?200:d<=10?325:d<=20?525:d<=30?675:d<=40?775:d<=50?825:825+(d-50)*5;
-    if(d>=100)info="2L free water"; else if(d>=50)info="1L free water";
-  } else if(vehicle==="bike"){
-    if(type==="Share") return {ok:false,message:"Bike Share उपलब्ध नहीं है."};
-    fare=d<=2?30:d<=5?50:d<=10?90:d<=15?140:d<=20?190:d<=25?280:d<=30?370:d<=40?480:d<=50?600:600+(d-50)*12;
-  } else {
-    if(type==="Share") return {ok:false,message:"Car Share उपलब्ध नहीं है."};
-    fare=d<=5?200:d<=10?400:d<=20?800:d<=30?1200:d<=40?1500:d<=50?1800:d<=60?2100:d<=70?2400:d<=80?2700:d<=100?3200:3200+(d-100)*30;
-    if(d>=100)info="2L free water"; else if(d>=50)info="1L free water";
+    alert("इस फोन में GPS उपलब्ध नहीं है।");
+    return;
   }
-  return {ok:true,fare:Math.round(fare),info:info};
-}
 
-function updateFarePreview(){
-  const r=calculateFare(document.getElementById("vehicle").value,localState.rideType,document.getElementById("distanceKm").value,document.getElementById("passengers").value);
-  document.getElementById("fareAmount").textContent=r.ok?"₹"+r.fare:"₹0";
-  document.getElementById("fareInfo").textContent=r.ok?(r.info||""):(r.message||"");
-}
-
-function book(){
-  const toggle=document.getElementById("bookingToggle"); if(toggle && !toggle.checked){document.getElementById("customerStatus").textContent="Booking अभी बंद है।";return;}
-  const mobile=document.getElementById("mobile").value.trim();
-  if(!/^\d{10}$/.test(mobile)){document.getElementById("customerStatus").textContent="10 अंकों का मोबाइल नंबर डालें।";return;}
-  const r=calculateFare(document.getElementById("vehicle").value,localState.rideType,document.getElementById("distanceKm").value,document.getElementById("passengers").value);
-  if(!r.ok){document.getElementById("customerStatus").textContent=r.message;return;}
-  const b={pickup:document.getElementById("pickup").value,destination:document.getElementById("destination").value,distance:currentDistanceKm,fare:r.fare,vehicle:document.getElementById("vehicle").value,type:localState.rideType,passengers:parseInt(document.getElementById("passengers").value)||1,mobile:mobile,status:"new",createdAt:new Date().toISOString()};
-  allBookings.unshift(b); localState.lastBooking=b; saveLocal(); renderAll();
-  bookingsRef.add(b).catch(function(){});
-  document.getElementById("customerStatus").innerHTML="<span class='success'>Ride booked successfully. Fare ₹"+r.fare+"</span>";
-}
-
-function renderHistory(){
-  const h=document.getElementById("history"), b=localState.lastBooking;
-  h.innerHTML=b?"<div class='history-item'><b>"+b.pickup+" → "+b.destination+"</b><br>₹"+b.fare+" • "+b.distance.toFixed(2)+" km</div>":"कोई पिछली सवारी नहीं";
-}
-function toggleOnline(){driverOnline=!driverOnline;document.getElementById("onlineBtn").textContent=driverOnline?"🔴 Offline":"🟢 Online";renderDriverRide();}
-function renderDriverRide(){const el=document.getElementById("driverRide");const b=allBookings.find(x=>x.status==="new");document.getElementById("newRideCount").textContent=b?1:0;el.innerHTML=b?"<div class='history-item'><b>"+b.pickup+" → "+b.destination+"</b><br>₹"+b.fare+"<br><button class='primary' onclick='acceptRide()'>Accept Ride</button></div>":"Online होने पर नई ride यहाँ दिखाई देगी।";}
-function acceptRide(){const b=allBookings.find(x=>x.status==="new");if(b)b.status="accepted";renderAll();}
-function renderAdmin(){const rev=allBookings.reduce((a,b)=>a+(Number(b.fare)||0),0), cp=Number(document.getElementById("commission").value)||10;document.getElementById("bookingCount").textContent=allBookings.length;document.getElementById("adminRevenue").textContent="₹"+Math.round(rev);document.getElementById("adminCommission").textContent="₹"+Math.round(rev*cp/100);document.getElementById("adminHistory").innerHTML=allBookings.map(b=>"<div class='history-item'>"+b.pickup+" → "+b.destination+"<br>₹"+b.fare+" • "+b.status+"</div>").join("")||"कोई booking नहीं";}
-function renderAll(){renderHistory();renderDriverRide();renderAdmin();}
-
-document.addEventListener("DOMContentLoaded",function(){
-  try{setRideType(localState.rideType||"Share");}catch(e){}
-  renderAll(); updateFarePreview(); loadGoogleMaps();
-});
-
-</script>
-</body>
-</html>
+ 
