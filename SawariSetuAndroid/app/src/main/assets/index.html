@@ -27,38 +27,76 @@ function showTab(name,btn){document.querySelectorAll('.page').forEach(p=>p.class
 function setRideType(type){localState.rideType=type;$('shareBtn').classList.toggle('selected',type==='Share');$('directBtn').classList.toggle('selected',type==='Direct');saveLocal();updateFarePreview();}
 function setMapMessage(msg){$('mapMessage').textContent=msg;$('mapMessage').style.display='flex';}
 function initMap(){if(map)return;if(typeof L==='undefined'){setMapMessage('Map library load नहीं हुई। Internet connection जाँचें।');return;}map=L.map('map').setView([25.366,81.879],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);setTimeout(()=>map.invalidateSize(),100);}
-async function searchPlaces(q){const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&countrycodes=in&q='+encodeURIComponent(q),{headers:{Accept:'application/json'}});if(!r.ok)throw Error('Location service unavailable');return await r.json();}
-async function geocodePlace(q){const d=await searchPlaces(q);if(!d.length)throw Error('Location नहीं मिली');return{lat:+d[0].lat,lon:+d[0].lon,name:d[0].display_name};}
-let suggestionTimer=null,suggestionController=null;
+async function searchPlaces(q){
+  const params=new URLSearchParams({format:'jsonv2',limit:'8',addressdetails:'1',countrycodes:'in',q:q});
+  if(currentGpsOrigin){
+    params.set('lat',String(currentGpsOrigin.lat));
+    params.set('lon',String(currentGpsOrigin.lon));
+    params.set('bounded','0');
+  }
+  const r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'}});
+  if(!r.ok)throw Error('Location service unavailable');
+  return await r.json();
+}
+async function geocodePlace(q){
+  const d=await searchPlaces(q);
+  if(!d.length)throw Error('Location नहीं मिली');
+  return{lat:+d[0].lat,lon:+d[0].lon,name:d[0].display_name};
+}
+let suggestionTimer=null,suggestionController=null,suggestionSeq=0;
 function placeInput(field){
-  if(field==='pickup') currentGpsOrigin=null;
+  if(field==='pickup')currentGpsOrigin=null;
   lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();
   clearTimeout(suggestionTimer);
   const input=$(field),box=$(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
   const q=input.value.trim();box.innerHTML='';
-  if(q.length<3){clearTimeout(routeTimer);routeTimer=setTimeout(calculateRoute,900);return;}
-  suggestionTimer=setTimeout(()=>loadSuggestions(field,q),450);
+  if(q.length<2){return;}
+  suggestionTimer=setTimeout(()=>loadSuggestions(field,q),350);
+}
+function locationScore(x,field,q){
+  let score=0;
+  const a=x.address||{};
+  const text=(x.display_name||'').toLowerCase();
+  const query=q.toLowerCase().trim();
+  if((x.name||'').toLowerCase()===query)score+=100;
+  if(text.startsWith(query+','))score+=50;
+  if(a.state_district==='Prayagraj'||a.county==='Prayagraj')score+=35;
+  if(a.state==='Uttar Pradesh')score+=20;
+  if(currentGpsOrigin){
+    const dx=(+x.lat-currentGpsOrigin.lat)*111;
+    const dy=(+x.lon-currentGpsOrigin.lon)*111*Math.cos(currentGpsOrigin.lat*Math.PI/180);
+    const km=Math.sqrt(dx*dx+dy*dy);
+    score+=Math.max(0,30-km);
+  }
+  return score;
 }
 async function loadSuggestions(field,q){
   const box=$(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
+  const seq=++suggestionSeq;
   box.innerHTML='<div class="suggestion">🔎 जगह खोजी जा रही है...</div>';
   try{
     if(suggestionController)suggestionController.abort();
     suggestionController=new AbortController();
-    const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=1&countrycodes=in&q='+encodeURIComponent(q),{headers:{Accept:'application/json'},signal:suggestionController.signal});
+    const params=new URLSearchParams({format:'jsonv2',limit:'10',addressdetails:'1',countrycodes:'in',q:q});
+    if(currentGpsOrigin){params.set('lat',String(currentGpsOrigin.lat));params.set('lon',String(currentGpsOrigin.lon));}
+    const r=await fetch('https://nominatim.openstreetmap.org/search?'+params.toString(),{headers:{Accept:'application/json'},signal:suggestionController.signal});
     if(!r.ok)throw Error();
     const data=await r.json();
-    if(!data.length){box.innerHTML='<div class="suggestion">कोई matching location नहीं मिली</div>';return;}
-    box.innerHTML=data.map((x,i)=>'<button type="button" class="suggestion" onclick="selectPlace(\''+field+'\','+i+')"><b>'+escapeHtml((x.name||x.display_name||'Location'))+'</b><small>'+escapeHtml(x.display_name||'')+'</small></button>').join('');
+    if(seq!==suggestionSeq)return;
+    data.sort((a,b)=>locationScore(b,field,q)-locationScore(a,field,q));
     window._placeResults=window._placeResults||{};window._placeResults[field]=data;
-  }catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="suggestion">Location search नहीं हो पाई</div>';}
+    if(!data.length){box.innerHTML='<div class="suggestion">कोई matching location नहीं मिली</div>';return;}
+    box.innerHTML=data.map((x,i)=>`<button type="button" class="suggestion" onclick="selectPlace('${field}',${i})"><b>${escapeHtml(x.name||x.display_name||'Location')}</b><small>${escapeHtml(x.display_name||'')}</small></button>`).join('');
+  }catch(e){if(e.name!=='AbortError'&&seq===suggestionSeq)box.innerHTML='<div class="suggestion">Location search नहीं हो पाई — Internet check करें</div>';}
 }
-function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c]));}
+function escapeHtml(v){return String(v).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));}
 function selectPlace(field,index){
   const data=window._placeResults&&window._placeResults[field];const x=data&&data[index];if(!x)return;
-  $(field).value=x.display_name||x.name||'';$(field==='pickup'?'pickupSuggestions':'destinationSuggestions').innerHTML='';
+  $(field).value=x.display_name||x.name||'';
+  $(field==='pickup'?'pickupSuggestions':'destinationSuggestions').innerHTML='';
   if(field==='pickup')currentGpsOrigin={lat:+x.lat,lon:+x.lon};
-  lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();calculateRoute();
+  lastRouteKey='';currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();
+  calculateRoute();
 }
 
 async function reverseGeocode(lat,lon){try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+lat+'&lon='+lon+'&zoom=18&addressdetails=1',{headers:{Accept:'application/json'}});if(!r.ok)return'';const d=await r.json();return d.display_name||'';}catch(e){return'';}}
