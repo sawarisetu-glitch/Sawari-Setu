@@ -597,51 +597,30 @@ async function searchPlaceSuggestions(field,q){
   const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
   if(!box)return;
   box.innerHTML='<div class="suggestion">🔎 जगह खोजी जा रही है...</div>';
+  const c=searchCenter();
   try{
-    const {AutocompleteSuggestion,AutocompleteSessionToken}=await google.maps.importLibrary('places');
-    const c=searchCenter();
-    const token=new AutocompleteSessionToken();
-    const request={
-      input:q,
-      sessionToken:token,
-      includedRegionCodes:['in'],
-      locationBias:{center:c,radius:8000},
-      origin:c,
-      language:'hi',
-      region:'IN'
-    };
-    const response=await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-    const suggestions=(response&&response.suggestions)||[];
-    box.innerHTML='';
-    if(!suggestions.length){
-      box.innerHTML='<div class="suggestion">कोई suggestion नहीं मिला। थोड़ा और नाम/area लिखें।</div>';
-      return;
-    }
-    suggestions.slice(0,8).forEach(suggestion=>{
-      const prediction=suggestion.placePrediction;
-      if(!prediction)return;
-      const b=document.createElement('button');
-      b.type='button';
-      b.className='suggestion';
-      const main=prediction.mainText ? prediction.mainText.toString() : (prediction.text ? prediction.text.toString() : 'Place');
-      const secondary=prediction.secondaryText ? prediction.secondaryText.toString() : '';
-      b.innerHTML=escapeHtml(main)+(secondary?'<small>'+escapeHtml(secondary)+'</small>':'');
-      b.onclick=async()=>{
-        try{
-          const place=prediction.toPlace();
-          await place.fetchFields({fields:['displayName','formattedAddress','location','id','types','primaryType']});
-          selectGooglePlace(field,place);
-        }catch(e){
-          console.error('Place selection:',e);
-          box.innerHTML='<div class="suggestion">जगह चुनने में समस्या आई। फिर कोशिश करें।</div>';
-        }
-      };
-      box.appendChild(b);
-    });
-  }catch(e){
-    console.error('Autocomplete search:',e);
-    box.innerHTML='<div class="suggestion">Search में समस्या आई: '+escapeHtml(e.message||'Places API error')+'</div>';
-  }
+    const {Place}=await google.maps.importLibrary('places');
+    const response=await Place.searchByText({textQuery:q,fields:['displayName','formattedAddress','location','id','types','primaryType'],locationBias:{center:c,radius:8000},maxResultCount:8,rankPreference:'RELEVANCE',language:'hi',region:'IN'});
+    const places=(response&&response.places)||[];
+    if(places.length){renderGooglePlaceSuggestions(field,places,box);return;}
+  }catch(e){console.warn('Places API search blocked/failed; using Geocoder fallback:',e);}
+  try{
+    const geocoder=new google.maps.Geocoder();
+    const request={address:q,region:'IN',language:'hi'};
+    if(map){const bounds=map.getBounds();if(bounds)request.bounds=bounds;}
+    const result=await geocoder.geocode(request);
+    const results=(result&&result.results)||[];
+    if(!results.length){box.innerHTML='<div class="suggestion">कोई matching location नहीं मिली। नाम के साथ area/district भी लिखें।</div>';return;}
+    renderGeocoderSuggestions(field,results.slice(0,8),box);
+  }catch(e){console.error('Geocoder search:',e);box.innerHTML='<div class="suggestion">Search में समस्या आई। Internet/API settings जाँचें।</div>';}
+}
+function renderGooglePlaceSuggestions(field,places,box){
+  box.innerHTML='';
+  places.forEach(place=>{const b=document.createElement('button');b.type='button';b.className='suggestion';const name=place.displayName||'Place';const address=place.formattedAddress||'';b.innerHTML=escapeHtml(name)+(address?'<small>'+escapeHtml(address)+'</small>':'');b.onclick=()=>selectGooglePlace(field,place);box.appendChild(b);});
+}
+function renderGeocoderSuggestions(field,results,box){
+  box.innerHTML='';
+  results.forEach(result=>{const loc=result.geometry&&result.geometry.location;if(!loc)return;const place={displayName:(result.address_components&&result.address_components[0]&&result.address_components[0].long_name)||result.formatted_address,formattedAddress:result.formatted_address,location:loc,id:null,types:result.types||[]};const b=document.createElement('button');b.type='button';b.className='suggestion';b.innerHTML=escapeHtml(place.displayName)+(place.formattedAddress?'<small>'+escapeHtml(place.formattedAddress)+'</small>':'');b.onclick=()=>selectGooglePlace(field,place);box.appendChild(b);});
 }
 
 function selectGooglePlace(field,place){
@@ -673,80 +652,68 @@ function clearSearchSelection(field){
 }
 
 function applyCurrentLocation(lat,lng,accuracy){
-  const nlat=Number(lat),nlng=Number(lng),nacc=Number(accuracy)||999999;
-  if(!isFinite(nlat)||!isFinite(nlng))return;
-  if(currentGpsOrigin && currentGpsOrigin.accuracy && nacc>currentGpsOrigin.accuracy+25)return;
-  currentGpsOrigin={lat:nlat,lng:nlng,accuracy:nacc};
+  currentGpsOrigin={lat:Number(lat),lng:Number(lng),accuracy:Number(accuracy)||0};
   pickupPlace=null;
-  const pickup=document.getElementById('pickup');pickup._selectedPlace=null;
-  clearSuggestions('pickup');
+  const pickup=document.getElementById('pickup');pickup._selectedPlace=null;clearSuggestions('pickup');pickup.value='';
+  document.getElementById('customerStatus').innerHTML='<div class="status">📍 Current GPS location मिली। Address निकाला जा रहा है...</div>';
   if(currentGpsMarker)currentGpsMarker.setMap(null);
-  currentGpsMarker=new google.maps.Marker({position:currentGpsOrigin,map,title:'मेरी वर्तमान लोकेशन'});
-  map.setCenter(currentGpsOrigin);map.setZoom(17);
-  reverseGeocode(currentGpsOrigin);
-  showNearbyPlaces(currentGpsOrigin);
+  currentGpsMarker=new google.maps.Marker({position:{lat:currentGpsOrigin.lat,lng:currentGpsOrigin.lng},map,title:'मेरी वर्तमान लोकेशन'});
+  map.setCenter({lat:currentGpsOrigin.lat,lng:currentGpsOrigin.lng});map.setZoom(17);
+  reverseGeocode(currentGpsOrigin);showNearbyPlaces(currentGpsOrigin);
   lastRouteKey='';currentDistanceKm=0;document.getElementById('distanceKm').value='';updateFarePreview();
 }
 
 // Native Android GPS bridge. MainActivity can call this after getting a GPS fix.
 window.onNativeLocation=function(lat,lng,accuracy){
   const msg=document.getElementById('mapMessage');
-  if(gpsRequestTimer)clearTimeout(gpsRequestTimer);
   if(!map||!googleReady){
     window._pendingNativeLocation={lat:lat,lng:lng,accuracy:accuracy};
     return;
   }
+  msg.style.display='none';
   applyCurrentLocation(lat,lng,accuracy);
-  if(currentGpsOrigin)msg.style.display='none';
 };
-
-let gpsRequestTimer=null;
-let gpsWebRequestStarted=false;
 
 function useCurrentLocation(){
   const msg=document.getElementById('mapMessage');
-  msg.style.display='flex';
-  msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
-  if(gpsRequestTimer)clearTimeout(gpsRequestTimer);
-  gpsWebRequestStarted=false;
+  msg.style.display='flex';msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
 
-  // Android native GPS और WebView GPS दोनों साथ चलेंगे। जो usable fix पहले/बेहतर देगा, वही लिया जाएगा।
   if(window.AndroidLocation&&typeof window.AndroidLocation.requestLocation==='function'){
-    try{ window.AndroidLocation.requestLocation(); }catch(e){ console.warn('Native GPS:',e); }
+    try{ window.AndroidLocation.requestLocation(); return; }catch(e){ console.warn('Native GPS:',e); }
   }
 
-  const startWebGps=()=>{
-    if(gpsWebRequestStarted)return;
-    gpsWebRequestStarted=true;
-    if(!navigator.geolocation){
-      if(!currentGpsOrigin)msg.textContent='लोकेशन नहीं मिल पाई: फोन का GPS उपलब्ध नहीं है।';
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(pos=>{
-      applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
-      if(currentGpsOrigin)msg.style.display='none';
-    },err=>{
-      if(!currentGpsOrigin)msg.textContent='लोकेशन नहीं मिल पाई: '+(err.message||'GPS signal नहीं मिला');
-    },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
-  };
-
-  // Native GPS को कुछ सेकंड head-start, फिर WebView fallback।
-  gpsRequestTimer=setTimeout(startWebGps,5000);
-  // अगर native callback पहले आ जाए तो message तुरंत हट जाएगा।
-  setTimeout(()=>{if(currentGpsOrigin)msg.style.display='none';},30000);
+  if(!navigator.geolocation){
+    msg.textContent='लोकेशन नहीं मिल पाई: फोन का GPS उपलब्ध नहीं है।';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    msg.style.display='none';
+    applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
+  },err=>{
+    msg.textContent='लोकेशन नहीं मिल पाई: '+(err.message||'GPS error');
+  },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
 }
 
-function reverseGeocode(pos){
+async function reverseGeocode(pos){
   if(!googleReady)return;
-  const geocoder=new google.maps.Geocoder();
-  geocoder.geocode({location:{lat:pos.lat,lng:pos.lng}},(results,status)=>{
-    if(status==='OK'&&results&&results[0]){
-      document.getElementById('pickup').value=results[0].formatted_address;
-      document.getElementById('pickup')._selectedPlace=null;
-      document.getElementById('customerStatus').innerHTML='<div class="status success">📍 GPS Location मिली<br>'+escapeHtml(results[0].formatted_address)+'<br><span class="small">Accuracy: लगभग '+Math.round(pos.accuracy||0)+' m</span></div>';
-      calculateRoute();
+  const pickup=document.getElementById('pickup');
+  try{
+    const geocoder=new google.maps.Geocoder();
+    const result=await geocoder.geocode({location:{lat:Number(pos.lat),lng:Number(pos.lng)},language:'hi',region:'IN'});
+    const results=(result&&result.results)||[];
+    if(results.length&&results[0].formatted_address){
+      const address=results[0].formatted_address;
+      pickup.value=address;pickup._selectedPlace=null;pickupPlace=null;
+      document.getElementById('customerStatus').innerHTML='<div class="status success">📍 GPS Location मिली<br>'+escapeHtml(address)+'<br><span class="small">Accuracy: लगभग '+Math.round(pos.accuracy||0)+' m</span></div>';
+      calculateRoute();return;
     }
-  });
+    throw Error('No reverse-geocode result');
+  }catch(e){
+    console.warn('Reverse geocode failed:',e);
+    pickup.value='वर्तमान लोकेशन ('+Number(pos.lat).toFixed(6)+', '+Number(pos.lng).toFixed(6)+')';pickup._selectedPlace=null;
+    document.getElementById('customerStatus').innerHTML='<div class="status warning">📍 GPS Location मिली, लेकिन address नाम नहीं मिला। Coordinates: '+Number(pos.lat).toFixed(6)+', '+Number(pos.lng).toFixed(6)+'</div>';
+    calculateRoute();
+  }
 }
 
 function clearNearbyMarkers(){
