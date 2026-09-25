@@ -598,37 +598,49 @@ async function searchPlaceSuggestions(field,q){
   if(!box)return;
   box.innerHTML='<div class="suggestion">🔎 जगह खोजी जा रही है...</div>';
   try{
-    const {Place}=await google.maps.importLibrary('places');
+    const {AutocompleteSuggestion,AutocompleteSessionToken}=await google.maps.importLibrary('places');
     const c=searchCenter();
+    const token=new AutocompleteSessionToken();
     const request={
-      textQuery:q,
-      fields:['displayName','formattedAddress','location','id','types','primaryType'],
+      input:q,
+      sessionToken:token,
+      includedRegionCodes:['in'],
       locationBias:{center:c,radius:8000},
-      maxResultCount:8,
-      rankPreference:'RELEVANCE',
+      origin:c,
       language:'hi',
       region:'IN'
     };
-    const response=await Place.searchByText(request);
-    const places=(response&&response.places)||[];
+    const response=await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+    const suggestions=(response&&response.suggestions)||[];
     box.innerHTML='';
-    if(!places.length){
-      box.innerHTML='<div class="suggestion">कोई matching place नहीं मिला। पूरा नाम या area लिखकर देखें।</div>';
+    if(!suggestions.length){
+      box.innerHTML='<div class="suggestion">कोई suggestion नहीं मिला। थोड़ा और नाम/area लिखें।</div>';
       return;
     }
-    places.forEach((place,index)=>{
+    suggestions.slice(0,8).forEach(suggestion=>{
+      const prediction=suggestion.placePrediction;
+      if(!prediction)return;
       const b=document.createElement('button');
       b.type='button';
       b.className='suggestion';
-      const name=place.displayName||'Place';
-      const address=place.formattedAddress||'';
-      b.innerHTML=escapeHtml(name)+(address?'<small>'+escapeHtml(address)+'</small>':'');
-      b.onclick=()=>selectGooglePlace(field,place);
+      const main=prediction.mainText ? prediction.mainText.toString() : (prediction.text ? prediction.text.toString() : 'Place');
+      const secondary=prediction.secondaryText ? prediction.secondaryText.toString() : '';
+      b.innerHTML=escapeHtml(main)+(secondary?'<small>'+escapeHtml(secondary)+'</small>':'');
+      b.onclick=async()=>{
+        try{
+          const place=prediction.toPlace();
+          await place.fetchFields({fields:['displayName','formattedAddress','location','id','types','primaryType']});
+          selectGooglePlace(field,place);
+        }catch(e){
+          console.error('Place selection:',e);
+          box.innerHTML='<div class="suggestion">जगह चुनने में समस्या आई। फिर कोशिश करें।</div>';
+        }
+      };
       box.appendChild(b);
     });
   }catch(e){
-    console.error('Places search:',e);
-    box.innerHTML='<div class="suggestion">Search में समस्या आई। फिर से कोशिश करें।</div>';
+    console.error('Autocomplete search:',e);
+    box.innerHTML='<div class="suggestion">Search में समस्या आई: '+escapeHtml(e.message||'Places API error')+'</div>';
   }
 }
 
@@ -661,7 +673,10 @@ function clearSearchSelection(field){
 }
 
 function applyCurrentLocation(lat,lng,accuracy){
-  currentGpsOrigin={lat:Number(lat),lng:Number(lng),accuracy:Number(accuracy)||0};
+  const nlat=Number(lat),nlng=Number(lng),nacc=Number(accuracy)||999999;
+  if(!isFinite(nlat)||!isFinite(nlng))return;
+  if(currentGpsOrigin && currentGpsOrigin.accuracy && nacc>currentGpsOrigin.accuracy+25)return;
+  currentGpsOrigin={lat:nlat,lng:nlng,accuracy:nacc};
   pickupPlace=null;
   const pickup=document.getElementById('pickup');pickup._selectedPlace=null;
   clearSuggestions('pickup');
@@ -676,32 +691,49 @@ function applyCurrentLocation(lat,lng,accuracy){
 // Native Android GPS bridge. MainActivity can call this after getting a GPS fix.
 window.onNativeLocation=function(lat,lng,accuracy){
   const msg=document.getElementById('mapMessage');
+  if(gpsRequestTimer)clearTimeout(gpsRequestTimer);
   if(!map||!googleReady){
     window._pendingNativeLocation={lat:lat,lng:lng,accuracy:accuracy};
     return;
   }
-  msg.style.display='none';
   applyCurrentLocation(lat,lng,accuracy);
+  if(currentGpsOrigin)msg.style.display='none';
 };
+
+let gpsRequestTimer=null;
+let gpsWebRequestStarted=false;
 
 function useCurrentLocation(){
   const msg=document.getElementById('mapMessage');
-  msg.style.display='flex';msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
+  msg.style.display='flex';
+  msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
+  if(gpsRequestTimer)clearTimeout(gpsRequestTimer);
+  gpsWebRequestStarted=false;
 
+  // Android native GPS और WebView GPS दोनों साथ चलेंगे। जो usable fix पहले/बेहतर देगा, वही लिया जाएगा।
   if(window.AndroidLocation&&typeof window.AndroidLocation.requestLocation==='function'){
-    try{ window.AndroidLocation.requestLocation(); return; }catch(e){ console.warn('Native GPS:',e); }
+    try{ window.AndroidLocation.requestLocation(); }catch(e){ console.warn('Native GPS:',e); }
   }
 
-  if(!navigator.geolocation){
-    msg.textContent='लोकेशन नहीं मिल पाई: फोन का GPS उपलब्ध नहीं है।';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(pos=>{
-    msg.style.display='none';
-    applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
-  },err=>{
-    msg.textContent='लोकेशन नहीं मिल पाई: '+(err.message||'GPS error');
-  },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
+  const startWebGps=()=>{
+    if(gpsWebRequestStarted)return;
+    gpsWebRequestStarted=true;
+    if(!navigator.geolocation){
+      if(!currentGpsOrigin)msg.textContent='लोकेशन नहीं मिल पाई: फोन का GPS उपलब्ध नहीं है।';
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
+      if(currentGpsOrigin)msg.style.display='none';
+    },err=>{
+      if(!currentGpsOrigin)msg.textContent='लोकेशन नहीं मिल पाई: '+(err.message||'GPS signal नहीं मिला');
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  };
+
+  // Native GPS को कुछ सेकंड head-start, फिर WebView fallback।
+  gpsRequestTimer=setTimeout(startWebGps,5000);
+  // अगर native callback पहले आ जाए तो message तुरंत हट जाएगा।
+  setTimeout(()=>{if(currentGpsOrigin)msg.style.display='none';},30000);
 }
 
 function reverseGeocode(pos){
