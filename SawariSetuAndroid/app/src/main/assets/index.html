@@ -322,16 +322,22 @@ button{
     <h2>🚕 Ride Book</h2>
 
     <label>Pickup</label>
-    <input id="pickup" value="Sirsa, Prayagraj, Uttar Pradesh"
-           oninput="inputChanged('pickup')">
+    <div class="search-wrap">
+      <input id="pickup" value="Sirsa, Prayagraj, Uttar Pradesh"
+             oninput="inputChanged('pickup')">
+      <div id="pickupSuggestions" class="suggestions"></div>
+    </div>
 
     <button class="gps-btn" onclick="useCurrentLocation()">
       📍 मेरी वर्तमान लोकेशन
     </button>
 
     <label>Destination</label>
-    <input id="destination" value="Meja Road, Prayagraj, Uttar Pradesh"
-           oninput="inputChanged('destination')">
+    <div class="search-wrap">
+      <input id="destination" value="Meja Road, Prayagraj, Uttar Pradesh"
+             oninput="inputChanged('destination')">
+      <div id="destinationSuggestions" class="suggestions"></div>
+    </div>
 
     <div class="mapbox">
       <div id="map"></div>
@@ -544,6 +550,11 @@ async function initializeGoogleMap(){
     document.getElementById('map').classList.add('loaded');
     document.getElementById('mapMessage').style.display='none';
     calculateRoute();
+    if(window._pendingNativeLocation){
+      const p=window._pendingNativeLocation;
+      window._pendingNativeLocation=null;
+      applyCurrentLocation(p.lat,p.lng,p.accuracy);
+    }
     if(currentGpsOrigin)showNearbyPlaces(currentGpsOrigin);
   }catch(e){
     console.error('Google Maps init:',e);
@@ -649,20 +660,45 @@ function clearSearchSelection(field){
   if(field==='destination')destinationPlace=null;
 }
 
+function applyCurrentLocation(lat,lng,accuracy){
+  currentGpsOrigin={lat:Number(lat),lng:Number(lng),accuracy:Number(accuracy)||0};
+  pickupPlace=null;
+  const pickup=document.getElementById('pickup');pickup._selectedPlace=null;
+  clearSuggestions('pickup');
+  if(currentGpsMarker)currentGpsMarker.setMap(null);
+  currentGpsMarker=new google.maps.Marker({position:currentGpsOrigin,map,title:'मेरी वर्तमान लोकेशन'});
+  map.setCenter(currentGpsOrigin);map.setZoom(17);
+  reverseGeocode(currentGpsOrigin);
+  showNearbyPlaces(currentGpsOrigin);
+  lastRouteKey='';currentDistanceKm=0;document.getElementById('distanceKm').value='';updateFarePreview();
+}
+
+// Native Android GPS bridge. MainActivity can call this after getting a GPS fix.
+window.onNativeLocation=function(lat,lng,accuracy){
+  const msg=document.getElementById('mapMessage');
+  if(!map||!googleReady){
+    window._pendingNativeLocation={lat:lat,lng:lng,accuracy:accuracy};
+    return;
+  }
+  msg.style.display='none';
+  applyCurrentLocation(lat,lng,accuracy);
+};
+
 function useCurrentLocation(){
-  if(!navigator.geolocation){alert('इस फोन में GPS उपलब्ध नहीं है।');return;}
   const msg=document.getElementById('mapMessage');
   msg.style.display='flex';msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
+
+  if(window.AndroidLocation&&typeof window.AndroidLocation.requestLocation==='function'){
+    try{ window.AndroidLocation.requestLocation(); return; }catch(e){ console.warn('Native GPS:',e); }
+  }
+
+  if(!navigator.geolocation){
+    msg.textContent='लोकेशन नहीं मिल पाई: फोन का GPS उपलब्ध नहीं है।';
+    return;
+  }
   navigator.geolocation.getCurrentPosition(pos=>{
-    currentGpsOrigin={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy||0};
-    pickupPlace=null;
-    const pickup=document.getElementById('pickup');pickup._selectedPlace=null;
-    if(currentGpsMarker)currentGpsMarker.setMap(null);
-    currentGpsMarker=new google.maps.Marker({position:currentGpsOrigin,map,title:'मेरी वर्तमान लोकेशन'});
-    map.setCenter(currentGpsOrigin);map.setZoom(17);
-    reverseGeocode(currentGpsOrigin);
-    showNearbyPlaces(currentGpsOrigin);
-    lastRouteKey='';currentDistanceKm=0;document.getElementById('distanceKm').value='';updateFarePreview();
+    msg.style.display='none';
+    applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
   },err=>{
     msg.textContent='लोकेशन नहीं मिल पाई: '+(err.message||'GPS error');
   },{enableHighAccuracy:true,timeout:30000,maximumAge:0});
