@@ -149,7 +149,7 @@ button{
 }
 
 .mapbox{
-  height:270px;
+  height:280px;
   border-radius:14px;
   overflow:hidden;
   margin-top:12px;
@@ -339,14 +339,14 @@ button{
 
     <label>कहाँ जाना है (Destination)</label>
     <div class="search-wrap">
-      <input id="destination" placeholder="जैसे: रामनगर, खानपुर, मेजा रोड, मांडा..." oninput="onSearchInput('destination')">
+      <input id="destination" placeholder="जैसे: खानपुर, रामनगर, चिलबिला, मेजा रोड, मांडा..." oninput="onSearchInput('destination')">
       <div id="destinationSuggestions" class="suggestions"></div>
     </div>
 
     <div class="mapbox">
       <div id="map"></div>
       <div id="mapMessage" class="map-message">
-        Google Maps लोड हो रहा है...
+        मैप लोड हो रहा है...
       </div>
     </div>
 
@@ -485,12 +485,37 @@ let map=null;
 let googleReady=false;
 let currentDistanceKm=0;
 
-// आधार केंद्र बिंदु (सिरसा, प्रयागराज)
+// आधार बिंदु (सिरसा)
 let pickupLocation = {lat: 25.2672, lng: 82.0725};
-let destLocation = null;
+let destLocation = {lat: 25.2144, lng: 82.1158}; // मेजा रोड डिफ़ॉल्ट
 
-let directionsRenderer=null;
-let directionsService=null;
+let routePolyline = null;
+let pickupMarker = null;
+let destMarker = null;
+
+// ==========================================
+// 100% फ्री लोकल डायरेक्टरी (बिना बिलिंग के 1 मिलीसेकंड में सर्च)
+// ==========================================
+const LOCAL_DATABASE = [
+  { name: "खानपुर (Khanpur)", address: "खानपुर, सिरसा के पास, प्रयागराज", lat: 25.2550, lng: 82.0650 },
+  { name: "रामनगर (Ramnagar)", address: "रामनगर, मेजा तहसील, प्रयागराज", lat: 25.2480, lng: 82.0910 },
+  { name: "रामनगर माता धाम (Mata Dham)", address: "माता धाम मंदिर, रामनगर, मेजा, प्रयागराज", lat: 25.2465, lng: 82.0925 },
+  { name: "सिरसा बाजार (Sirsa Bazar)", address: "मुख्य बाजार, सिरसा, प्रयागराज", lat: 25.2672, lng: 82.0725 },
+  { name: "सिरसा गंगा घाट (Sirsa Ghat)", address: "गंगा घाट, सिरसा, प्रयागराज", lat: 25.2710, lng: 82.0700 },
+  { name: "मेजा रोड (Meja Road)", address: "मेजा रोड स्टेशन/बाजार, प्रयागराज", lat: 25.2144, lng: 82.1158 },
+  { name: "मेजा रोड हॉस्पिटल (Hospital)", address: "सामुदायिक स्वास्थ्य केंद्र/हॉस्पिटल, मेजा रोड", lat: 25.2160, lng: 82.1140 },
+  { name: "मेजा खास (Meja Khas)", address: "तहसील मुख्यालय, मेजा, प्रयागराज", lat: 25.1380, lng: 82.1220 },
+  { name: "चिलबिला बाजार (Chilbila Bazar)", address: "चिलबिला बाजार, मांडा रोड, प्रयागराज", lat: 25.1050, lng: 82.2350 },
+  { name: "मांडा (Manda)", address: "मांडा खास / बाजार, प्रयागराज", lat: 25.0920, lng: 82.2530 },
+  { name: "मांडा रोड स्टेशन (Manda Road)", address: "मांडा रोड रेलवे स्टेशन, प्रयागराज", lat: 25.1110, lng: 82.2410 },
+  { name: "जिगना (Jigna)", address: "जिगना बाजार / स्टेशन, मिर्जापुर बॉर्डर", lat: 25.1290, lng: 82.3120 },
+  { name: "उरुवा बाजार (Uruwa)", address: "उरुवा ब्लॉक/बाजार, मेजा, प्रयागराज", lat: 25.2280, lng: 82.0150 },
+  { name: "कोरांव (Koraon)", address: "कोरांव कस्बा / बाजार, प्रयागराज", lat: 24.9820, lng: 82.0650 },
+  { name: "करछना (Karchana)", address: "करछना तहसील / बाजार, प्रयागराज", lat: 25.2810, lng: 81.9320 },
+  { name: "नैनी (Naini)", address: "नैनी इंडस्ट्रियल एरिया / बाजार, प्रयागराज", lat: 25.3850, lng: 81.8650 },
+  { name: "प्रयागराज जंक्शन (Civil Lines)", address: "सिविल लाइंस / रेलवे स्टेशन, प्रयागराज", lat: 25.4484, lng: 81.8333 },
+  { name: "मिर्जापुर (Mirzapur)", address: "मिर्जापुर शहर / घंटाघर", lat: 25.1337, lng: 82.5644 }
+];
 
 function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(localState));}catch(e){}}
 
@@ -552,7 +577,7 @@ function loadGoogleMaps(){
   if(window.google&&google.maps){initializeGoogleMap();return;}
   const script=document.createElement('script');
   script.id='googleMapsScript';
-  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places';
+  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY);
   script.async=true;
   script.defer=true;
   script.onload=initializeGoogleMap;
@@ -564,11 +589,6 @@ function initializeGoogleMap(){
   try{
     googleReady=true;
 
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-      polylineOptions: { strokeColor: '#087f5b', strokeWeight: 6 }
-    });
-
     map = new google.maps.Map(document.getElementById('map'),{
       center: pickupLocation,
       zoom: 13,
@@ -577,10 +597,24 @@ function initializeGoogleMap(){
       fullscreenControl: true
     });
 
-    directionsRenderer.setMap(map);
+    pickupMarker = new google.maps.Marker({
+      position: pickupLocation,
+      map: map,
+      title: 'पिकअप'
+    });
+
+    destMarker = new google.maps.Marker({
+      position: destLocation,
+      map: map,
+      icon: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+      title: 'गंतव्य'
+    });
 
     document.getElementById('map').classList.add('loaded');
     document.getElementById('mapMessage').style.display='none';
+
+    // पहली बार लोड होते ही सिरसा से मेजा रोड का रूट तुरंत बना दें
+    drawFreeRoadRoute();
 
     if(window._pendingNativeLocation){
       const p=window._pendingNativeLocation;
@@ -588,7 +622,7 @@ function initializeGoogleMap(){
       applyCurrentLocation(p.lat,p.lng,p.accuracy);
     }
   }catch(e){
-    console.error('Map Init Error:', e);
+    console.error('Google Maps Init Error:', e);
   }
 }
 
@@ -612,191 +646,143 @@ let searchTimer=null;
 function onSearchInput(field){
   clearTimeout(searchTimer);
   const val = document.getElementById(field).value.trim();
-  if(val.length < 2){
+  if(val.length < 1){
     clearSuggestions(field);
     return;
   }
-  searchTimer = setTimeout(()=>findLocalPlaces(field, val), 200);
+  searchTimer = setTimeout(()=>executeInstantSearch(field, val), 150);
 }
 
-// सबसे मुख्य समाधान: 
-// 1. केवल लोकल दायरा (उत्तर प्रदेश - प्रयागराज/मिर्जापुर मंडल)
-// 2. दूरी के हिसाब से छांटना: पहले 2km, फिर 4km, फिर 10km (उत्तराखंड/बंगाल पूरी तरह बाहर)
-function findLocalPlaces(field, query){
+// ========================================================
+// इंस्टेंट सर्च: पहले लोकल डेटाबेस (दूरी के अनुसार), फिर ओपन सर्च
+// ========================================================
+function executeInstantSearch(field, query){
   const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
   if(!box)return;
-  box.innerHTML='<div class="suggestion">🔎 लोकल स्थान खोजे जा रहे हैं...</div>';
 
   const uLat = pickupLocation.lat;
   const uLng = pickupLocation.lng;
+  const qClean = query.toLowerCase();
 
-  // 1. Google Geocoder के साथ यूपी-प्रयागराज क्षेत्रीय प्राथमिकता
-  if(googleReady && window.google){
-    const geocoder = new google.maps.Geocoder();
-    
-    // अगर यूजर ने केवल नाम (जैसे रामनगर या खानपुर) लिखा है, तो सर्च को इसी मंडल में बांधें
-    const qLower = query.toLowerCase();
-    const hasRegion = qLower.includes('up') || qLower.includes('uttar pradesh') || qLower.includes('prayagraj') || qLower.includes('mirzapur');
-    const regionalQuery = hasRegion ? query : `${query}, Prayagraj, Uttar Pradesh`;
-
-    geocoder.geocode({
-      address: regionalQuery,
-      componentRestrictions: { country: 'in' }
-    }, (results, status)=>{
-      if(status === 'OK' && results && results.length > 0){
-        filterAndSortResults(field, results, box, uLat, uLng);
-      } else {
-        // अगर प्रयागराज संदर्भ से न मिले तो सीधे यूपी में खोजें
-        geocoder.geocode({
-          address: `${query}, Uttar Pradesh`,
-          componentRestrictions: { country: 'in' }
-        }, (res2, stat2)=>{
-          if(stat2 === 'OK' && res2 && res2.length > 0){
-            filterAndSortResults(field, res2, box, uLat, uLng);
-          } else {
-            fallbackLocalOSM(field, query, box, uLat, uLng);
-          }
-        });
-      }
-    });
-    return;
-  }
-
-  fallbackLocalOSM(field, query, box, uLat, uLng);
-}
-
-function filterAndSortResults(field, places, box, uLat, uLng){
-  const list = [];
-
-  places.forEach(p => {
-    const lat = p.geometry.location.lat();
-    const lng = p.geometry.location.lng();
-    const dist = calcDistance(uLat, uLng, lat, lng);
-
-    // सख्त नियम: 150 किमी से दूर वाले (उत्तराखंड, बंगाल, कर्नाटक) को लिस्ट से पूरी तरह बाहर निकालें
-    if(dist <= 150){
-      list.push({
-        title: (p.address_components && p.address_components[0]) ? p.address_components[0].long_name : p.formatted_address.split(',')[0],
-        address: p.formatted_address,
-        lat: lat,
-        lng: lng,
-        dist: dist
-      });
-    }
+  // 1. सबसे पहले अपने लोकल डेटाबेस से छानना
+  let localMatches = LOCAL_DATABASE.filter(item => {
+    return item.name.toLowerCase().includes(qClean) || item.address.toLowerCase().includes(qClean);
+  }).map(item => {
+    const dist = calcDistance(uLat, uLng, item.lat, item.lng);
+    return { ...item, dist: dist };
   });
 
   // सबसे नजदीक (2 किमी, 4 किमी) को 1 नंबर पर दिखाना
-  list.sort((a,b) => a.dist - b.dist);
+  localMatches.sort((a,b) => a.dist - b.dist);
 
-  if(list.length === 0){
-    box.innerHTML = '<div class="suggestion">आसपास कोई स्थान नहीं मिला। नाम पूरा लिखें।</div>';
+  if(localMatches.length > 0){
+    renderSearchButtons(field, localMatches, box);
     return;
   }
 
+  // 2. अगर लोकल डेटाबेस में नाम न हो (जैसे कोई बाहर का शहर डाले), तो फ्री ओपन सर्च करें
+  box.innerHTML='<div class="suggestion">🔎 स्थान खोजा जा रहा है...</div>';
+  fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=in&q=${encodeURIComponent(query + ' Uttar Pradesh')}`)
+    .then(r => r.json())
+    .then(data => {
+      if(!data || data.length === 0){
+        box.innerHTML = '<div class="suggestion">कोई स्थान नहीं मिला। कृपया नाम सही लिखें।</div>';
+        return;
+      }
+      const remoteMatches = data.map(item => {
+        const lat = parseFloat(item.lat);
+        const lng = parseFloat(item.lon);
+        return {
+          name: item.name || item.display_name.split(',')[0],
+          address: item.display_name,
+          lat: lat,
+          lng: lng,
+          dist: calcDistance(uLat, uLng, lat, lng)
+        };
+      });
+      remoteMatches.sort((a,b) => a.dist - b.dist);
+      renderSearchButtons(field, remoteMatches, box);
+    })
+    .catch(()=>{
+      box.innerHTML = '<div class="suggestion">सर्च करने में त्रुटि। इंटरनेट जांचें।</div>';
+    });
+}
+
+function renderSearchButtons(field, list, box){
   box.innerHTML='';
-  list.slice(0, 8).forEach(item => {
+  list.slice(0, 7).forEach(item => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'suggestion';
-    b.innerHTML = `<b>${escapeHtml(item.title)}</b> <span style="color:#087f5b;font-size:12px;font-weight:700;">(${item.dist.toFixed(1)} km दूर)</span><small>${escapeHtml(item.address)}</small>`;
+    b.innerHTML = `<b>${escapeHtml(item.name)}</b> <span style="color:#087f5b;font-size:12px;font-weight:700;">(${item.dist.toFixed(1)} km दूर)</span><small>${escapeHtml(item.address)}</small>`;
     
     b.onclick = () => {
-      document.getElementById(field).value = item.title;
+      document.getElementById(field).value = item.name;
       clearSuggestions(field);
       
-      const chosenLoc = {lat: item.lat, lng: item.lng};
-      if(field === 'pickup') {
-        pickupLocation = chosenLoc;
+      const loc = {lat: item.lat, lng: item.lng};
+      if(field === 'pickup'){
+        pickupLocation = loc;
+        if(pickupMarker) pickupMarker.setPosition(loc);
       } else {
-        destLocation = chosenLoc;
+        destLocation = loc;
+        if(destMarker) destMarker.setPosition(loc);
       }
 
-      // पक्का रूट तैयार करें
-      drawConfirmedRoute();
+      // तुरंत 100% पक्का फ्री सड़क रूट बनाएं
+      drawFreeRoadRoute();
     };
     box.appendChild(b);
   });
 }
 
-function fallbackLocalOSM(field, query, box, uLat, uLng){
-  fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=10&countrycodes=in&q=${encodeURIComponent(query + ' Uttar Pradesh')}`)
-    .then(r => r.json())
-    .then(data => {
-      if(!data || data.length === 0){
-        box.innerHTML = '<div class="suggestion">कोई स्थान नहीं मिला। कृपया नाम सही करें।</div>';
-        return;
-      }
-      const list = [];
-      data.forEach(item => {
-        const lat = parseFloat(item.lat);
-        const lng = parseFloat(item.lon);
-        const dist = calcDistance(uLat, uLng, lat, lng);
-        if(dist <= 150){
-          list.push({
-            title: item.name || item.display_name.split(',')[0],
-            address: item.display_name,
-            lat: lat,
-            lng: lng,
-            dist: dist
-          });
-        }
-      });
-
-      list.sort((a,b) => a.dist - b.dist);
-      box.innerHTML = '';
-      list.slice(0, 8).forEach(item => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'suggestion';
-        b.innerHTML = `<b>${escapeHtml(item.title)}</b> <span style="color:#087f5b;font-size:12px;font-weight:700;">(${item.dist.toFixed(1)} km दूर)</span><small>${escapeHtml(item.address)}</small>`;
-        b.onclick = () => {
-          document.getElementById(field).value = item.title;
-          clearSuggestions(field);
-          
-          const chosenLoc = {lat: item.lat, lng: item.lng};
-          if(field === 'pickup') {
-            pickupLocation = chosenLoc;
-          } else {
-            destLocation = chosenLoc;
-          }
-          drawConfirmedRoute();
-        };
-        box.appendChild(b);
-      });
-    })
-    .catch(()=>{
-      box.innerHTML = '<div class="suggestion">सर्च करने में त्रुटि हुई।</div>';
-    });
-}
-
-// 100% फुलप्रूफ रूट इंजन: LatLng ऑब्जेक्ट से सीधा रूट, कभी नहीं टूटेगा
-function drawConfirmedRoute(){
-  if(!googleReady || !map || !directionsService || !directionsRenderer) return;
-  if(!pickupLocation || !destLocation) return;
-
+// ========================================================
+// 100% फ्री सड़क मार्ग इंजन (OSRM Router - नो बिलिंग, नो क्रैश)
+// ========================================================
+function drawFreeRoadRoute(){
+  if(!destLocation) return;
   document.getElementById('customerStatus').innerHTML='<div class="status">🚗 सड़क मार्ग बनाया जा रहा है...</div>';
 
-  const originLatLng = new google.maps.LatLng(pickupLocation.lat, pickupLocation.lng);
-  const destLatLng = new google.maps.LatLng(destLocation.lat, destLocation.lng);
+  const url = `https://router.project-osrm.org/route/v1/driving/${pickupLocation.lng},${pickupLocation.lat};${destLocation.lng},${destLocation.lat}?overview=full&geometries=geojson`;
 
-  directionsService.route({
-    origin: originLatLng,
-    destination: destLatLng,
-    travelMode: google.maps.TravelMode.DRIVING
-  }, (res, status)=>{
-    if(status === google.maps.DirectionsStatus.OK){
-      directionsRenderer.setDirections(res);
-      const leg = res.routes[0].legs[0];
-      currentDistanceKm = (leg.distance.value / 1000);
-      document.getElementById('distanceKm').value = currentDistanceKm.toFixed(2);
-      updateFarePreview();
-      document.getElementById('customerStatus').innerHTML = 
-        `<div class="status success">📏 सड़क की दूरी: <b>${currentDistanceKm.toFixed(2)} km</b> (${leg.duration.text})</div>`;
-    } else {
-      document.getElementById('customerStatus').innerHTML = 
-        '<div class="status warning">⚠️ इस स्थान तक सीधा सड़क मार्ग नहीं मिला। मुख्य मार्ग का स्थान चुनें।</div>';
-    }
-  });
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if(data.routes && data.routes.length > 0){
+        const route = data.routes[0];
+        currentDistanceKm = (route.distance / 1000);
+        document.getElementById('distanceKm').value = currentDistanceKm.toFixed(2);
+        updateFarePreview();
+
+        // गूगल मैप पर सड़क की पक्की हरी/नीली लाइन खींचना
+        if(map && window.google){
+          if(routePolyline) routePolyline.setMap(null);
+
+          const pathCoords = route.geometry.coordinates.map(c => ({lat: c[1], lng: c[0]}));
+          routePolyline = new google.maps.Polyline({
+            path: pathCoords,
+            geodesic: true,
+            strokeColor: '#087f5b',
+            strokeOpacity: 0.9,
+            strokeWeight: 6,
+            map: map
+          });
+
+          const bounds = new google.maps.LatLngBounds();
+          pathCoords.forEach(pt => bounds.extend(pt));
+          map.fitBounds(bounds);
+        }
+
+        const mins = Math.round(route.duration / 60);
+        document.getElementById('customerStatus').innerHTML = 
+          `<div class="status success">📏 सड़क की दूरी: <b>${currentDistanceKm.toFixed(2)} km</b> (लगभग ${mins} मिनट)</div>`;
+      } else {
+        document.getElementById('customerStatus').innerHTML = '<div class="status warning">⚠️ इस स्थान के लिए सड़क मार्ग नहीं मिला।</div>';
+      }
+    })
+    .catch(()=>{
+      document.getElementById('customerStatus').innerHTML = '<div class="status warning">⚠️ रूट सर्वर से संपर्क नहीं हो सका। इंटरनेट जांचें।</div>';
+    });
 }
 
 function useCurrentLocation(){
@@ -833,24 +819,26 @@ function applyCurrentLocation(lat,lng,accuracy){
   const pickup = document.getElementById('pickup');
   pickup.value = 'सिरसा, प्रयागराज';
 
+  if(pickupMarker) pickupMarker.setPosition(pickupLocation);
   if(map){
     map.setCenter(pickupLocation);
     map.setZoom(15);
   }
 
-  // रिवर्स जियोकोडिंग
-  if(googleReady){
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({location: pickupLocation}, (results, status)=>{
-      if(status === 'OK' && results && results[0]){
-        pickup.value = results[0].formatted_address.split(',')[0] + ', प्रयागराज';
-        document.getElementById('customerStatus').innerHTML = `<div class="status success">📍 करंट लोकेशन: ${escapeHtml(results[0].formatted_address)}</div>`;
+  // रिवर्स जियोकोडिंग (सिरसा के नाम के लिए)
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+    .then(r => r.json())
+    .then(data => {
+      if(data && data.display_name){
+        const shortName = data.address.village || data.address.suburb || data.address.town || 'सिरसा';
+        pickup.value = shortName + ', प्रयागराज';
+        document.getElementById('customerStatus').innerHTML = `<div class="status success">📍 करंट लोकेशन: ${escapeHtml(data.display_name)}</div>`;
       }
-    });
-  }
+    })
+    .catch(()=>{});
 
   if(destLocation){
-    drawConfirmedRoute();
+    drawFreeRoadRoute();
   }
 }
 
