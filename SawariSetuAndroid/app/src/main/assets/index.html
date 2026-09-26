@@ -106,6 +106,25 @@ input[readonly]{
   background:#f2f5f8;
 }
 
+/* गूगल के असली सजेशन बॉक्स को साफ़ और ऊपर दिखाना */
+.pac-container {
+  z-index: 99999 !important;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  border: 2px solid #087f5b;
+  font-family: inherit;
+}
+.pac-item {
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pac-item-query {
+  font-size: 15px;
+  color: #172033;
+  font-weight: 700;
+}
+
 button{
   border:0;
   border-radius:10px;
@@ -161,43 +180,6 @@ button{
   width:100%;
   height:100%;
 }
-
-.search-wrap{position:relative}
-.suggestions{
-  position:absolute;
-  left:0;
-  right:0;
-  top:100%;
-  z-index:1000;
-  background:#fff;
-  border:2px solid #087f5b;
-  border-radius:0 0 12px 12px;
-  box-shadow:0 10px 25px #0004;
-  overflow:hidden;
-  max-height:260px;
-  overflow-y:auto;
-}
-
-.suggestion{
-  display:block;
-  width:100%;
-  text-align:left;
-  background:#fff;
-  border:0;
-  border-bottom:1px solid #eef1f4;
-  border-radius:0;
-  padding:12px;
-  color:#172033;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.suggestion:hover{
-  background:#f0faf6;
-}
-
-.suggestion:last-child{border-bottom:0}
-.suggestion small{display:block;color:#687386;font-weight:400;margin-top:4px;font-size:12px;}
 
 .map-message{
   position:absolute;
@@ -328,20 +310,14 @@ button{
     <h2>🚕 Ride Book</h2>
 
     <label>पिकअप (Pickup)</label>
-    <div class="search-wrap">
-      <input id="pickup" value="सिरसा, प्रयागराज" oninput="inputChanged('pickup')">
-      <div id="pickupSuggestions" class="suggestions"></div>
-    </div>
+    <input id="pickup" value="Sirsa, Prayagraj, Uttar Pradesh">
 
     <button class="gps-btn" onclick="useCurrentLocation()">
       📍 मेरी वर्तमान लोकेशन
     </button>
 
     <label>कहाँ जाना है (Destination)</label>
-    <div class="search-wrap">
-      <input id="destination" placeholder="जैसे: माता धाम, मेजा रोड हॉस्पिटल, चिलबिला, खानपुर" oninput="inputChanged('destination')">
-      <div id="destinationSuggestions" class="suggestions"></div>
-    </div>
+    <input id="destination" placeholder="स्थान, बाजार, मंदिर या अस्पताल लिखें...">
 
     <div class="mapbox">
       <div id="map"></div>
@@ -484,15 +460,15 @@ let driverOnline=false;
 let map=null;
 let googleReady=false;
 let currentDistanceKm=0;
-let lastRouteKey='';
 
-// सिरसा और मेजा रोड के डिफ़ॉल्ट आधार बिंदु
+// आधार बिंदु (सिरसा प्रयागराज)
 let pickupLocation = {lat: 25.2672, lng: 82.0725};
-let destLocation = {lat: 25.2144, lng: 82.1158};
+let destLocation = null;
 
 let directionsRenderer=null;
 let directionsService=null;
-let placesService=null;
+let pickupAutocomplete=null;
+let destAutocomplete=null;
 
 function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(localState));}catch(e){}}
 
@@ -580,13 +556,12 @@ function initializeGoogleMap(){
     });
 
     directionsRenderer.setMap(map);
-    placesService = new google.maps.places.PlacesService(map);
 
     document.getElementById('map').classList.add('loaded');
     document.getElementById('mapMessage').style.display='none';
 
-    // पहली बार में सिरसा से मेजा रोड का रूट तुरंत तैयार करना
-    calculateRoute();
+    // गूगल के असली ऑटो-कम्पलीट को इनपुट बॉक्स से जोड़ना
+    setupNativeGoogleAutocomplete();
 
     if(window._pendingNativeLocation){
       const p=window._pendingNativeLocation;
@@ -598,142 +573,49 @@ function initializeGoogleMap(){
   }
 }
 
-function clearSuggestions(field){
-  const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
-  if(box)box.innerHTML='';
-}
+// यह वही असली Google Places Autocomplete है जिससे प्रयागराज, नैनी, करछना, मांडा, रामनगर सब आते हैं
+function setupNativeGoogleAutocomplete(){
+  const destInput = document.getElementById('destination');
+  const pickupInput = document.getElementById('pickup');
 
-// हवाई दूरी की गणना
-function getDistanceInKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-}
+  // आपके केंद्र के चारों ओर 50 किमी का दायरा
+  const circle = new google.maps.Circle({
+    center: new google.maps.LatLng(pickupLocation.lat, pickupLocation.lng),
+    radius: 50000
+  });
 
-let searchTimer=null;
-function inputChanged(field){
-  clearTimeout(searchTimer);
-  const val = document.getElementById(field).value.trim();
-  if(val.length < 2){
-    clearSuggestions(field);
-    return;
-  }
-  searchTimer = setTimeout(()=>smartBusinessSearch(field, val), 240);
-}
-
-// मास्टर सर्च: मंदिर, अस्पताल, रेस्टोरेंट, चिलबिला बाजार, खानपुर सब खोजेगा
-function smartBusinessSearch(field, query){
-  const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
-  if(!box)return;
-  box.innerHTML='<div class="suggestion">🔎 खोजा जा रहा है...</div>';
-
-  const userLat = pickupLocation.lat;
-  const userLng = pickupLocation.lng;
-
-  if(!googleReady || !placesService){
-    return;
-  }
-
-  // 1. Google Places findPlaceFromQuery और textSearch (सबसे सटीक बिजनेस व लैंडमार्क इंजन)
-  const request = {
-    query: query,
-    locationBias: {
-      center: new google.maps.LatLng(userLat, userLng),
-      radius: 40000 // 40 किमी का दायरा
-    },
-    fields: ['name', 'geometry', 'formatted_address']
+  const options = {
+    bounds: circle.getBounds(),
+    componentRestrictions: { country: "in" },
+    fields: ["geometry", "name", "formatted_address"]
   };
 
-  placesService.textSearch(request, (results, status)=>{
-    if(status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0){
-      const items = results.map(r => ({
-        title: r.name,
-        address: r.formatted_address,
-        lat: r.geometry.location.lat(),
-        lng: r.geometry.location.lng(),
-        dist: getDistanceInKm(userLat, userLng, r.geometry.location.lat(), r.geometry.location.lng())
-      }));
-
-      // सबसे नजदीकी स्थान (जैसे 1-2 किमी पर खानपुर, रामनगर माता धाम) सबसे ऊपर
-      items.sort((a,b) => a.dist - b.dist);
-      renderResults(field, items, box);
-    } else {
-      // अगर Google TextSearch को सीधे न मिले, तो Google Autocomplete को लोकल बायस के साथ कॉल करें
-      autocompleteFallback(field, query, box, userLat, userLng);
+  destAutocomplete = new google.maps.places.Autocomplete(destInput, options);
+  destAutocomplete.addListener('place_changed', () => {
+    const place = destAutocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) {
+      return;
     }
-  });
-}
-
-function autocompleteFallback(field, query, box, userLat, userLng){
-  const autoService = new google.maps.places.AutocompleteService();
-  const circle = new google.maps.Circle({
-    center: new google.maps.LatLng(userLat, userLng),
-    radius: 40000
-  });
-
-  autoService.getPlacePredictions({
-    input: query,
-    bounds: circle.getBounds(),
-    componentRestrictions: { country: 'in' }
-  }, (predictions, status)=>{
-    if(status === google.maps.places.PlacesServiceStatus.OK && predictions && predictions.length > 0){
-      box.innerHTML='';
-      predictions.slice(0, 7).forEach(p => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'suggestion';
-        b.innerHTML = `<b>${escapeHtml(p.structured_formatting.main_text)}</b><small>${escapeHtml(p.description)}</small>`;
-        b.onclick = () => {
-          document.getElementById(field).value = p.structured_formatting.main_text;
-          clearSuggestions(field);
-
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({placeId: p.place_id}, (res, stat)=>{
-            if(stat === 'OK' && res[0]){
-              const loc = {lat: res[0].geometry.location.lat(), lng: res[0].geometry.location.lng()};
-              if(field === 'pickup'){
-                pickupLocation = loc;
-              } else {
-                destLocation = loc;
-              }
-              lastRouteKey = '';
-              calculateRoute();
-            }
-          });
-        };
-        box.appendChild(b);
-      });
-    } else {
-      box.innerHTML='<div class="suggestion">कोई स्थान नहीं मिला। कृपया नाम थोड़ा सा बदल कर देखें।</div>';
-    }
-  });
-}
-
-function renderResults(field, items, box){
-  box.innerHTML='';
-  items.slice(0, 8).forEach(item => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'suggestion';
-    b.innerHTML = `<b>${escapeHtml(item.title)}</b> <span style="color:#087f5b;font-size:12px;font-weight:700;">(${item.dist.toFixed(1)} km दूर)</span><small>${escapeHtml(item.address)}</small>`;
-    b.onclick = () => {
-      document.getElementById(field).value = item.title;
-      clearSuggestions(field);
-
-      const loc = {lat: item.lat, lng: item.lng};
-      if(field === 'pickup'){
-        pickupLocation = loc;
-      } else {
-        destLocation = loc;
-      }
-      lastRouteKey = '';
-      calculateRoute();
+    destLocation = {
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng()
     };
-    box.appendChild(b);
+    calculateRoute();
+  });
+
+  pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, options);
+  pickupAutocomplete.addListener('place_changed', () => {
+    const place = pickupAutocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) {
+      return;
+    }
+    pickupLocation = {
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng()
+    };
+    if (destLocation) {
+      calculateRoute();
+    }
   });
 }
 
@@ -742,25 +624,19 @@ function calculateRoute(){
   if(!googleReady || !map || !directionsService || !directionsRenderer) return;
   if(!pickupLocation || !destLocation) return;
 
-  const key = `${pickupLocation.lat},${pickupLocation.lng}||${destLocation.lat},${destLocation.lng}`;
-  if(key === lastRouteKey && currentDistanceKm) return;
-
-  document.getElementById('mapMessage').style.display='flex';
-  document.getElementById('mapMessage').textContent='सड़क का रूट बनाया जा रहा है...';
+  document.getElementById('customerStatus').innerHTML='<div class="status">🚗 सड़क मार्ग बनाया जा रहा है...</div>';
 
   directionsService.route({
     origin: new google.maps.LatLng(pickupLocation.lat, pickupLocation.lng),
     destination: new google.maps.LatLng(destLocation.lat, destLocation.lng),
     travelMode: google.maps.TravelMode.DRIVING
   }, (res, status)=>{
-    document.getElementById('mapMessage').style.display='none';
     if(status === google.maps.DirectionsStatus.OK){
       directionsRenderer.setDirections(res);
       const leg = res.routes[0].legs[0];
       currentDistanceKm = (leg.distance.value / 1000);
       document.getElementById('distanceKm').value = currentDistanceKm.toFixed(2);
       updateFarePreview();
-      lastRouteKey = key;
       document.getElementById('customerStatus').innerHTML = 
         `<div class="status success">📏 सड़क की दूरी: <b>${currentDistanceKm.toFixed(2)} km</b> (${leg.duration.text})</div>`;
     } else {
@@ -809,19 +685,29 @@ function applyCurrentLocation(lat,lng,accuracy){
     map.setZoom(15);
   }
 
+  // जब GPS नया मिले तो ऑटो-कम्पलीट के घेरे को भी नई जगह पर अपडेट कर दें
+  if(destAutocomplete && window.google){
+    const circle = new google.maps.Circle({
+      center: new google.maps.LatLng(lat, lng),
+      radius: 50000
+    });
+    destAutocomplete.setBounds(circle.getBounds());
+  }
+
   // रिवर्स जियोकोडिंग
   if(googleReady){
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({location: pickupLocation}, (results, status)=>{
       if(status === 'OK' && results && results[0]){
-        pickup.value = results[0].formatted_address.split(',')[0] + ', प्रयागराज';
+        pickup.value = results[0].formatted_address;
         document.getElementById('customerStatus').innerHTML = `<div class="status success">📍 करंट लोकेशन: ${escapeHtml(results[0].formatted_address)}</div>`;
       }
     });
   }
 
-  lastRouteKey = '';
-  calculateRoute();
+  if(destLocation){
+    calculateRoute();
+  }
 }
 
 function book(){
