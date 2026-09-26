@@ -2,6 +2,7 @@ package com.sawarisetu.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,17 +27,16 @@ import java.io.InputStream;
 public class MainActivity extends Activity {
     private static final String ORIGIN = "https://sawarisetu.local/";
     private static final int LOCATION_REQUEST = 10;
-    private static final long LOCATION_TIMEOUT_MS = 30000L;
-    private static final float MAX_ACCEPTABLE_ACCURACY_M = 100f;
+    private static final long GPS_TIMEOUT_MS = 25000L;
 
     private WebView webView;
     private LocationManager locationManager;
-    private Location bestLocation;
-    private LocationListener locationListener;
+    private LocationListener gpsListener;
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private boolean locationRequestRunning = false;
+    private boolean isListening = false;
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
         setContentView(webView);
@@ -51,11 +51,12 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new AssetWebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
-            @Override public void onGeolocationPermissionsShowPrompt(String origin,
-                    GeolocationPermissions.Callback callback) {
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
                 callback.invoke(origin, true, false);
             }
         });
+
         webView.addJavascriptInterface(new AndroidLocationBridge(), "AndroidLocation");
         webView.loadUrl(ORIGIN + "index.html");
 
@@ -72,125 +73,82 @@ public class MainActivity extends Activity {
                 checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private boolean hasAnyLocationPermission() {
-        return Build.VERSION.SDK_INT < 23 ||
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
     private void requestNativeLocation() {
         stopLocationUpdates();
 
-        if (!hasAnyLocationPermission()) {
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, LOCATION_REQUEST);
-            notifyJs("लोकेशन permission दें, फिर 'मेरी वर्तमान लोकेशन' दोबारा दबाएँ।", true);
-            return;
-        }
-
-        // Ride pickup needs precise location. Do not silently accept Android's
-        // approximate/coarse permission, because that can place the user many km away.
         if (!hasFineLocation()) {
-            notifyJs("सटीक (Precise) Location permission चालू करें। Android में Location permission में 'Precise' चुनें।", true);
+            if (Build.VERSION.SDK_INT >= 23) {
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_REQUEST);
+            }
+            notifyJs("सटीक (Precise) GPS अनुमति दें।", true);
             return;
         }
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationManager == null) {
-            notifyJs("फोन का Location service उपलब्ध नहीं है।", true);
+            notifyJs("लोकेशन सेवा उपलब्ध नहीं है।", true);
             return;
         }
 
-        boolean gpsEnabled = false;
-        boolean networkEnabled = false;
-        try {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ignored) {}
-
-        if (!gpsEnabled && !networkEnabled) {
-            notifyJs("Phone का Location/GPS ON करें, फिर दोबारा प्रयास करें।", true);
+        boolean isGpsOn = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!isGpsOn) {
+            notifyJs("कृपया फोन की सेटिंग्स से GPS (Location) ON करें।", true);
             return;
         }
 
-        bestLocation = null;
-        locationRequestRunning = true;
-        locationListener = new LocationListener() {
-            @Override public void onLocationChanged(Location location) {
-                if (!isUsableFreshLocation(location)) return;
+        isListening = true;
 
-                if (bestLocation == null || isBetter(location, bestLocation)) {
-                    bestLocation = new Location(location);
-                }
-
-                if (bestLocation.hasAccuracy() && bestLocation.getAccuracy() <= MAX_ACCEPTABLE_ACCURACY_M) {
-                    sendLocation(bestLocation);
+        gpsListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location loc) {
+                if (loc != null && loc.hasAccuracy() && loc.getAccuracy() <= 60.0f) {
+                    // सिर्फ सैटेलाइट आधारित सटीक फिक्स ही ऐप को भेजा जाएगा
+                    sendLocationToJs(loc);
                     stopLocationUpdates();
                 }
             }
+            @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
+            @Override public void onProviderEnabled(String provider) {}
+            @Override public void onProviderDisabled(String provider) {}
         };
 
         try {
-            if (gpsEnabled) {
-                locationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 500L, 0f, locationListener, Looper.getMainLooper());
-            }
-            if (networkEnabled) {
-                locationManager.requestLocationUpdates(
-                        LocationManager.NETWORK_PROVIDER, 1000L, 0f, locationListener, Looper.getMainLooper());
-            }
+            // सेल-टावर (Network) को छोड़कर केवल हाई-एक्यूरेसी GPS_PROVIDER से डेटा लेना
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    1000L,
+                    0f,
+                    gpsListener,
+                    Looper.getMainLooper()
+            );
         } catch (SecurityException e) {
-            stopLocationUpdates();
-            notifyJs("Location permission उपलब्ध नहीं है।", true);
+            notifyJs("GPS अनुमति की समस्या है।", true);
             return;
         }
 
+        // 25 सेकंड तक अगर 60 मीटर से बेहतर सैटेलाइट सिग्नल न मिले तो उपलब्ध बेस्ट लोकेशन भेजें
         handler.postDelayed(() -> {
-            if (!locationRequestRunning) return;
-            Location result = bestLocation;
-            if (result != null && isUsableFreshLocation(result)
-                    && result.hasAccuracy() && result.getAccuracy() <= MAX_ACCEPTABLE_ACCURACY_M) {
-                sendLocation(result);
-            } else {
-                notifyJs("सटीक GPS location नहीं मिली। कृपया खुले स्थान में जाकर Location/GPS ON करके फिर कोशिश करें।", true);
-            }
+            if (!isListening) return;
+            try {
+                Location lastGps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (lastGps != null && (System.currentTimeMillis() - lastGps.getTime()) < 60000) {
+                    sendLocationToJs(lastGps);
+                } else {
+                    notifyJs("कमज़ोर GPS सिग्नल। कृपया खुले स्थान में जाकर फिर प्रयास करें।", true);
+                }
+            } catch (SecurityException ignored) {}
             stopLocationUpdates();
-        }, LOCATION_TIMEOUT_MS);
+        }, GPS_TIMEOUT_MS);
     }
 
-    private boolean isUsableFreshLocation(Location location) {
-        if (location == null || !location.hasAccuracy()) return false;
-        if (location.getAccuracy() <= 0f || location.getAccuracy() > 1000f) return false;
-
-        long now = System.currentTimeMillis();
-        long ageMs = now - location.getTime();
-        if (ageMs < -10000L) return false;
-        if (ageMs > 15000L) return false;
-
-        if (Build.VERSION.SDK_INT >= 18 && location.isFromMockProvider()) return false;
-        return true;
-    }
-
-    private boolean isBetter(Location a, Location b) {
-        if (b == null) return true;
-        if (!a.hasAccuracy()) return false;
-        if (!b.hasAccuracy()) return true;
-        return a.getAccuracy() + 5f < b.getAccuracy();
-    }
-
-    private void sendLocation(Location location) {
-        if (location == null) return;
-        final double lat = location.getLatitude();
-        final double lon = location.getLongitude();
-        final float accuracy = location.hasAccuracy() ? location.getAccuracy() : 0f;
-
+    private void sendLocationToJs(Location loc) {
         runOnUiThread(() -> {
             if (webView == null) return;
-            String js = "if(typeof window.onNativeLocation==='function'){window.onNativeLocation(" +
-                    lat + "," + lon + "," + accuracy + ");}" +
-                    "else{window._pendingNativeLocation={lat:" + lat + ",lng:" + lon + ",accuracy:" + accuracy + "};}";
+            String js = "if(typeof window.onNativeLocation==='function'){window.onNativeLocation("
+                    + loc.getLatitude() + "," + loc.getLongitude() + "," + loc.getAccuracy() + ");}";
             webView.evaluateJavascript(js, null);
         });
     }
@@ -198,45 +156,39 @@ public class MainActivity extends Activity {
     private void notifyJs(String message, boolean error) {
         runOnUiThread(() -> {
             if (webView == null) return;
-            String safe = message.replace("\\", "\\\\").replace("'", "\\'");
+            String safe = message.replace("'", "\\'");
             webView.evaluateJavascript(
                     "if(typeof window.showNativeLocationMessage==='function'){window.showNativeLocationMessage('" + safe + "'," + error + ");}",
-                    null);
-            if (error) Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                    null
+            );
+            if (error) Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
         });
     }
 
     private void stopLocationUpdates() {
-        locationRequestRunning = false;
+        isListening = false;
         handler.removeCallbacksAndMessages(null);
-        if (locationManager != null && locationListener != null) {
-            try { locationManager.removeUpdates(locationListener); } catch (SecurityException ignored) {}
+        if (locationManager != null && gpsListener != null) {
+            try { locationManager.removeUpdates(gpsListener); } catch (Exception ignored) {}
         }
-        locationListener = null;
-    }
-
-    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode != LOCATION_REQUEST) return;
-        if (hasFineLocation()) {
-            notifyJs("सटीक Location permission मिल गई। अब 'मेरी वर्तमान लोकेशन' दबाएँ।", false);
-        } else if (hasAnyLocationPermission()) {
-            notifyJs("Approximate location मिली है। Ride pickup के लिए Precise Location चुनें।", true);
-        } else {
-            notifyJs("Location permission नहीं मिली।", true);
-        }
+        gpsListener = null;
     }
 
     private class AndroidLocationBridge {
-        @JavascriptInterface public void requestLocation() { requestNativeLocation(); }
+        @JavascriptInterface
+        public void requestLocation() {
+            requestNativeLocation();
+        }
     }
 
     private class AssetWebViewClient extends WebViewClient {
-        @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             return serve(request.getUrl().getPath());
         }
 
-        @Override public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
             try { return serve(android.net.Uri.parse(url).getPath()); }
             catch (Exception e) { return null; }
         }
@@ -254,13 +206,15 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         stopLocationUpdates();
         if (webView != null) webView.destroy();
         super.onDestroy();
     }
 
-    @Override public void onBackPressed() {
+    @Override
+    public void onBackPressed() {
         if (webView != null && webView.canGoBack()) webView.goBack();
         else super.onBackPressed();
     }
