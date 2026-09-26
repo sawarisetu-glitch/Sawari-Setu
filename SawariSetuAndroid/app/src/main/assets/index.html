@@ -502,6 +502,7 @@ button{
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU";
 const firebaseConfig = {apiKey:"AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",authDomain:"sawari-setu.firebaseapp.com",projectId:"sawari-setu",storageBucket:"sawari-setu.firebasestorage.app",messagingSenderId:"292605368862",appId:"1:292605368862:web:b9945354dfd21f7eb62c0f",measurementId:"G-567NSGD4R4"};
 let db=null, bookingsRef=null;
+let lastRouteKey='';
 try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();bookingsRef=db.collection("bookings");}catch(e){console.warn(e);}
 const STORAGE_KEY="sawari_setu_v2";
 let localState={rideType:"Share",earnings:0};
@@ -601,7 +602,7 @@ async function searchPlaceSuggestions(field,q){
   let shown=false;
   try{
     const {Place}=await google.maps.importLibrary('places');
-    const response=await Place.searchByText({textQuery:q,fields:['displayName','formattedAddress','location','id','types','primaryType'],locationBias:{center:c,radius:8000},maxResultCount:8,rankPreference:'RELEVANCE',language:'hi',region:'IN'});
+    const response=await Place.searchByText({textQuery:q,fields:['displayName','formattedAddress','location','id','types','primaryType'],locationBias:{center:c,radius:(field==='destination'?150000:25000)},maxResultCount:8,rankPreference:'DISTANCE',language:'hi',region:'IN'});
     const places=(response&&response.places)||[];
     if(places.length){renderGooglePlaceSuggestions(field,places,box);shown=true;}
   }catch(e){console.warn('Places API failed:',e);}
@@ -613,21 +614,13 @@ async function searchPlaceSuggestions(field,q){
     if(results.length){renderGeocoderSuggestions(field,results.slice(0,8),box);return;}
   }catch(e){console.warn('Google Geocoder failed:',e);}
   try{
-    const photon='https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit=8&lang=hi';
-    const response=await fetch(photon,{headers:{'Accept':'application/json'}});
-    if(!response.ok)throw Error('Photon HTTP '+response.status);
-    const data=await response.json();
-    const features=(data&&data.features)||[];
-    if(features.length){renderPhotonSuggestions(field,features,box);return;}
-  }catch(e){console.warn('Photon search failed:',e);}
-  try{
     const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=1&countrycodes=in&q='+encodeURIComponent(q);
     const response=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hi,en'}});
-    if(!response.ok)throw Error('Nominatim HTTP '+response.status);
+    if(!response.ok)throw Error('HTTP '+response.status);
     const data=await response.json();
-    if(data.length){renderNominatimSuggestions(field,data,box);return;}
-  }catch(e){console.warn('Nominatim search failed:',e);}
-  box.innerHTML='<div class="suggestion">कोई matching location नहीं मिली। कृपया area/जिला भी लिखें।</div>';
+    if(!data.length){box.innerHTML='<div class="suggestion">कोई matching location नहीं मिली।</div>';return;}
+    renderNominatimSuggestions(field,data,box);
+  }catch(e){console.error('Location search:',e);box.innerHTML='<div class="suggestion">Search में समस्या आई। Internet connection जाँचें।</div>';}
 }
 function renderGooglePlaceSuggestions(field,places,box){
   box.innerHTML='';
@@ -636,24 +629,6 @@ function renderGooglePlaceSuggestions(field,places,box){
 function renderGeocoderSuggestions(field,results,box){
   box.innerHTML='';
   results.forEach(result=>{const loc=result.geometry&&result.geometry.location;if(!loc)return;const place={displayName:(result.address_components&&result.address_components[0]&&result.address_components[0].long_name)||result.formatted_address,formattedAddress:result.formatted_address,location:loc,id:null,types:result.types||[]};const b=document.createElement('button');b.type='button';b.className='suggestion';b.innerHTML=escapeHtml(place.displayName)+(place.formattedAddress?'<small>'+escapeHtml(place.formattedAddress)+'</small>':'');b.onclick=()=>selectGooglePlace(field,place);box.appendChild(b);});
-}
-
-function renderPhotonSuggestions(field,features,box){
-  box.innerHTML='';
-  features.forEach(f=>{
-    const c=f.geometry&&f.geometry.coordinates||[];
-    const lng=Number(c[0]),lat=Number(c[1]);
-    if(!isFinite(lat)||!isFinite(lng))return;
-    const p=f.properties||{};
-    const name=p.name||p.city||p.town||p.village||'Location';
-    const parts=[p.street,p.locality,p.village,p.town,p.city,p.district,p.state].filter(Boolean);
-    const address=[...new Set(parts)].join(', ')||name;
-    const place={displayName:name,formattedAddress:address,location:{lat,lng},id:null,types:[]};
-    const b=document.createElement('button');b.type='button';b.className='suggestion';
-    b.innerHTML=escapeHtml(name)+'<small>'+escapeHtml(address)+'</small>';
-    b.onclick=()=>selectGooglePlace(field,place);
-    box.appendChild(b);
-  });
 }
 
 function renderNominatimSuggestions(field,data,box){
@@ -719,6 +694,13 @@ window.onNativeLocation=function(lat,lng,accuracy){
   applyCurrentLocation(lat,lng,accuracy);
 };
 
+window.showNativeLocationMessage=function(message,isError){
+  const box=document.getElementById('customerStatus');
+  if(box)box.innerHTML='<div class=\"status '+(isError?'warning':'')+'\">'+escapeHtml(message||'')+'</div>';
+  const msg=document.getElementById('mapMessage');
+  if(msg&&isError){msg.style.display='flex';msg.textContent=message||'Location नहीं मिली।';}
+};
+
 function useCurrentLocation(){
   const msg=document.getElementById('mapMessage');
   msg.style.display='flex';msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
@@ -758,22 +740,9 @@ async function reverseGeocode(pos){
     }catch(e){console.warn('Google reverse geocode failed:',e);}
   }
   try{
-    const url='https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lng)+'&localityLanguage=hi';
-    const response=await fetch(url,{headers:{'Accept':'application/json'}});
-    if(!response.ok)throw Error('BigDataCloud HTTP '+response.status);
-    const data=await response.json();
-    const parts=[data.localityInfo&&data.localityInfo.administrative&&data.localityInfo.administrative.find(x=>x.order===8)?.name,data.locality,data.city,data.principalSubdivision].filter(Boolean);
-    const address=[...new Set(parts)].join(', ');
-    if(address){
-      pickup.value=address;pickup._selectedPlace=null;pickupPlace=null;
-      document.getElementById('customerStatus').innerHTML='<div class="status success">📍 Current location<br>'+escapeHtml(address)+'<br><span class="small">Accuracy: लगभग '+Math.round(pos.accuracy||0)+' m</span></div>';
-      calculateRoute();return;
-    }
-  }catch(e){console.warn('BigDataCloud reverse geocode failed:',e);}
-  try{
     const url='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lng)+'&zoom=18&addressdetails=1';
     const response=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hi,en'}});
-    if(!response.ok)throw Error('Nominatim HTTP '+response.status);
+    if(!response.ok)throw Error('HTTP '+response.status);
     const data=await response.json();
     const address=data.display_name||[data.address&&data.address.village,data.address&&data.address.town,data.address&&data.address.city,data.address&&data.address.state].filter(Boolean).join(', ');
     if(address){
