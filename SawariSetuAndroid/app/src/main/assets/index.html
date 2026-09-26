@@ -132,20 +132,6 @@ button{
   color:#c62828;
 }
 
-.blue{
-  background:#e9f1ff;
-  color:#1557b0;
-}
-
-.row{
-  display:flex;
-  gap:8px;
-}
-
-.row>*{
-  flex:1;
-}
-
 .choice{
   display:flex;
   gap:8px;
@@ -177,11 +163,10 @@ button{
 }
 
 .search-wrap{position:relative}
-.suggestions{position:absolute;left:0;right:0;top:100%;z-index:1000;background:#fff;border:1px solid #d8dee8;border-radius:0 0 12px 12px;box-shadow:0 8px 20px #0002;overflow:hidden;max-height:220px;overflow-y:auto;}
+.suggestions{position:absolute;left:0;right:0;top:100%;z-index:1000;background:#fff;border:1px solid #d8dee8;border-radius:0 0 12px 12px;box-shadow:0 8px 20px #0002;overflow:hidden;max-height:230px;overflow-y:auto;}
 .suggestion{display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #eef1f4;border-radius:0;padding:11px 12px;color:#172033;font-weight:600;cursor:pointer;}
 .suggestion:last-child{border-bottom:0}
 .suggestion small{display:block;color:#687386;font-weight:400;margin-top:3px}
-.nearby-note{font-size:12px;color:#687386;margin-top:8px}
 
 .map-message{
   position:absolute;
@@ -288,12 +273,6 @@ button{
 .contact-buttons button{
   flex:1;
 }
-
-@media(max-width:420px){
-  .row{
-    flex-direction:column;
-  }
-}
 </style>
 </head>
 
@@ -317,10 +296,9 @@ button{
   <div class="card">
     <h2>🚕 Ride Book</h2>
 
-    <label>Pickup</label>
+    <label>पिकअप (Pickup)</label>
     <div class="search-wrap">
-      <input id="pickup" value="Sirsa, Prayagraj, Uttar Pradesh"
-             oninput="inputChanged('pickup')">
+      <input id="pickup" value="सिरसा, प्रयागराज" oninput="inputChanged('pickup')">
       <div id="pickupSuggestions" class="suggestions"></div>
     </div>
 
@@ -328,10 +306,9 @@ button{
       📍 मेरी वर्तमान लोकेशन
     </button>
 
-    <label>Destination</label>
+    <label>कहाँ जाना है (Destination)</label>
     <div class="search-wrap">
-      <input id="destination" value="Meja Road, Prayagraj, Uttar Pradesh"
-             oninput="inputChanged('destination')">
+      <input id="destination" placeholder="जैसे: रामनगर, मांडा, मिर्जापुर" oninput="inputChanged('destination')">
       <div id="destinationSuggestions" class="suggestions"></div>
     </div>
 
@@ -341,23 +318,16 @@ button{
         Google Maps लोड हो रहा है...
       </div>
     </div>
-    <div id="nearbyNote" class="nearby-note"></div>
 
-    <label>Automatic Road Distance</label>
-    <input id="distanceKm"
-           readonly
-           placeholder="Route मिलने के बाद दूरी अपने आप आएगी">
+    <label>सड़क की दूरी (Road Distance)</label>
+    <input id="distanceKm" readonly placeholder="स्थान चुनते ही दूरी आएगी">
 
     <div class="choice" style="margin-top:12px">
-      <button id="shareBtn" class="selected" onclick="setRideType('Share')">
-        Share Ride
-      </button>
-      <button id="directBtn" onclick="setRideType('Direct')">
-        Direct Ride
-      </button>
+      <button id="shareBtn" class="selected" onclick="setRideType('Share')">Share Ride</button>
+      <button id="directBtn" onclick="setRideType('Direct')">Direct Ride</button>
     </div>
 
-    <label>Vehicle</label>
+    <label>गाड़ी चुनें</label>
     <select id="vehicle" onchange="updateFarePreview()">
       <option value="e-rickshaw">ई-रिक्शा</option>
       <option value="auto">ऑटो रिक्शा</option>
@@ -365,13 +335,11 @@ button{
       <option value="car">कार</option>
     </select>
 
-    <label>Passenger</label>
-    <input id="passengers" type="number" min="1" value="1"
-           onchange="updateFarePreview()">
+    <label>सवारियों की संख्या (Passenger)</label>
+    <input id="passengers" type="number" min="1" value="1" onchange="updateFarePreview()">
 
-    <label>Mobile Number</label>
-    <input id="mobile" type="tel" maxlength="10"
-           placeholder="10 अंकों का मोबाइल नंबर">
+    <label>मोबाइल नंबर</label>
+    <input id="mobile" type="tel" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
 
     <div class="fare">
       <div>किराया</div>
@@ -379,10 +347,7 @@ button{
       <div id="fareInfo" class="small"></div>
     </div>
 
-    <button class="primary" onclick="book()">
-      🚕 Book Ride
-    </button>
-
+    <button class="primary" onclick="book()">🚕 Book Ride</button>
     <div id="customerStatus"></div>
   </div>
 
@@ -393,29 +358,23 @@ button{
 
 </section>
 
-
 <!-- DRIVER -->
 <section id="driver" class="page">
-
   <div class="card">
     <h2>🛺 Driver Panel</h2>
-
     <div class="status">
       Driver: <b>राम कुमार</b><br>
       Vehicle: ई-रिक्शा<br>
       Rating: ⭐ 4.8
     </div>
 
-    <button id="onlineBtn" class="primary" onclick="toggleOnline()">
-      ⚪ Offline
-    </button>
+    <button id="onlineBtn" class="primary" onclick="toggleOnline()">⚪ Offline</button>
 
     <div class="stat-grid" style="margin-top:12px">
       <div class="stat">
         <span>New Ride</span>
         <b id="newRideCount">0</b>
       </div>
-
       <div class="stat">
         <span>Today's Earnings</span>
         <b id="todayEarnings">₹0</b>
@@ -429,66 +388,47 @@ button{
       ड्राइवर ऑनलाइन होने पर नई राइड यहाँ दिखाई देगी।
     </div>
   </div>
-
 </section>
-
 
 <!-- ADMIN -->
 <section id="admin" class="page">
-
   <div class="card">
     <h2>⚙️ Admin Panel</h2>
-
     <div class="stat-grid">
-
       <div class="stat">
         <span>Drivers</span>
         <b id="driverCount">24</b>
       </div>
-
       <div class="stat">
         <span>Bookings</span>
         <b id="bookingCount">0</b>
       </div>
-
       <div class="stat">
         <span>Revenue</span>
         <b id="adminRevenue">₹0</b>
       </div>
-
       <div class="stat">
         <span>Commission</span>
         <b id="adminCommission">₹0</b>
       </div>
-
     </div>
   </div>
 
   <div class="card">
-
     <div class="toggle">
       <span>Commission %</span>
-      <input id="commission" type="number" value="10"
-             style="width:90px">
+      <input id="commission" type="number" value="10" style="width:90px">
     </div>
-
     <div class="toggle">
       <span>Booking</span>
       <input id="bookingToggle" type="checkbox" checked>
     </div>
-
-    <div class="toggle">
-      <span>Driver Registration</span>
-      <input id="driverRegistration" type="checkbox" checked>
-    </div>
-
   </div>
 
   <div class="card">
     <h3>📋 Booking History</h3>
     <div id="adminHistory">कोई booking नहीं</div>
   </div>
-
 </section>
 
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
@@ -498,7 +438,6 @@ const GOOGLE_MAPS_API_KEY = "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU";
 const firebaseConfig = {apiKey:"AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",authDomain:"sawari-setu.firebaseapp.com",projectId:"sawari-setu",storageBucket:"sawari-setu.firebasestorage.app",messagingSenderId:"292605368862",appId:"1:292605368862:web:b9945354dfd21f7eb62c0f",measurementId:"G-567NSGD4R4"};
 
 let db=null, bookingsRef=null;
-let lastRouteKey='';
 try{
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
@@ -514,12 +453,14 @@ let driverOnline=false;
 let map=null;
 let directionsService=null;
 let directionsRenderer=null;
-let currentGpsOrigin=null;
-let currentGpsMarker=null;
-let destinationMarker=null;
+// सिरसा का केंद्र बिंदु (डिफ़ॉल्ट आधार)
+let currentGpsOrigin={lat: 25.2672, lng: 82.0725};
 let googleReady=false;
-let routeTimer=null;
 let currentDistanceKm=0;
+
+// स्टोर किए गए ऑब्जेक्ट्स
+let pickupLocationObj = {lat: 25.2672, lng: 82.0725};
+let destinationLocationObj = null;
 
 function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(localState));}catch(e){}}
 
@@ -543,32 +484,30 @@ function setRideType(type){
 
 function calculateFare(vehicle,type,distance,passengers){
   const d=parseFloat(distance),p=Math.max(1,parseInt(passengers)||1);
-  if(!isFinite(d)||d<=0)return {ok:false,message:'Valid distance डालें.'};
+  if(!isFinite(d)||d<=0)return {ok:false,message:'वैध दूरी आवश्यक है।'};
   let fare=0,info='';
   if(vehicle==='e-rickshaw'){
     if(type==='Share'){
       if(d<=2)fare=10;else if(d<=4)fare=20;else if(d<=6)fare=30;else if(d<=8)fare=40;else if(d<=10)fare=50;
-      else return {ok:false,message:'E-Rickshaw Share 10 km से ऊपर उपलब्ध नहीं है.'};
+      else return {ok:false,message:'ई-रिक्शा शेयर 10 किमी तक उपलब्ध है।'};
     }else{
       if(d<=2)fare=40;else if(d<=4)fare=60;else if(d<=6)fare=75;else if(d<=8)fare=90;else if(d<=10)fare=105;
       else fare=105+(d-10)*10;
     }
   }else if(vehicle==='auto'){
-    if(type==='Share'){fare=d*10*p;info='Share fare प्रति passenger के हिसाब से है।';}
+    if(type==='Share'){fare=d*10*p;info='शेयर किराया प्रति सवारी है।';}
     else{
       if(d<=5)fare=200;else if(d<=10)fare=325;else if(d<=20)fare=525;else if(d<=30)fare=675;else if(d<=40)fare=775;else if(d<=50)fare=825;
       else fare=825+(d-50)*5;
-      if(d>=100)info='2L पानी शामिल है।';else if(d>=50)info='1L पानी शामिल है।';
     }
   }else if(vehicle==='bike'){
-    if(type==='Share')return {ok:false,message:'Bike Share उपलब्ध नहीं है.'};
+    if(type==='Share')return {ok:false,message:'बाइक शेयर उपलब्ध नहीं है।'};
     if(d<=2)fare=30;else if(d<=5)fare=50;else if(d<=10)fare=90;else if(d<=15)fare=140;else if(d<=20)fare=190;else if(d<=25)fare=280;else if(d<=30)fare=370;else if(d<=40)fare=480;else if(d<=50)fare=600;
     else fare=600+(d-50)*12;
   }else if(vehicle==='car'){
-    if(type==='Share')return {ok:false,message:'Car Share उपलब्ध नहीं है.'};
+    if(type==='Share')return {ok:false,message:'कार शेयर उपलब्ध नहीं है।'};
     if(d<=5)fare=200;else if(d<=10)fare=400;else if(d<=20)fare=800;else if(d<=30)fare=1200;else if(d<=40)fare=1500;else if(d<=50)fare=1800;else if(d<=60)fare=2100;else if(d<=70)fare=2400;else if(d<=80)fare=2700;else if(d<=100)fare=3200;
     else fare=3200+(d-100)*30;
-    if(d>=100)info='2L पानी शामिल है।';else if(d>=50)info='1L पानी शामिल है।';
   }
   return {ok:true,fare:Math.round(fare),info};
 }
@@ -587,7 +526,7 @@ function loadGoogleMaps(){
   script.async=true;
   script.defer=true;
   script.onload=initializeGoogleMap;
-  script.onerror=()=>{document.getElementById('mapMessage').textContent='Google Maps लोड नहीं हो पाया। API Key चेक करें।';};
+  script.onerror=()=>{document.getElementById('mapMessage').textContent='गूगल मैप लोड नहीं हो पाया।';};
   document.head.appendChild(script);
 }
 
@@ -596,21 +535,23 @@ function initializeGoogleMap(){
   try{
     googleReady=true;
     directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers:false});
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      map: null,
+      suppressMarkers: false,
+      polylineOptions: { strokeColor: '#087f5b', strokeWeight: 5 }
+    });
 
     map=new google.maps.Map(document.getElementById('map'),{
-      center:{lat:25.267,lng:82.072}, // प्रयागराज/सिरसा केंद्र
-      zoom:12,
-      mapTypeId:'roadmap',
-      streetViewControl:false,
-      fullscreenControl:true
+      center: currentGpsOrigin,
+      zoom: 13,
+      mapTypeId: 'roadmap',
+      streetViewControl: false,
+      fullscreenControl: true
     });
 
     directionsRenderer.setMap(map);
     document.getElementById('map').classList.add('loaded');
     document.getElementById('mapMessage').style.display='none';
-
-    calculateRoute();
 
     if(window._pendingNativeLocation){
       const p=window._pendingNativeLocation;
@@ -618,7 +559,7 @@ function initializeGoogleMap(){
       applyCurrentLocation(p.lat,p.lng,p.accuracy);
     }
   }catch(e){
-    console.error('Google Maps init:',e);
+    console.error('Map init error:',e);
   }
 }
 
@@ -627,34 +568,47 @@ function clearSuggestions(field){
   if(box)box.innerHTML='';
 }
 
+let searchDebounce=null;
 function inputChanged(field){
-  const input=document.getElementById(field);
-  input._selectedLocation=null;
-  currentDistanceKm=0;lastRouteKey='';document.getElementById('distanceKm').value='';updateFarePreview();
-  clearTimeout(input._placeTimer);
-  const q=input.value.trim();
-  if(q.length<2){clearSuggestions(field);return;}
-  input._placeTimer=setTimeout(()=>searchLocations(field,q),300);
+  clearTimeout(searchDebounce);
+  const val = document.getElementById(field).value.trim();
+  if(val.length < 2){
+    clearSuggestions(field);
+    return;
+  }
+  searchDebounce = setTimeout(()=>searchLocalPlaces(field, val), 300);
 }
 
-// सबसे सुरक्षित और फास्ट सर्च (Google Autocomplete Service + OpenStreetMap fallback)
-function searchLocations(field, q){
+// सबसे महत्वपूर्ण: लोकल एरिया को पहली प्राथमिकता देना
+function searchLocalPlaces(field, q){
   const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
   if(!box)return;
   box.innerHTML='<div class="suggestion">🔎 खोजा जा रहा है...</div>';
 
+  const centerLat = currentGpsOrigin ? currentGpsOrigin.lat : 25.2672;
+  const centerLng = currentGpsOrigin ? currentGpsOrigin.lng : 82.0725;
+
+  // 1. सबसे पहले Google Places Autocomplete (लोकल 35km रेडियस के साथ)
   if(googleReady && window.google && google.maps && google.maps.places){
     try{
       const service = new google.maps.places.AutocompleteService();
-      // उत्तर प्रदेश / प्रयागराज परिधि के अंदर प्राथमिकता
+      
+      // सिरसा के 35 किमी के दायरे को प्राथमिकता
+      const circle = new google.maps.Circle({
+        center: new google.maps.LatLng(centerLat, centerLng),
+        radius: 35000 // 35 KM
+      });
+
       service.getPlacePredictions({
         input: q,
+        bounds: circle.getBounds(),
         componentRestrictions: { country: 'in' }
       }, (predictions, status)=>{
         if(status === google.maps.places.PlacesServiceStatus.OK && predictions && predictions.length){
           renderPredictions(field, predictions, box);
         }else{
-          searchNominatim(field, q, box);
+          // अगर गूगल पर लोकल नाम न मिले, तो ओपन-स्ट्रीट मैप (ग्रामीण/कस्बा खोज) पर जाएं
+          searchNominatim(field, q, box, centerLat, centerLng);
         }
       });
       return;
@@ -662,57 +616,80 @@ function searchLocations(field, q){
       console.warn(e);
     }
   }
-  searchNominatim(field, q, box);
+
+  searchNominatim(field, q, box, centerLat, centerLng);
 }
 
 function renderPredictions(field, predictions, box){
   box.innerHTML='';
-  predictions.slice(0,6).forEach(p=>{
+  predictions.slice(0, 6).forEach(p=>{
     const b=document.createElement('button');
     b.type='button';
     b.className='suggestion';
-    b.innerHTML=escapeHtml(p.structured_formatting.main_text)+'<small>'+escapeHtml(p.description)+'</small>';
+    b.innerHTML=escapeHtml(p.structured_formatting.main_text) + '<small>' + escapeHtml(p.description) + '</small>';
     b.onclick=()=>{
-      document.getElementById(field).value = p.description;
-      document.getElementById(field)._selectedLocation = p.description;
+      document.getElementById(field).value = p.structured_formatting.main_text + ' (' + p.description.split(',')[0] + ')';
       clearSuggestions(field);
-      calculateRoute();
+      
+      // Place ID से सटीक LatLng निकालना
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({placeId: p.place_id}, (results, status)=>{
+        if(status==='OK' && results[0]){
+          const loc = results[0].geometry.location;
+          if(field==='pickup') pickupLocationObj = {lat: loc.lat(), lng: loc.lng()};
+          else destinationLocationObj = {lat: loc.lat(), lng: loc.lng()};
+        }else{
+          // फॉलबैक
+          if(field==='pickup') pickupLocationObj = p.description;
+          else destinationLocationObj = p.description;
+        }
+        calculateRoute();
+      });
     };
     box.appendChild(b);
   });
 }
 
-function searchNominatim(field, q, box){
-  fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=in&q='+encodeURIComponent(q))
-    .then(res=>res.json())
+// ग्रामीण इलाकों और छोटे गांवों (रामनगर, खानपुर) के लिए विशेष लोकल सर्च
+function searchNominatim(field, q, box, lat, lng){
+  // लोकल बाउंड्री बॉक्स (सिरसा/प्रयागराज/मिर्जापुर बॉर्डर)
+  const viewbox = `${lng-0.4},${lat+0.4},${lng+0.4},${lat-0.4}`;
+  const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=in&viewbox=${viewbox}&bounded=0&q=${encodeURIComponent(q)}`;
+
+  fetch(url)
+    .then(r=>r.json())
     .then(data=>{
       if(!data || !data.length){
-        box.innerHTML='<div class="suggestion">स्थान नहीं मिला, कृपया नाम सही करें।</div>';
+        box.innerHTML='<div class="suggestion">कोई स्थान नहीं मिला। कृपया नाम सही लिखें।</div>';
         return;
       }
       box.innerHTML='';
-      data.forEach(x=>{
+      data.forEach(item=>{
         const b=document.createElement('button');
         b.type='button';
         b.className='suggestion';
-        b.innerHTML=escapeHtml(x.name || x.display_name)+'<small>'+escapeHtml(x.display_name)+'</small>';
+        const title = item.name || item.display_name.split(',')[0];
+        b.innerHTML=escapeHtml(title)+'<small>'+escapeHtml(item.display_name)+'</small>';
         b.onclick=()=>{
-          document.getElementById(field).value = x.display_name;
-          document.getElementById(field)._selectedLocation = {lat: parseFloat(x.lat), lng: parseFloat(x.lon)};
+          document.getElementById(field).value = title;
           clearSuggestions(field);
+          const pos = {lat: parseFloat(item.lat), lng: parseFloat(item.lon)};
+          if(field==='pickup') pickupLocationObj = pos;
+          else destinationLocationObj = pos;
           calculateRoute();
         };
         box.appendChild(b);
       });
     })
     .catch(()=>{
-      box.innerHTML='<div class="suggestion">स्थान खोजने में असमर्थ।</div>';
+      box.innerHTML='<div class="suggestion">सर्च करने में समस्या आई।</div>';
     });
 }
 
 function useCurrentLocation(){
   const msg=document.getElementById('mapMessage');
-  msg.style.display='flex';msg.textContent='📍 लोकेशन मिल रही है...';
+  msg.style.display='flex';
+  msg.textContent='📍 वर्तमान लोकेशन जांची जा रही है...';
 
   if(window.AndroidLocation&&typeof window.AndroidLocation.requestLocation==='function'){
     try{ window.AndroidLocation.requestLocation(); return; }catch(e){}
@@ -721,10 +698,10 @@ function useCurrentLocation(){
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       msg.style.display='none';
-      applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
+      applyCurrentLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy||0);
     },err=>{
-      msg.textContent='लोकेशन नहीं मिली: '+err.message;
-    },{enableHighAccuracy:true,timeout:15000});
+      msg.textContent='लोकेशन नहीं मिल सकी।';
+    },{enableHighAccuracy:true, timeout:15000});
   }
 }
 
@@ -738,77 +715,65 @@ window.onNativeLocation=function(lat,lng,accuracy){
   applyCurrentLocation(lat,lng,accuracy);
 };
 
-// सिरसा / स्थानीय नाम ही आए, दूर का शहर न आए इसके लिए सटीक रिवर्स जियोकोडिंग
 function applyCurrentLocation(lat,lng,accuracy){
   currentGpsOrigin={lat:Number(lat),lng:Number(lng)};
+  pickupLocationObj = currentGpsOrigin;
+
   const pickup=document.getElementById('pickup');
-  pickup.value='लोकेशन जांची जा रही है...';
-  pickup._selectedLocation = currentGpsOrigin;
+  pickup.value='सिरसा (वर्तमान स्थान)';
 
-  if(currentGpsMarker)currentGpsMarker.setMap(null);
-  currentGpsMarker=new google.maps.Marker({
-    position:currentGpsOrigin,
-    map:map,
-    title:'मेरी लोकेशन'
-  });
   map.setCenter(currentGpsOrigin);
-  map.setZoom(16);
+  map.setZoom(15);
 
+  // नाम निकालना
   if(googleReady){
     const geocoder=new google.maps.Geocoder();
     geocoder.geocode({location:currentGpsOrigin}, (results, status)=>{
       if(status==='OK' && results && results.length){
         let best = results[0];
-        // यदि सब-लोकैलिटी या विलेज (जैसे सिरसा) मौजूद हो तो वही एड्रेस लें
         for(let r of results){
-          if(r.types.includes('sublocality') || r.types.includes('locality') || r.types.includes('neighborhood')){
+          if(r.types.includes('sublocality') || r.types.includes('locality')){
             best = r;
             break;
           }
         }
         pickup.value = best.formatted_address;
-        pickup._selectedLocation = currentGpsOrigin;
-        document.getElementById('customerStatus').innerHTML='<div class="status success">📍 सटीक लोकेशन: '+escapeHtml(best.formatted_address)+'</div>';
-        calculateRoute();
-      }else{
-        pickup.value = 'सिरसा (वर्तमान स्थान: ' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ')';
-        calculateRoute();
+        document.getElementById('customerStatus').innerHTML='<div class="status success">📍 करंट लोकेशन: '+escapeHtml(best.formatted_address)+'</div>';
       }
     });
-  }else{
-    pickup.value = 'सिरसा (' + lat.toFixed(5) + ', ' + lng.toFixed(5) + ')';
+  }
+
+  // अगर डेस्टिनेशन पहले से भरा हुआ है तो रूट तुरंत अपडेट करें
+  if(destinationLocationObj){
     calculateRoute();
   }
 }
 
-// सबसे भरोसेमंद रूट कैलकुलेटर (मांडा, मिर्जापुर, खानपुर आदि के लिए)
+// सबसे मजबूत रूट सिस्टम: मिर्जापुर, रामनगर, मांडा सबका रूट बनेगा
 function calculateRoute(){
   if(!googleReady || !directionsService || !directionsRenderer)return;
-  const pInput=document.getElementById('pickup');
-  const dInput=document.getElementById('destination');
 
-  const origin = pInput._selectedLocation || pInput.value.trim();
-  const dest = dInput._selectedLocation || dInput.value.trim();
+  const origin = pickupLocationObj || document.getElementById('pickup').value.trim();
+  const destination = destinationLocationObj || document.getElementById('destination').value.trim();
 
-  if(!origin || !dest)return;
+  if(!origin || !destination) return;
+
+  document.getElementById('customerStatus').innerHTML='<div class="status">सड़क रूट बनाया जा रहा है...</div>';
 
   directionsService.route({
     origin: origin,
-    destination: dest,
+    destination: destination,
     travelMode: google.maps.TravelMode.DRIVING
   }, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
       directionsRenderer.setDirections(response);
-      const route = response.routes[0].legs[0];
-      currentDistanceKm = (route.distance.value / 1000);
+      const leg = response.routes[0].legs[0];
+      currentDistanceKm = (leg.distance.value / 1000);
       document.getElementById('distanceKm').value = currentDistanceKm.toFixed(2);
       updateFarePreview();
-      document.getElementById('mapMessage').style.display='none';
-      document.getElementById('customerStatus').innerHTML='<div class="status success">📏 सड़क की दूरी: '+currentDistanceKm.toFixed(2)+' km ('+route.duration.text+')</div>';
-    }else{
-      document.getElementById('distanceKm').value = '';
-      updateFarePreview();
-      document.getElementById('customerStatus').innerHTML='<div class="status warning">⚠️ इस स्थान के लिए सड़क मार्ग नहीं मिला। सूची से सही स्थान चुनें।</div>';
+      document.getElementById('customerStatus').innerHTML='<div class="status success">📏 रूट तैयार: <b>'+currentDistanceKm.toFixed(2)+' km</b> ('+leg.duration.text+')</div>';
+    } else {
+      document.getElementById('customerStatus').innerHTML='<div class="status warning">⚠️ इस स्थान के लिए सड़क मार्ग नहीं मिला। कृपया लिस्ट से स्थान चुनें।</div>';
     }
   });
 }
@@ -820,7 +785,7 @@ function book(){
   if(!/^\d{10}$/.test(mobile)){alert('10 अंकों का मोबाइल नंबर डालें।');return;}
   const distance=parseFloat(document.getElementById('distanceKm').value);
   const fare=calculateFare(document.getElementById('vehicle').value,localState.rideType,distance,document.getElementById('passengers').value);
-  if(!fare.ok){alert(fare.message||'कृपया पहले वैध रूट और दूरी आने दें।');return;}
+  if(!fare.ok){alert(fare.message||'कृपया पहले रूट बनने दें।');return;}
 
   const booking={
     pickup:document.getElementById('pickup').value,
@@ -837,7 +802,7 @@ function book(){
 
   allBookings.unshift(booking);
   if(bookingsRef)bookingsRef.add(booking).catch(e=>console.warn(e));
-  document.getElementById('customerStatus').innerHTML='<div class="success">✅ Ride बुक हो गई — ₹'+fare.fare+'</div>';
+  document.getElementById('customerStatus').innerHTML='<div class="success">✅ राइड बुक हो गई — ₹'+fare.fare+'</div>';
   renderHistory();
   renderAdmin();
   renderDriverRide();
@@ -849,7 +814,6 @@ function renderHistory(){
   el.innerHTML=allBookings.slice(0,5).map(b=>'<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>₹'+b.fare+' • '+b.distanceKm+' km<br>'+escapeHtml(b.status)+'</div>').join('');
 }
 
-// ड्राइवर ऑनलाइन / ऑफलाइन टॉगल
 function toggleOnline(){
   driverOnline = !driverOnline;
   const btn=document.getElementById('onlineBtn');
@@ -879,7 +843,6 @@ function rejectRide(id){
   renderDriverRide();renderHistory();renderAdmin();
 }
 
-// ड्राइवर पैनल: ऑनलाइन होने पर बुकिंग तुरंत दिखेगी
 function renderDriverRide(){
   const el=document.getElementById('driverRide'), n=document.getElementById('newRideCount');
   const pending=allBookings.filter(b=>b.status==='new');
@@ -887,12 +850,12 @@ function renderDriverRide(){
   document.getElementById('todayEarnings').textContent='₹'+(localState.earnings||0);
 
   if(!driverOnline){
-    el.innerHTML='<div class="status warning">🔴 ड्राइवर Offline है। नई राइड प्राप्त करने के लिए ऊपर का बटन दबाकर <b>Online</b> करें।</div>';
+    el.innerHTML='<div class="status warning">🔴 ड्राइवर Offline है। बुकिंग देखने के लिए ऊपर का बटन दबाकर <b>Online</b> करें।</div>';
     return;
   }
 
   if(!pending.length){
-    el.innerHTML='<div class="status success">🟢 ड्राइवर Online है। नई बुकिंग का इंतज़ार है...</div>';
+    el.innerHTML='<div class="status success">🟢 ड्राइवर Online है। अभी कोई नई बुकिंग नहीं है।</div>';
     return;
   }
 
