@@ -1,189 +1,303 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 <title>सवारी सेतु</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
+}
 
 body{
-  margin:0;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:#f4f7fb;
-  color:#172033;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
-header{
-  background:linear-gradient(135deg,#087f5b,#0b9b70);
-  color:#fff;
-  padding:18px 15px;
-  text-align:center;
-  box-shadow:0 2px 10px rgba(8,127,91,0.25);
-}
-
-.logo{
-  width:72px;
-  height:72px;
-  border-radius:50%;
-  background:#fff;
-  object-fit:contain;
-  padding:5px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.15);
-}
-
-header h1{
-  margin:8px 0 2px;
-  font-size:26px;
-  font-weight:800;
-  letter-spacing:0.3px;
-}
-
-header p{
-  margin:0;
-  opacity:.92;
-  font-size:14px;
-}
-
-.tabs{
-  display:flex;
-  background:#fff;
-  position:sticky;
-  top:0;
-  z-index:20;
-  box-shadow:0 2px 8px rgba(0,0,0,0.06);
-}
-
-.tab{
-  flex:1;
-  padding:14px 5px;
-  border:0;
-  background:#fff;
-  font-weight:700;
-  color:#555;
-  font-size:15px;
-  cursor:pointer;
-  transition:all 0.2s;
-}
-
-.tab.active{
-  color:#087f5b;
-  border-bottom:3px solid #087f5b;
-  background:#f8fdfa;
-}
-
-.page{
-  display:none;
-  padding:14px;
-  max-width:700px;
-  margin:auto;
-}
-
-.page.active{
-  display:block;
-}
-
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 4px 16px rgba(0,0,0,0.05);
-  border:1px solid #edf2f7;
-}
-
-h2,h3{
-  margin-top:0;
-  font-weight:800;
-}
-
-label{
-  display:block;
-  font-weight:700;
-  margin:12px 0 6px;
-  font-size:14px;
-  color:#2d3748;
-}
-
-input,select{
-  width:100%;
-  padding:13px;
-  border:1px solid #d8dee8;
-  border-radius:10px;
-  font-size:15px;
-  background:#fff;
-  color:#172033;
-  outline:none;
-}
-
-input:focus,select:focus{
-  border-color:#087f5b;
-  box-shadow:0 0 0 3px rgba(8,127,91,0.12);
-}
-
-input[readonly]{
-  background:#f2f5f8;
-  font-weight:600;
+button,
+input,
+select{
+  font:inherit;
 }
 
 button{
-  border:0;
-  border-radius:10px;
-  padding:13px 16px;
-  font-size:15px;
-  font-weight:700;
   cursor:pointer;
-  transition:all 0.2s;
 }
 
-button:active{
-  transform:scale(0.98);
-}
-
-.primary{
+.app{
   width:100%;
-  background:#087f5b;
-  color:#fff;
-  margin-top:14px;
-  box-shadow:0 4px 12px rgba(8,127,91,0.25);
+  max-width:650px;
+  min-height:100vh;
+  margin:auto;
+  background:#f8fafc;
+  box-shadow:0 0 35px rgba(15,23,42,.12);
 }
 
-.secondary{
-  background:#e8f6f1;
-  color:#087f5b;
+/* ================= HEADER ================= */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:linear-gradient(135deg,#0f172a,#1e3a8a);
+  color:white;
+  padding:14px 16px 12px;
+  padding-top:max(14px, env(safe-area-inset-top));
 }
 
-.danger{
-  background:#ffe9e9;
-  color:#c62828;
-}
-
-.choice{
+.header-inner{
   display:flex;
-  gap:8px;
+  align-items:center;
+  gap:12px;
 }
 
-.choice button{
-  flex:1;
-  background:#f0f3f6;
-  color:#333;
+.logo{
+  width:52px;
+  height:52px;
+  border-radius:15px;
+  object-fit:cover;
+  background:white;
+  padding:3px;
+  box-shadow:0 5px 18px rgba(0,0,0,.25);
 }
 
-.choice button.selected{
-  background:#087f5b;
-  color:#fff;
-  box-shadow:0 2px 8px rgba(8,127,91,0.25);
+.brand{
+  min-width:0;
 }
+
+.brand h1{
+  margin:0;
+  font-size:22px;
+  font-weight:800;
+  line-height:1.15;
+}
+
+.brand p{
+  margin:4px 0 0;
+  font-size:12px;
+  opacity:.85;
+}
+
+.connection{
+  margin-left:auto;
+  white-space:nowrap;
+  font-size:10px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+}
+
+/* ================= TABS ================= */
+
+.tabs{
+  position:sticky;
+  top:78px;
+  z-index:999;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  background:white;
+  border-bottom:1px solid #e2e8f0;
+  box-shadow:0 3px 12px rgba(15,23,42,.07);
+}
+
+.tab{
+  border:0;
+  background:white;
+  color:#64748b;
+  padding:13px 5px;
+  font-weight:700;
+  font-size:13px;
+  position:relative;
+}
+
+.tab.active{
+  color:#1d4ed8;
+}
+
+.tab.active:after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:18%;
+  right:18%;
+  height:3px;
+  border-radius:5px 5px 0 0;
+  background:#2563eb;
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+  padding:14px;
+}
+
+.page{
+  display:block;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.card{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding:15px;
+  margin-bottom:14px;
+  box-shadow:0 5px 18px rgba(15,23,42,.05);
+}
+
+.card-title{
+  margin:0 0 13px;
+  font-size:17px;
+  font-weight:800;
+}
+
+.section-subtitle{
+  font-size:12px;
+  color:#64748b;
+  margin:-7px 0 12px;
+}
+
+/* ================= INPUT ================= */
+
+.label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:#475569;
+  margin:0 0 6px;
+}
+
+.input-wrap{
+  position:relative;
+  margin-bottom:11px;
+}
+
+input,
+select{
+  width:100%;
+  border:1px solid #cbd5e1;
+  background:#fff;
+  color:#0f172a;
+  border-radius:12px;
+  padding:13px 12px;
+  outline:none;
+  min-height:48px;
+}
+
+input:focus,
+select:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.10);
+}
+
+input[readonly]{
+  background:#f8fafc;
+}
+
+/* ================= SEARCH SUGGESTIONS ================= */
+
+.suggestions{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  z-index:3000;
+  background:white;
+  border:1px solid #cbd5e1;
+  border-radius:12px;
+  margin-top:3px;
+  overflow:hidden;
+  box-shadow:0 12px 28px rgba(15,23,42,.18);
+}
+
+.suggestion{
+  padding:12px;
+  border-bottom:1px solid #f1f5f9;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.suggestion:last-child{
+  border-bottom:0;
+}
+
+.suggestion:active{
+  background:#eff6ff;
+}
+
+.suggestion-main{
+  font-weight:700;
+}
+
+.suggestion-sub{
+  color:#64748b;
+  font-size:11px;
+  margin-top:2px;
+}
+
+/* ================= CURRENT LOCATION ================= */
+
+.location-btn{
+  width:100%;
+  border:1px solid #bfdbfe;
+  background:#eff6ff;
+  color:#1d4ed8;
+  border-radius:12px;
+  padding:11px;
+  margin-bottom:12px;
+  font-weight:800;
+}
+
+.location-btn:active{
+  transform:scale(.99);
+}
+
+.location-status{
+  font-size:11px;
+  color:#64748b;
+  margin:-5px 0 10px;
+}
+
+/* ================= MAP ================= */
 
 .mapbox{
-  height:280px;
-  border-radius:14px;
-  overflow:hidden;
-  margin-top:12px;
-  background:#e8edf2;
   position:relative;
-  border:1px solid #e1e8ed;
+  height:290px;
+  width:100%;
+  border-radius:16px;
+  overflow:hidden;
+  background:#e2e8f0;
+  border:1px solid #cbd5e1;
+  margin-top:8px;
 }
 
 #map{
@@ -191,732 +305,4369 @@ button:active{
   height:100%;
 }
 
-.search-wrap{position:relative}
-.suggestions{
-  position:absolute;
-  left:0;
-  right:0;
-  top:100%;
-  z-index:99999;
-  background:#fff;
-  border:2px solid #087f5b;
-  border-radius:0 0 12px 12px;
-  box-shadow:0 12px 28px rgba(0,0,0,0.2);
-  overflow:hidden;
-  max-height:260px;
-  overflow-y:auto;
-}
-
-.suggestion{
-  display:block;
-  width:100%;
-  text-align:left;
-  background:#fff;
-  border:0;
-  border-bottom:1px solid #eef1f4;
-  border-radius:0;
-  padding:12px;
-  color:#172033;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.suggestion:hover, .suggestion:active{
-  background:#e8f6f1;
-}
-
-.suggestion:last-child{border-bottom:0}
-.suggestion small{display:block;color:#687386;font-weight:400;margin-top:4px;font-size:12px;}
-
 .map-message{
   position:absolute;
-  inset:0;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  width:85%;
+  text-align:center;
+  padding:12px 14px;
+  background:rgba(255,255,255,.94);
+  border-radius:12px;
+  font-size:12px;
+  color:#475569;
+  box-shadow:0 5px 18px rgba(15,23,42,.12);
+}
+
+.map-message.success{
+  color:#166534;
+}
+
+.map-message.error{
+  color:#b91c1c;
+}
+
+/* ================= ROUTE INFO ================= */
+
+.route-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:10px;
+}
+
+.route-box{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:10px;
+}
+
+.route-label{
+  font-size:10px;
+  color:#64748b;
+}
+
+.route-value{
+  font-size:15px;
+  font-weight:800;
+  margin-top:2px;
+}
+
+/* ================= RIDE TYPE ================= */
+
+.type-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:10px 0;
+}
+
+.type-btn{
+  border:1px solid #cbd5e1;
+  background:white;
+  border-radius:13px;
+  padding:12px 8px;
+  font-weight:800;
+  color:#475569;
+}
+
+.type-btn.selected{
+  border-color:#2563eb;
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+/* ================= FARE ================= */
+
+.fare{
+  border-radius:16px;
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  border:1px solid #bfdbfe;
+  padding:15px;
+  text-align:center;
+  margin:12px 0;
+}
+
+.fare-label{
+  font-size:11px;
+  color:#475569;
+}
+
+.fare-amount{
+  font-size:30px;
+  font-weight:900;
+  color:#1d4ed8;
+  margin:3px 0;
+}
+
+.fare-note{
+  font-size:11px;
+  color:#475569;
+}
+
+/* ================= MAIN BUTTON ================= */
+
+.primary{
+  width:100%;
+  border:0;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:white;
+  border-radius:14px;
+  padding:15px;
+  font-size:16px;
+  font-weight:900;
+  box-shadow:0 7px 18px rgba(37,99,235,.25);
+}
+
+.primary:active{
+  transform:scale(.985);
+}
+
+.primary:disabled{
+  opacity:.55;
+  box-shadow:none;
+}
+
+/* ================= SECONDARY ================= */
+
+.secondary{
+  border:1px solid #cbd5e1;
+  background:white;
+  color:#334155;
+  border-radius:12px;
+  padding:10px 13px;
+  font-weight:700;
+}
+
+.row{
+  display:flex;
+  gap:9px;
+  align-items:center;
+}
+
+.row > *{
+  flex:1;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+  padding:11px 12px;
+  border-radius:12px;
+  font-size:12px;
+  margin-top:10px;
+  background:#f8fafc;
+  color:#475569;
+  border:1px solid #e2e8f0;
+}
+
+.status.ok{
+  background:#f0fdf4;
+  color:#166534;
+  border-color:#bbf7d0;
+}
+
+.status.error{
+  background:#fef2f2;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+
+.status.warn{
+  background:#fffbeb;
+  color:#92400e;
+  border-color:#fde68a;
+}
+
+/* ================= HISTORY ================= */
+
+.history-item{
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:12px;
+  margin-top:9px;
+  background:#fff;
+}
+
+.history-top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+
+.history-route{
+  font-weight:800;
+  font-size:13px;
+}
+
+.history-date{
+  font-size:10px;
+  color:#64748b;
+  margin-top:5px;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#eff6ff;
+  color:#1d4ed8;
+  font-size:10px;
+  font-weight:800;
+}
+
+.badge.green{
+  background:#f0fdf4;
+  color:#15803d;
+}
+
+.badge.orange{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+/* ================= DRIVER ================= */
+
+.driver-avatar{
+  width:68px;
+  height:68px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#1d4ed8,#0f172a);
   display:flex;
   align-items:center;
   justify-content:center;
+  color:white;
+  font-size:28px;
+  margin:auto;
+}
+
+.driver-name{
   text-align:center;
-  padding:20px;
-  color:#667;
-  background:#eef2f5;
-  z-index:1;
-  font-weight:600;
-}
-
-#map.loaded + .map-message{
-  display:none;
-}
-
-.gps-btn{
-  margin-top:8px;
-  width:100%;
-  background:#eaf2ff;
-  color:#1557b0;
-  border:1px solid #d4e3fc;
-}
-
-.fare{
-  background:#f0faf6;
-  border:1px solid #cdeee1;
-  padding:14px;
-  border-radius:12px;
-  margin-top:12px;
-}
-
-.fare strong{
-  font-size:26px;
-  color:#087f5b;
-  display:block;
-  margin:4px 0;
-}
-
-.status{
-  padding:12px;
-  border-radius:10px;
-  background:#f5f6f8;
-  margin-top:10px;
-  font-size:14px;
-  line-height:1.5;
-}
-
-.small{
-  font-size:13px;
-  color:#687386;
-}
-
-.success{
-  color:#087f5b;
-  font-weight:700;
-}
-
-.warning{
-  color:#b26a00;
-  font-weight:700;
-}
-
-.history-item{
-  border:1px solid #e1e5ea;
-  border-radius:12px;
-  padding:12px;
+  font-size:18px;
+  font-weight:900;
   margin-top:9px;
-  background:#fafbfc;
 }
 
-.stat-grid{
+.driver-meta{
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+  margin-top:4px;
+}
+
+.online-btn{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  margin-top:13px;
+  font-weight:900;
+}
+
+.online-btn.online{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.online-btn.offline{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.earn-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
 }
 
 .stat{
-  background:#f7f9fb;
-  border-radius:12px;
-  padding:14px;
-  border:1px solid #eef2f5;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:13px;
 }
 
-.stat b{
+.stat-label{
+  font-size:10px;
+  color:#64748b;
+}
+
+.stat-value{
+  font-size:21px;
+  font-weight:900;
+  margin-top:3px;
+}
+
+/* ================= ADMIN ================= */
+
+.admin-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.admin-stat{
+  background:white;
+  border:1px solid #e2e8f0;
+  border-radius:15px;
+  padding:13px;
+}
+
+.admin-stat small{
   display:block;
-  font-size:22px;
-  color:#087f5b;
-  margin-top:4px;
+  color:#64748b;
+  font-size:10px;
 }
 
-.toggle{
+.admin-stat strong{
+  display:block;
+  font-size:21px;
+  margin-top:3px;
+}
+
+/* ================= TOGGLE ================= */
+
+.switch-row{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  padding:12px 0;
-  border-bottom:1px solid #eee;
-  font-weight:600;
+  align-items:center;
+  padding:11px 0;
+  border-bottom:1px solid #f1f5f9;
 }
 
-.toggle input{
-  width:auto;
+.switch-row:last-child{
+  border-bottom:0;
 }
 
-.contact-buttons{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
+.switch{
+  width:46px;
+  height:26px;
+  position:relative;
 }
 
-.contact-buttons button{
-  flex:1;
+.switch input{
+  display:none;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  background:#cbd5e1;
+  transition:.2s;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+}
+
+.switch input:checked + .slider{
+  background:#2563eb;
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(20px);
+}
+
+/* ================= LOADING ================= */
+
+.loader{
+  display:inline-block;
+  width:15px;
+  height:15px;
+  border:2px solid #cbd5e1;
+  border-top-color:#2563eb;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:-3px;
+  margin-right:5px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+  text-align:center;
+  padding:18px 10px 25px;
+  color:#94a3b8;
+  font-size:10px;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:390px){
+  .content{
+    padding:10px;
+  }
+
+  .card{
+    padding:13px;
+    border-radius:16px;
+  }
+
+  .brand h1{
+    font-size:19px;
+  }
+
+  .mapbox{
+    height:260px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <img src="logo.png" class="logo" onerror="this.style.display='none'">
-  <h1>सवारी सेतु</h1>
-  <p>आपकी सवारी, आपके पास</p>
-</header>
+<div class="app">
 
-<div class="tabs">
-  <button class="tab active" onclick="showTab('customer',this)">Customer</button>
-  <button class="tab" onclick="showTab('driver',this)">Driver</button>
-  <button class="tab" onclick="showTab('admin',this)">Admin</button>
-</div>
+  <!-- ================= HEADER ================= -->
 
-<!-- ==================== CUSTOMER PAGE ==================== -->
-<section id="customer" class="page active">
+  <header class="header">
+    <div class="header-inner">
 
-  <div class="card">
-    <h2>🚕 Ride Book</h2>
+      <img
+        src="logo.png"
+        class="logo"
+        alt="सवारी सेतु लोगो"
+        onerror="this.style.display='none'"
+      >
 
-    <label>पिकअप (Pickup)</label>
-    <div class="search-wrap">
-      <input id="pickup" value="सिरसा, प्रयागराज" oninput="onSearchInput('pickup')">
-      <div id="pickupSuggestions" class="suggestions"></div>
+      <div class="brand">
+        <h1>सवारी सेतु</h1>
+        <p>आपकी सवारी, आपके पास</p>
+      </div>
+
+      <div class="connection" id="connectionStatus">
+        Offline
+      </div>
+
     </div>
+  </header>
 
-    <button class="gps-btn" onclick="useCurrentLocation()">
-      📍 मेरी वर्तमान लोकेशन
+  <!-- ================= TABS ================= -->
+
+  <nav class="tabs">
+
+    <button
+      class="tab active"
+      id="customerTab"
+      onclick="showTab('customer',this)">
+      🚕 ग्राहक
     </button>
 
-    <label>कहाँ जाना है (Destination)</label>
-    <div class="search-wrap">
-      <input id="destination" placeholder="जैसे: कर्मा, वीरपुर, ऊंचडीह, मांडा, चिलबिला..." oninput="onSearchInput('destination')">
-      <div id="destinationSuggestions" class="suggestions"></div>
-    </div>
+    <button
+      class="tab"
+      id="driverTab"
+      onclick="showTab('driver',this)">
+      🚖 Driver
+    </button>
 
-    <div class="mapbox">
-      <div id="map"></div>
-      <div id="mapMessage" class="map-message">
-        Google Maps लोड हो रहा है...
+    <button
+      class="tab"
+      id="adminTab"
+      onclick="showTab('admin',this)">
+      🛠️ Admin
+    </button>
+
+  </nav>
+
+  <main class="content">
+
+    <!-- =====================================================
+         CUSTOMER PAGE
+    ====================================================== -->
+
+    <section id="customer" class="page">
+
+      <div class="card">
+
+        <h2 class="card-title">🚕 राइड बुक करें</h2>
+
+        <p class="section-subtitle">
+          Pickup और Destination डालें, route और किराया अपने-आप निकलेगा।
+        </p>
+
+        <!-- PICKUP -->
+
+        <label class="label">📍 Pickup Location</label>
+
+        <div class="input-wrap">
+
+          <input
+            id="pickup"
+            type="text"
+            value="सिरसा, प्रयागराज"
+            autocomplete="off"
+            placeholder="Pickup location"
+            oninput="onSearchInput('pickup')"
+          >
+
+          <div
+            id="pickupSuggestions"
+            class="suggestions hidden">
+          </div>
+
+        </div>
+
+        <button
+          class="location-btn"
+          onclick="useCurrentLocation()">
+          📍 मेरी Current Location इस्तेमाल करें
+        </button>
+
+        <div
+          id="locationStatus"
+          class="location-status">
+          Current location लेने के लिए ऊपर वाला बटन दबाएँ।
+        </div>
+
+        <!-- DESTINATION -->
+
+        <label class="label">🏁 Destination</label>
+
+        <div class="input-wrap">
+
+          <input
+            id="destination"
+            type="text"
+            autocomplete="off"
+            placeholder="Destination जैसे Meja Road"
+            oninput="onSearchInput('destination')"
+          >
+
+          <div
+            id="destinationSuggestions"
+            class="suggestions hidden">
+          </div>
+
+        </div>
+
+        <!-- MAP -->
+
+        <div class="mapbox">
+
+          <div id="map"></div>
+
+          <div
+            id="mapMessage"
+            class="map-message">
+            🗺️ Google Maps route यहाँ दिखाई जाएगी।
+          </div>
+
+        </div>
+
+        <!-- ROUTE INFO -->
+
+        <div class="route-info">
+
+          <div class="route-box">
+            <div class="route-label">📏 Road Distance</div>
+            <div
+              class="route-value"
+              id="distanceDisplay">
+              — km
+            </div>
+          </div>
+
+          <div class="route-box">
+            <div class="route-label">⏱️ अनुमानित समय</div>
+            <div
+              class="route-value"
+              id="durationDisplay">
+              —
+            </div>
+          </div>
+
+        </div>
+
+        <input
+          id="distanceKm"
+          type="hidden"
+          value=""
+        >
+
+        <div
+          id="distanceStatus"
+          class="status">
+          Pickup और Destination डालकर route निकालें।
+        </div>
+
       </div>
-    </div>
 
-    <label>सड़क की दूरी (Road Distance)</label>
-    <input id="distanceKm" readonly placeholder="स्थान चुनते ही दूरी आएगी">
 
-    <div class="choice" style="margin-top:12px">
-      <button id="shareBtn" class="selected" onclick="setRideType('Share')">Share Ride</button>
-      <button id="directBtn" onclick="setRideType('Direct')">Direct Ride</button>
-    </div>
+      <!-- RIDE OPTIONS -->
 
-    <label>गाड़ी चुनें</label>
-    <select id="vehicle" onchange="updateFarePreview()">
-      <option value="e-rickshaw">ई-रिक्शा</option>
-      <option value="auto">ऑटो रिक्शा</option>
-      <option value="bike">बाइक</option>
-      <option value="car">कार</option>
-    </select>
+      <div class="card">
 
-    <label>सवारियों की संख्या (Passenger)</label>
-    <input id="passengers" type="number" min="1" value="1" onchange="updateFarePreview()">
+        <h2 class="card-title">🚘 Ride Options</h2>
 
-    <label>मोबाइल नंबर</label>
-    <input id="mobile" type="tel" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर">
+        <label class="label">Ride Type</label>
 
-    <div class="fare">
-      <div>किराया</div>
-      <strong id="fareAmount">₹0</strong>
-      <div id="fareInfo" class="small"></div>
-    </div>
+        <div class="type-grid">
 
-    <button class="primary" onclick="book()">🚕 Book Ride</button>
-    <div id="customerStatus"></div>
+          <button
+            id="share"
+            class="type-btn selected"
+            onclick="setType('share')">
+            👥 Share Ride
+          </button>
+
+          <button
+            id="direct"
+            class="type-btn"
+            onclick="setType('direct')">
+            🚕 Direct Ride
+          </button>
+
+        </div>
+
+
+        <label class="label">Vehicle</label>
+
+        <select
+          id="vehicle"
+          onchange="vehicleChanged()">
+
+          <option value="e-rickshaw">
+            🛺 ई-रिक्शा
+          </option>
+
+          <option value="auto">
+            🛺 ऑटो रिक्शा
+          </option>
+
+          <option value="bike">
+            🏍️ बाइक
+          </option>
+
+          <option value="car">
+            🚗 कार
+          </option>
+
+        </select>
+
+
+        <div style="height:10px"></div>
+
+
+        <label class="label">
+          👨‍👩‍👧 Passengers
+        </label>
+
+        <input
+          id="passengers"
+          type="number"
+          min="1"
+          max="10"
+          value="1"
+          oninput="updateFarePreview()"
+        >
+
+
+        <div style="height:10px"></div>
+
+
+        <label class="label">
+          📱 Mobile Number
+        </label>
+
+        <input
+          id="mobile"
+          type="tel"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="10 digit mobile number"
+          oninput="renderHistory()"
+        >
+
+
+        <!-- FARE -->
+
+        <div class="fare">
+
+          <div class="fare-label">
+            अनुमानित किराया
+          </div>
+
+          <div
+            id="farePreview"
+            class="fare-amount">
+            ₹ —
+          </div>
+
+          <div
+            id="fareNote"
+            class="fare-note">
+            Route select करें।
+          </div>
+
+        </div>
+
+
+        <!-- BOOK -->
+
+        <button
+          id="bookBtn"
+          class="primary"
+          onclick="book()">
+          🚕 राइड बुक करें
+        </button>
+
+        <div
+          id="booking"
+          class="status hidden">
+        </div>
+
+      </div>
+
+
+      <!-- CUSTOMER HISTORY -->
+
+      <div class="card">
+
+        <h2 class="card-title">
+          📋 मेरी राइड्स
+        </h2>
+
+        <div id="history">
+          अभी कोई राइड नहीं।
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DRIVER PAGE
+    ====================================================== -->
+
+    <section
+      id="driver"
+      class="page hidden">
+
+      <div class="card">
+
+        <div class="driver-avatar">
+          🚖
+        </div>
+
+        <div class="driver-name">
+          राम कुमार
+        </div>
+
+        <div class="driver-meta">
+          ई-रिक्शा • ⭐ 4.8
+        </div>
+
+        <button
+          id="onlineBtn"
+          class="online-btn online"
+          onclick="toggleOnline()">
+          🟢 Online
+        </button>
+
+        <div
+          id="driverStatus"
+          class="status ok">
+          ड्राइवर ऑनलाइन है। नई राइड का इंतज़ार...
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2 class="card-title">
+          📊 आज का हिसाब
+        </h2>
+
+        <div class="earn-grid">
+
+          <div class="stat">
+            <div class="stat-label">
+              आज की राइड
+            </div>
+            <div
+              id="driverRideCount"
+              class="stat-value">
+              0
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">
+              आज की कमाई
+            </div>
+            <div
+              id="earn"
+              class="stat-value">
+              ₹0
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2 class="card-title">
+          🔔 नई राइड
+        </h2>
+
+        <div id="newRide">
+          अभी कोई नई राइड नहीं।
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2 class="card-title">
+          🚕 Driver Ride History
+        </h2>
+
+        <div id="driverHistory">
+          अभी कोई राइड नहीं।
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ADMIN PAGE
+    ====================================================== -->
+
+    <section
+      id="admin"
+      class="page hidden">
+
+      <div class="card">
+
+        <h2 class="card-title">
+          🛠️ Admin Panel
+        </h2>
+
+        <p class="section-subtitle">
+          सवारी सेतु का booking और revenue control.
+        </p>
+
+
+        <div class="admin-grid">
+
+          <div class="admin-stat">
+            <small>👨‍✈️ Drivers</small>
+            <strong id="driversCount">24</strong>
+          </div>
+
+          <div class="admin-stat">
+            <small>🚕 Bookings</small>
+            <strong id="count">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <small>💰 Revenue</small>
+            <strong id="rev">₹0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <small>🏦 Commission</small>
+            <strong id="comm">₹0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <small>💵 Driver Payout</small>
+            <strong id="payout">₹0</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2 class="card-title">
+          ⚙️ Admin Settings
+        </h2>
+
+
+        <label class="label">
+          Commission %
+        </label>
+
+        <input
+          id="cp"
+          type="number"
+          min="0"
+          max="100"
+          value="10"
+          onchange="renderAdmin()"
+        >
+
+
+        <div class="switch-row">
+
+          <span>
+            🚕 Booking Allow
+          </span>
+
+          <label class="switch">
+            <input
+              id="allowBook"
+              type="checkbox"
+              checked
+              onchange="saveSettings()">
+
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+
+        <div class="switch-row">
+
+          <span>
+            🚖 Driver Allow
+          </span>
+
+          <label class="switch">
+
+            <input
+              id="allowDriver"
+              type="checkbox"
+              checked
+              onchange="saveSettings">
+
+            <span class="slider"></span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2 class="card-title">
+          📋 सभी Bookings
+        </h2>
+
+        <div id="adminHistory">
+          अभी कोई बुकिंग नहीं।
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div class="footer">
+    सवारी सेतु • आपकी सवारी, आपके पास
   </div>
 
-  <div class="card">
-    <h3>📋 Previous Ride</h3>
-    <div id="history">कोई पिछली सवारी नहीं</div>
-  </div>
+</div>
 
-</section>
 
-<!-- ==================== DRIVER PAGE ==================== -->
-<section id="driver" class="page">
-  <div class="card">
-    <h2>🛺 Driver Panel</h2>
-    <div class="status">
-      Driver: <b>राम कुमार</b><br>
-      Vehicle: ई-रिक्शा<br>
-      Rating: ⭐ 4.8
-    </div>
-
-    <button id="onlineBtn" class="primary danger" onclick="toggleOnline()">🔴 Offline</button>
-
-    <div class="stat-grid" style="margin-top:12px">
-      <div class="stat">
-        <span>New Ride</span>
-        <b id="newRideCount">0</b>
-      </div>
-      <div class="stat">
-        <span>Today's Earnings</span>
-        <b id="todayEarnings">₹0</b>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>📍 New Ride</h3>
-    <div id="driverRide">
-      ड्राइवर ऑनलाइन होने पर नई राइड यहाँ दिखाई देगी।
-    </div>
-  </div>
-</section>
-
-<!-- ==================== ADMIN PAGE ==================== -->
-<section id="admin" class="page">
-  <div class="card">
-    <h2>⚙️ Admin Panel</h2>
-    <div class="stat-grid">
-      <div class="stat">
-        <span>Drivers</span>
-        <b id="driverCount">24</b>
-      </div>
-      <div class="stat">
-        <span>Bookings</span>
-        <b id="bookingCount">0</b>
-      </div>
-      <div class="stat">
-        <span>Revenue</span>
-        <b id="adminRevenue">₹0</b>
-      </div>
-      <div class="stat">
-        <span>Commission</span>
-        <b id="adminCommission">₹0</b>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="toggle">
-      <span>Commission %</span>
-      <input id="commission" type="number" value="10" style="width:90px">
-    </div>
-    <div class="toggle">
-      <span>Booking</span>
-      <input id="bookingToggle" type="checkbox" checked>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>📋 Booking History</h3>
-    <div id="adminHistory">कोई booking नहीं</div>
-  </div>
-</section>
+<!-- ==========================================================
+     FIREBASE
+=========================================================== -->
 
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+
+
 <script>
-const GOOGLE_MAPS_API_KEY = "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU";
-const firebaseConfig = {apiKey:"AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",authDomain:"sawari-setu.firebaseapp.com",projectId:"sawari-setu",storageBucket:"sawari-setu.firebasestorage.app",messagingSenderId:"292605368862",appId:"1:292605368862:web:b9945354dfd21f7eb62c0f",measurementId:"G-567NSGD4R4"};
 
-let db=null, bookingsRef=null;
-try{
-  firebase.initializeApp(firebaseConfig);
-  db=firebase.firestore();
-  bookingsRef=db.collection("bookings");
-}catch(e){console.warn(e);}
+/* ============================================================
+   CONFIG
+============================================================ */
 
-const STORAGE_KEY="sawari_setu_v2";
-let localState={rideType:"Share",earnings:0};
-try{const x=localStorage.getItem(STORAGE_KEY);if(x)localState=Object.assign(localState,JSON.parse(x));}catch(e){}
+const GOOGLE_MAPS_API_KEY =
+  "AIzaSyCYbMUnUNe4EFVGIgvz2qJw9YYipIw0rzU";
 
-let allBookings=[];
-let driverOnline=false;
-let map=null;
-let googleReady=false;
-let currentDistanceKm=0;
-
-// आधार बिंदु (सिरसा, प्रयागराज)
-let pickupLocation = {lat: 25.2672, lng: 82.0725};
-let destLocation = null;
-
-let directionsRenderer=null;
-let directionsService=null;
-let autoService=null;
-let placesService=null;
-
-function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(localState));}catch(e){}}
-
-function showTab(name,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(name).classList.add('active');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  if(name==='customer'&&map&&window.google)setTimeout(()=>google.maps.event.trigger(map,'resize'),100);
-  if(name==='driver')renderDriverRide();
-  if(name==='admin')renderAdmin();
-}
-
-function setRideType(type){
-  localState.rideType=type;
-  document.getElementById('shareBtn').classList.toggle('selected',type==='Share');
-  document.getElementById('directBtn').classList.toggle('selected',type==='Direct');
-  saveLocal();
-  updateFarePreview();
-}
-
-function calculateFare(vehicle,type,distance,passengers){
-  const d=parseFloat(distance),p=Math.max(1,parseInt(passengers)||1);
-  if(!isFinite(d)||d<=0)return {ok:false,message:'वैध दूरी आवश्यक है।'};
-  let fare=0,info='';
-  if(vehicle==='e-rickshaw'){
-    if(type==='Share'){
-      if(d<=2)fare=10;else if(d<=4)fare=20;else if(d<=6)fare=30;else if(d<=8)fare=40;else if(d<=10)fare=50;
-      else return {ok:false,message:'ई-रिक्शा शेयर 10 किमी तक उपलब्ध है।'};
-    }else{
-      if(d<=2)fare=40;else if(d<=4)fare=60;else if(d<=6)fare=75;else if(d<=8)fare=90;else if(d<=10)fare=105;
-      else fare=105+(d-10)*10;
-    }
-  }else if(vehicle==='auto'){
-    if(type==='Share'){fare=d*10*p;info='शेयर किराया प्रति सवारी है।';}
-    else{
-      if(d<=5)fare=200;else if(d<=10)fare=325;else if(d<=20)fare=525;else if(d<=30)fare=675;else if(d<=40)fare=775;else if(d<=50)fare=825;
-      else fare=825+(d-50)*5;
-    }
-  }else if(vehicle==='bike'){
-    if(type==='Share')return {ok:false,message:'बाइक शेयर उपलब्ध नहीं है।'};
-    if(d<=2)fare=30;else if(d<=5)fare=50;else if(d<=10)fare=90;else if(d<=15)fare=140;else if(d<=20)fare=190;else if(d<=25)fare=280;else if(d<=30)fare=370;else if(d<=40)fare=480;else if(d<=50)fare=600;
-    else fare=600+(d-50)*12;
-  }else if(vehicle==='car'){
-    if(type==='Share')return {ok:false,message:'कार शेयर उपलब्ध नहीं है।'};
-    if(d<=5)fare=200;else if(d<=10)fare=400;else if(d<=20)fare=800;else if(d<=30)fare=1200;else if(d<=40)fare=1500;else if(d<=50)fare=1800;else if(d<=60)fare=2100;else if(d<=70)fare=2400;else if(d<=80)fare=2700;else if(d<=100)fare=3200;
-    else fare=3200+(d-100)*30;
-  }
-  return {ok:true,fare:Math.round(fare),info};
-}
-
-function updateFarePreview(){
-  const r=calculateFare(document.getElementById('vehicle').value,localState.rideType,document.getElementById('distanceKm').value,document.getElementById('passengers').value);
-  document.getElementById('fareAmount').textContent=r.ok?'₹'+r.fare:'₹0';
-  document.getElementById('fareInfo').textContent=r.ok?(r.info||''):(r.message||'');
-}
-
-function loadGoogleMaps(){
-  if(window.google&&google.maps){initializeGoogleMap();return;}
-  const script=document.createElement('script');
-  script.id='googleMapsScript';
-  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places';
-  script.async=true;
-  script.defer=true;
-  script.onload=initializeGoogleMap;
-  document.head.appendChild(script);
-}
-
-function initializeGoogleMap(){
-  if(!window.google||!google.maps)return;
-  try{
-    googleReady=true;
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-      polylineOptions: { strokeColor: '#087f5b', strokeWeight: 6 }
-    });
-
-    map = new google.maps.Map(document.getElementById('map'),{
-      center: pickupLocation,
-      zoom: 13,
-      mapTypeId: 'roadmap',
-      streetViewControl: false,
-      fullscreenControl: true
-    });
-
-    directionsRenderer.setMap(map);
-    autoService = new google.maps.places.AutocompleteService();
-    placesService = new google.maps.places.PlacesService(map);
-
-    document.getElementById('map').classList.add('loaded');
-    document.getElementById('mapMessage').style.display='none';
-
-    if(window._pendingNativeLocation){
-      const p=window._pendingNativeLocation;
-      window._pendingNativeLocation=null;
-      applyCurrentLocation(p.lat,p.lng,p.accuracy);
-    }
-  }catch(e){
-    console.error('Google Maps Init Error:', e);
-  }
-}
-
-function clearSuggestions(field){
-  const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
-  if(box)box.innerHTML='';
-}
-
-let searchTimer=null;
-function onSearchInput(field){
-  clearTimeout(searchTimer);
-  const val = document.getElementById(field).value.trim();
-  if(val.length < 2){
-    clearSuggestions(field);
-    return;
-  }
-  searchTimer = setTimeout(()=>executeGoogleOfficialSearch(field, val), 180);
-}
-
-// =========================================================================
-// ऑफिशियल Google Places Search
-// =========================================================================
-function executeGoogleOfficialSearch(field, query){
-  const box=document.getElementById(field==='pickup'?'pickupSuggestions':'destinationSuggestions');
-  if(!box)return;
-  box.innerHTML='<div class="suggestion">🔎 खोजा जा रहा है...</div>';
-
-  if(!googleReady || !autoService){
-    box.innerHTML='<div class="suggestion">Google मैप लोड हो रहा है, कृपया प्रतीक्षा करें...</div>';
-    return;
-  }
-
-  const userCenter = new google.maps.LatLng(pickupLocation.lat, pickupLocation.lng);
-  const circle = new google.maps.Circle({
-    center: userCenter,
-    radius: 70000 // 70 किमी दायरा
-  });
-
-  autoService.getPlacePredictions({
-    input: query,
-    bounds: circle.getBounds(),
-    origin: userCenter,
-    componentRestrictions: { country: 'in' }
-  }, (predictions, status)=>{
-    if(status === google.maps.places.PlacesServiceStatus.OK && predictions && predictions.length > 0){
-      box.innerHTML='';
-      predictions.slice(0, 8).forEach(p => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'suggestion';
-
-        let distText = '';
-        if(p.distance_meters){
-          distText = ` <span style="color:#087f5b;font-size:12px;font-weight:700;">(${(p.distance_meters/1000).toFixed(1)} km दूर)</span>`;
-        }
-
-        b.innerHTML = `<b>${escapeHtml(p.structured_formatting.main_text)}</b>${distText}<small>${escapeHtml(p.description)}</small>`;
-        
-        b.onclick = () => {
-          document.getElementById(field).value = p.structured_formatting.main_text;
-          clearSuggestions(field);
-
-          if(placesService){
-            placesService.getDetails({ placeId: p.place_id, fields: ['geometry'] }, (place, stat)=>{
-              if(stat === google.maps.places.PlacesServiceStatus.OK && place && place.geometry){
-                const loc = {
-                  lat: place.geometry.location.lat(),
-                  lng: place.geometry.location.lng()
-                };
-                if(field === 'pickup') pickupLocation = loc;
-                else destLocation = loc;
-
-                calculateGoogleOfficialRoute();
-              }
-            });
-          }
-        };
-        box.appendChild(b);
-      });
-    } else {
-      box.innerHTML='<div class="suggestion">कोई स्थान नहीं मिला। कृपया नाम सही लिखें।</div>';
-    }
-  });
-}
-
-// =========================================================================
-// Google Directions ड्राइविंग रूट
-// =========================================================================
-function calculateGoogleOfficialRoute(){
-  if(!googleReady || !map || !directionsService || !directionsRenderer) return;
-  if(!pickupLocation || !destLocation) return;
-
-  document.getElementById('customerStatus').innerHTML='<div class="status">🚗 सड़क मार्ग बनाया जा रहा है...</div>';
-
-  directionsService.route({
-    origin: new google.maps.LatLng(pickupLocation.lat, pickupLocation.lng),
-    destination: new google.maps.LatLng(destLocation.lat, destLocation.lng),
-    travelMode: google.maps.TravelMode.DRIVING
-  }, (res, status)=>{
-    if(status === google.maps.DirectionsStatus.OK){
-      directionsRenderer.setDirections(res);
-      const leg = res.routes[0].legs[0];
-      currentDistanceKm = (leg.distance.value / 1000);
-      document.getElementById('distanceKm').value = currentDistanceKm.toFixed(2);
-      updateFarePreview();
-      document.getElementById('customerStatus').innerHTML = 
-        `<div class="status success">📏 सड़क की दूरी: <b>${currentDistanceKm.toFixed(2)} km</b> (${leg.duration.text})</div>`;
-    } else {
-      document.getElementById('customerStatus').innerHTML = 
-        '<div class="status warning">⚠️ इस स्थान तक सीधा सड़क मार्ग नहीं मिला।</div>';
-    }
-  });
-}
-
-function useCurrentLocation(){
-  const msg=document.getElementById('mapMessage');
-  msg.style.display='flex';
-  msg.textContent='📍 लोकेशन जांची जा रही है...';
-
-  if(window.AndroidLocation && typeof window.AndroidLocation.requestLocation==='function'){
-    try{ window.AndroidLocation.requestLocation(); return; }catch(e){}
-  }
-
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      msg.style.display='none';
-      applyCurrentLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy||0);
-    },err=>{
-      msg.textContent='लोकेशन नहीं मिल सकी।';
-    },{enableHighAccuracy:true, timeout:15000});
-  }
-}
-
-window.onNativeLocation=function(lat,lng,accuracy){
-  const msg=document.getElementById('mapMessage');
-  if(!map||!googleReady){
-    window._pendingNativeLocation={lat:lat,lng:lng,accuracy:accuracy};
-    return;
-  }
-  msg.style.display='none';
-  applyCurrentLocation(lat,lng,accuracy);
+const firebaseConfig = {
+  apiKey:"AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",
+  authDomain:"sawari-setu.firebaseapp.com",
+  projectId:"sawari-setu",
+  storageBucket:"sawari-setu.firebasestorage.app",
+  messagingSenderId:"292605368862",
+  appId:"1:292605368862:web:b9945354dfd21f7eb62c0f",
+  measurementId:"G-567NSGD4R4"
 };
 
-function applyCurrentLocation(lat,lng,accuracy){
-  pickupLocation = {lat: Number(lat), lng: Number(lng)};
-  const pickup = document.getElementById('pickup');
-  pickup.value = 'सिरसा, प्रयागराज';
 
-  if(map){
-    map.setCenter(pickupLocation);
-    map.setZoom(15);
-  }
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
 
-  if(googleReady){
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({location: pickupLocation}, (results, status)=>{
-      if(status === 'OK' && results && results[0]){
-        pickup.value = results[0].formatted_address.split(',')[0] + ', प्रयागराज';
-        document.getElementById('customerStatus').innerHTML = `<div class="status success">📍 करंट लोकेशन: ${escapeHtml(results[0].formatted_address)}</div>`;
-      }
-    });
-  }
+const KEY = "sawari_setu_v2";
 
-  if(destLocation){
-    calculateGoogleOfficialRoute();
+let S = {
+  type:"share",
+  online:true,
+  earn:0,
+  currentBookingId:null,
+  allowBook:true,
+  allowDriver:true
+};
+
+try{
+  const saved = localStorage.getItem(KEY);
+
+  if(saved){
+    S = {
+      ...S,
+      ...JSON.parse(saved)
+    };
   }
+}catch(e){
+  console.warn("Local state error",e);
 }
 
-function book(){
-  const toggle=document.getElementById('bookingToggle');
-  if(toggle&&!toggle.checked){alert('Booking अभी बंद है।');return;}
-  const mobile=document.getElementById('mobile').value.trim();
-  if(!/^\d{10}$/.test(mobile)){alert('10 अंकों का मोबाइल नंबर डालें।');return;}
-  const distance=parseFloat(document.getElementById('distanceKm').value);
-  const fare=calculateFare(document.getElementById('vehicle').value,localState.rideType,distance,document.getElementById('passengers').value);
-  if(!fare.ok){alert(fare.message||'कृपया पहले रूट बनने दें।');return;}
+let firebaseReady = false;
+let firebaseInitError = "";
+let db = null;
+let bookingsRef = null;
+let unsubscribeBookings = null;
 
-  const booking={
-    pickup:document.getElementById('pickup').value,
-    destination:document.getElementById('destination').value,
-    distanceKm:distance,
-    vehicle:document.getElementById('vehicle').value,
-    rideType:localState.rideType,
-    passengers:parseInt(document.getElementById('passengers').value)||1,
-    mobile:mobile,
-    fare:fare.fare,
-    status:'new',
-    createdAt:new Date().toISOString()
+let firestoreBookings = [];
+
+let mapsReady = false;
+let mapsLoading = false;
+
+let map = null;
+let directionsService = null;
+let directionsRenderer = null;
+let geocoder = null;
+let autocompleteService = null;
+let placesService = null;
+
+let pickupLocation = {
+  lat:25.2672,
+  lng:82.0725
+};
+
+let destinationLocation = null;
+
+let pickupMarker = null;
+let destinationMarker = null;
+let currentLocationMarker = null;
+
+let searchTimers = {
+  pickup:null,
+  destination:null
+};
+
+let lastSearchField = null;
+
+let driverOnline =
+  S.online !== false;
+
+
+/* ============================================================
+   SAVE STATE
+============================================================ */
+
+function saveState(){
+
+  try{
+    localStorage.setItem(
+      KEY,
+      JSON.stringify(S)
+    );
+  }catch(e){
+    console.warn("Could not save state",e);
+  }
+
+}
+
+
+/* ============================================================
+   TAB SYSTEM
+============================================================ */
+
+function showTab(name, button){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>{
+      page.classList.add("hidden");
+    });
+
+  const target =
+    document.getElementById(name);
+
+  if(target){
+    target.classList.remove("hidden");
+  }
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(tab=>{
+      tab.classList.remove("active");
+    });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  if(name === "admin"){
+    renderAdmin();
+  }
+
+  if(name === "driver"){
+    renderDriver();
+  }
+
+  if(name === "customer"){
+    setTimeout(()=>{
+      resizeMap();
+    },100);
+  }
+
+}
+
+
+/* ============================================================
+   FIREBASE INIT
+============================================================ */
+
+function initializeFirebase(){
+
+  try{
+
+    if(!window.firebase){
+      throw new Error("Firebase library load नहीं हुई।");
+    }
+
+    if(!firebase.apps.length){
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    db = firebase.firestore();
+
+    try{
+      db.settings({
+        experimentalForceLongPolling:true
+      });
+    }catch(e){
+      console.warn("Firestore settings:",e);
+    }
+
+    bookingsRef =
+      db.collection("bookings");
+
+    firebaseReady = true;
+
+    updateConnection(
+      "Firebase Ready",
+      true
+    );
+
+    console.log(
+      "SAWARI SETU FIREBASE READY"
+    );
+
+    console.log(
+      "Project:",
+      firebaseConfig.projectId
+    );
+
+    console.log(
+      "Collection: bookings"
+    );
+
+    listenBookings();
+
+  }catch(error){
+
+    firebaseReady = false;
+    firebaseInitError =
+      error?.message ||
+      String(error);
+
+    updateConnection(
+      "Local Mode",
+      false
+    );
+
+    console.error(
+      "Firebase initialization failed:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   CONNECTION STATUS
+============================================================ */
+
+function updateConnection(text,ok){
+
+  const el =
+    document.getElementById(
+      "connectionStatus"
+    );
+
+  if(!el) return;
+
+  el.textContent =
+    ok ? "🟢 "+text : "🟠 "+text;
+
+}
+
+
+/* ============================================================
+   FIRESTORE LISTENER
+============================================================ */
+
+function listenBookings(){
+
+  if(!firebaseReady || !bookingsRef){
+    return;
+  }
+
+  if(unsubscribeBookings){
+    try{
+      unsubscribeBookings();
+    }catch(e){}
+  }
+
+  unsubscribeBookings =
+    bookingsRef
+      .orderBy("createdAt","desc")
+      .limit(200)
+      .onSnapshot(
+        snapshot=>{
+
+          firestoreBookings =
+            snapshot.docs.map(doc=>({
+
+              id:doc.id,
+              ...doc.data()
+
+            }));
+
+          updateConnection(
+            "Cloud Connected",
+            true
+          );
+
+          renderHistory();
+          renderDriver();
+          renderAdmin();
+
+          checkDriverNewRides();
+
+        },
+        error=>{
+
+          console.error(
+            "Firestore listener:",
+            error
+          );
+
+          updateConnection(
+            "Cloud Error",
+            false
+          );
+
+        }
+      );
+
+}
+
+
+/* ============================================================
+   LOCAL + CLOUD BOOKINGS
+============================================================ */
+
+function getLocalBookings(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        "sawari_setu_bookings"
+      );
+
+    if(!raw) return [];
+
+    const list =
+      JSON.parse(raw);
+
+    return Array.isArray(list)
+      ? list
+      : [];
+
+  }catch(e){
+    return [];
+  }
+
+}
+
+
+function saveLocalBookings(list){
+
+  try{
+
+    localStorage.setItem(
+      "sawari_setu_bookings",
+      JSON.stringify(list)
+    );
+
+  }catch(e){
+
+    console.warn(
+      "Could not save bookings",
+      e
+    );
+
+  }
+
+}
+
+
+function getAllBookings(){
+
+  const local =
+    getLocalBookings();
+
+  const mapById =
+    new Map();
+
+  local.forEach(item=>{
+    if(item && item.id){
+      mapById.set(item.id,item);
+    }
+  });
+
+  firestoreBookings.forEach(item=>{
+    if(item && item.id){
+      mapById.set(item.id,item);
+    }
+  });
+
+  return Array.from(
+    mapById.values()
+  ).sort(
+    (a,b)=>
+      getMillis(b.createdAt) -
+      getMillis(a.createdAt)
+  );
+
+}
+
+
+/* ============================================================
+   DATE HELPER
+============================================================ */
+
+function getMillis(value){
+
+  if(!value) return 0;
+
+  if(
+    typeof value.toMillis ===
+    "function"
+  ){
+    return value.toMillis();
+  }
+
+  if(
+    value.seconds !== undefined
+  ){
+    return value.seconds * 1000;
+  }
+
+  const t =
+    new Date(value).getTime();
+
+  return isNaN(t) ? 0 : t;
+
+}
+
+
+function formatDate(value){
+
+  const ms =
+    getMillis(value);
+
+  if(!ms) return "अभी";
+
+  return new Date(ms)
+    .toLocaleString("hi-IN",{
+      day:"2-digit",
+      month:"short",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+
+}
+
+
+/* ============================================================
+   GOOGLE MAPS LOADER
+============================================================ */
+
+function loadGoogleMaps(){
+
+  if(window.google &&
+     window.google.maps){
+
+    mapsReady = true;
+    initializeGoogleMap();
+    return;
+
+  }
+
+  if(mapsLoading){
+    return;
+  }
+
+  mapsLoading = true;
+
+  window.sawariSetuMapsReady =
+    function(){
+
+      mapsLoading = false;
+      mapsReady = true;
+
+      initializeGoogleMap();
+
+    };
+
+
+  window.sawariSetuMapsError =
+    function(){
+
+      mapsLoading = false;
+
+      showMapMessage(
+        "Google Maps load नहीं हो पाया। API Key / Maps API settings जाँचें।",
+        true
+      );
+
+    };
+
+
+  const script =
+    document.createElement("script");
+
+  script.src =
+    "https://maps.googleapis.com/maps/api/js" +
+    "?key="+
+    encodeURIComponent(
+      GOOGLE_MAPS_API_KEY
+    )+
+    "&libraries=places" +
+    "&callback=sawariSetuMapsReady";
+
+  script.async = true;
+  script.defer = true;
+
+  script.onerror =
+    window.sawariSetuMapsError;
+
+  document.head.appendChild(script);
+
+}
+
+
+/* ============================================================
+   GOOGLE MAP INIT
+============================================================ */
+
+function initializeGoogleMap(){
+
+  try{
+
+    if(!window.google ||
+       !google.maps){
+
+      throw new Error(
+        "Google Maps उपलब्ध नहीं है।"
+      );
+
+    }
+
+    const mapElement =
+      document.getElementById("map");
+
+    if(!mapElement){
+      return;
+    }
+
+    map =
+      new google.maps.Map(
+        mapElement,
+        {
+          center:pickupLocation,
+          zoom:13,
+          mapTypeControl:false,
+          streetViewControl:false,
+          fullscreenControl:false,
+          gestureHandling:"greedy"
+        }
+      );
+
+
+    directionsService =
+      new google.maps.DirectionsService();
+
+
+    directionsRenderer =
+      new google.maps.DirectionsRenderer({
+        map:map,
+        suppressMarkers:true,
+        preserveViewport:false,
+        polylineOptions:{
+          strokeColor:"#2563eb",
+          strokeOpacity:.9,
+          strokeWeight:6
+        }
+      });
+
+
+    geocoder =
+      new google.maps.Geocoder();
+
+
+    autocompleteService =
+      new google.maps.places.AutocompleteService();
+
+
+    placesService =
+      new google.maps.places.PlacesService(
+        map
+      );
+
+
+    mapsReady = true;
+
+    placePickupMarker(
+      pickupLocation,
+      "Pickup"
+    );
+
+    showMapMessage(
+      "📍 Pickup और Destination चुनें।",
+      false
+    );
+
+    resizeMap();
+
+  }catch(error){
+
+    console.error(
+      "Google Maps initialization:",
+      error
+    );
+
+    showMapMessage(
+      "Google Maps शुरू नहीं हो पाया: "+
+      (error.message || error),
+      true
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   MAP RESIZE
+============================================================ */
+
+function resizeMap(){
+
+  if(!map) return;
+
+  try{
+
+    google.maps.event.trigger(
+      map,
+      "resize"
+    );
+
+    map.setCenter(
+      pickupLocation
+    );
+
+  }catch(e){}
+
+}
+
+
+/* ============================================================
+   MAP MESSAGE
+============================================================ */
+
+function showMapMessage(
+  message,
+  error=false
+){
+
+  const el =
+    document.getElementById(
+      "mapMessage"
+    );
+
+  if(!el) return;
+
+  el.textContent = message;
+
+  el.classList.remove(
+    "hidden",
+    "error",
+    "success"
+  );
+
+  if(error){
+    el.classList.add("error");
+  }
+
+}
+
+
+/* ============================================================
+   HIDE MAP MESSAGE
+============================================================ */
+
+function hideMapMessage(){
+
+  const el =
+    document.getElementById(
+      "mapMessage"
+    );
+
+  if(el){
+    el.classList.add("hidden");
+  }
+
+}
+
+
+/* ============================================================
+   SEARCH INPUT
+============================================================ */
+
+function onSearchInput(field){
+
+  const input =
+    document.getElementById(field);
+
+  if(!input) return;
+
+  const query =
+    input.value.trim();
+
+  clearTimeout(
+    searchTimers[field]
+  );
+
+  if(query.length < 2){
+
+    hideSuggestions(field);
+
+    return;
+
+  }
+
+  searchTimers[field] =
+    setTimeout(()=>{
+
+      searchPlaces(
+        field,
+        query
+      );
+
+    },350);
+
+}
+
+
+/* ============================================================
+   SEARCH PLACES
+============================================================ */
+
+function searchPlaces(field,query){
+
+  lastSearchField = field;
+
+  if(!mapsReady ||
+     !autocompleteService){
+
+    loadGoogleMaps();
+
+    return;
+
+  }
+
+  autocompleteService.getPlacePredictions(
+    {
+      input:query,
+      componentRestrictions:{
+        country:"in"
+      },
+      locationBias:{
+        center:pickupLocation,
+        radius:50000
+      }
+    },
+    (predictions,status)=>{
+
+      const container =
+        document.getElementById(
+          field === "pickup"
+            ? "pickupSuggestions"
+            : "destinationSuggestions"
+        );
+
+      if(!container){
+        return;
+      }
+
+      container.innerHTML = "";
+
+      if(
+        status !==
+        google.maps.places.PlacesServiceStatus.OK ||
+        !predictions ||
+        !predictions.length
+      ){
+
+        hideSuggestions(field);
+        return;
+
+      }
+
+
+      predictions
+        .slice(0,6)
+        .forEach(prediction=>{
+
+          const item =
+            document.createElement("div");
+
+          item.className =
+            "suggestion";
+
+          const main =
+            prediction.structured_formatting
+              ?.main_text ||
+            prediction.description;
+
+          const secondary =
+            prediction.structured_formatting
+              ?.secondary_text ||
+            "";
+
+          item.innerHTML =
+            `<div class="suggestion-main">
+              ${escapeHtml(main)}
+             </div>
+             <div class="suggestion-sub">
+              ${escapeHtml(secondary)}
+             </div>`;
+
+          item.onclick =
+            function(){
+
+              selectPlace(
+                field,
+                prediction.place_id
+              );
+
+            };
+
+          container.appendChild(item);
+
+        });
+
+      container.classList.remove(
+        "hidden"
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   SELECT PLACE
+============================================================ */
+
+function selectPlace(
+  field,
+  placeId
+){
+
+  hideSuggestions(field);
+
+  if(!placesService){
+    return;
+  }
+
+  placesService.getDetails(
+    {
+      placeId:placeId,
+      fields:[
+        "geometry",
+        "formatted_address",
+        "name"
+      ]
+    },
+    (place,status)=>{
+
+      if(
+        status !==
+        google.maps.places.PlacesServiceStatus.OK ||
+        !place ||
+        !place.geometry ||
+        !place.geometry.location
+      ){
+
+        setLocationStatus(
+          "Location details नहीं मिल सके।",
+          true
+        );
+
+        return;
+
+      }
+
+      const loc = {
+        lat:
+          place.geometry.location.lat(),
+        lng:
+          place.geometry.location.lng()
+      };
+
+      const text =
+        place.formatted_address ||
+        place.name ||
+        "";
+
+      if(field === "pickup"){
+
+        pickupLocation = loc;
+
+        document.getElementById(
+          "pickup"
+        ).value = text;
+
+        placePickupMarker(
+          loc,
+          "Pickup"
+        );
+
+      }else{
+
+        destinationLocation = loc;
+
+        document.getElementById(
+          "destination"
+        ).value = text;
+
+        placeDestinationMarker(
+          loc,
+          "Destination"
+        );
+
+      }
+
+      if(
+        pickupLocation &&
+        destinationLocation
+      ){
+
+        calculateGoogleOfficialRoute();
+
+      }else{
+
+        map.setCenter(loc);
+
+        map.setZoom(14);
+
+        updateFarePreview();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   CURRENT LOCATION
+============================================================ */
+
+function useCurrentLocation(){
+
+  setLocationStatus(
+    "📍 Current location जांची जा रही है...",
+    false
+  );
+
+  showMapMessage(
+    "📍 आपकी current location ली जा रही है..."
+  );
+
+
+  /*
+   * Android APK native bridge.
+   */
+  if(
+    window.AndroidLocation &&
+    typeof
+    window.AndroidLocation.requestLocation ===
+    "function"
+  ){
+
+    try{
+
+      window.AndroidLocation.requestLocation();
+
+      return;
+
+    }catch(error){
+
+      console.warn(
+        "Android location bridge error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /*
+   * Browser / WebView Geolocation.
+   */
+  if(
+    navigator.geolocation
+  ){
+
+    navigator.geolocation.getCurrentPosition(
+      position=>{
+
+        applyCurrentLocation(
+          position.coords.latitude,
+          position.coords.longitude,
+          position.coords.accuracy
+        );
+
+      },
+      error=>{
+
+        console.error(
+          "Geolocation:",
+          error
+        );
+
+        setLocationStatus(
+          "❌ Current location नहीं मिली। Location permission दें।",
+          true
+        );
+
+        showMapMessage(
+          "Current location permission नहीं मिली।",
+          true
+        );
+
+      },
+      {
+        enableHighAccuracy:true,
+        timeout:15000,
+        maximumAge:10000
+      }
+    );
+
+    return;
+
+  }
+
+
+  setLocationStatus(
+    "❌ इस device में location service उपलब्ध नहीं है।",
+    true
+  );
+
+}
+
+
+/* ============================================================
+   ANDROID NATIVE CALLBACK
+============================================================ */
+
+window.onNativeLocation =
+function(lat,lng,accuracy){
+
+  const latitude =
+    Number(lat);
+
+  const longitude =
+    Number(lng);
+
+  const acc =
+    Number(accuracy || 0);
+
+  if(
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ){
+
+    setLocationStatus(
+      "❌ Android ने invalid location भेजी।",
+      true
+    );
+
+    return;
+
+  }
+
+  applyCurrentLocation(
+    latitude,
+    longitude,
+    acc
+  );
+
+};
+
+
+/* ============================================================
+   APPLY CURRENT LOCATION
+============================================================ */
+
+function applyCurrentLocation(
+  lat,
+  lng,
+  accuracy
+){
+
+  pickupLocation = {
+    lat:Number(lat),
+    lng:Number(lng)
   };
 
-  allBookings.unshift(booking);
-  if(bookingsRef)bookingsRef.add(booking).catch(e=>console.warn(e));
-  document.getElementById('customerStatus').innerHTML='<div class="success">✅ राइड बुक हो गई — ₹'+fare.fare+'</div>';
-  renderHistory();
-  renderAdmin();
-  renderDriverRide();
+
+  placePickupMarker(
+    pickupLocation,
+    "आपकी Current Location"
+  );
+
+
+  if(map){
+
+    map.setCenter(
+      pickupLocation
+    );
+
+    map.setZoom(16);
+
+  }
+
+
+  setLocationStatus(
+    "📍 Current location मिल गई"+
+    (
+      accuracy
+        ? " • Accuracy लगभग "+
+          Math.round(accuracy)+
+          " m"
+        : ""
+    ),
+    false
+  );
+
+
+  /*
+   * Actual coordinates का reverse geocoding.
+   * अब pickup को hard-code करके
+   * "सिरसा, प्रयागराज" नहीं किया जाएगा।
+   */
+  if(geocoder){
+
+    geocoder.geocode(
+      {
+        location:pickupLocation
+      },
+      (results,status)=>{
+
+        if(
+          status === "OK" &&
+          results &&
+          results.length
+        ){
+
+          document.getElementById(
+            "pickup"
+          ).value =
+            results[0].formatted_address;
+
+        }else{
+
+          document.getElementById(
+            "pickup"
+          ).value =
+            "Current Location";
+
+        }
+
+        if(destinationLocation){
+
+          calculateGoogleOfficialRoute();
+
+        }else{
+
+          updateFarePreview();
+
+        }
+
+      }
+    );
+
+  }else{
+
+    document.getElementById(
+      "pickup"
+    ).value =
+      "Current Location";
+
+    if(destinationLocation){
+      calculateGoogleOfficialRoute();
+    }
+
+  }
+
 }
+
+
+/* ============================================================
+   PICKUP MARKER
+============================================================ */
+
+function placePickupMarker(
+  position,
+  title
+){
+
+  if(!map || !window.google){
+    return;
+  }
+
+  if(pickupMarker){
+    pickupMarker.setMap(null);
+  }
+
+  pickupMarker =
+    new google.maps.Marker({
+      position:position,
+      map:map,
+      title:title || "Pickup",
+      label:{
+        text:"P",
+        color:"white",
+        fontWeight:"bold"
+      }
+    });
+
+}
+
+
+/* ============================================================
+   DESTINATION MARKER
+============================================================ */
+
+function placeDestinationMarker(
+  position,
+  title
+){
+
+  if(!map || !window.google){
+    return;
+  }
+
+  if(destinationMarker){
+    destinationMarker.setMap(null);
+  }
+
+  destinationMarker =
+    new google.maps.Marker({
+      position:position,
+      map:map,
+      title:title || "Destination",
+      label:{
+        text:"D",
+        color:"white",
+        fontWeight:"bold"
+      }
+    });
+
+}
+
+
+/* ============================================================
+   CURRENT LOCATION MARKER
+============================================================ */
+
+function placeCurrentLocationMarker(
+  position
+){
+
+  if(!map || !window.google){
+    return;
+  }
+
+  if(currentLocationMarker){
+    currentLocationMarker.setMap(null);
+  }
+
+  currentLocationMarker =
+    new google.maps.Marker({
+      position:position,
+      map:map,
+      title:"Current Location",
+      icon:{
+        path:google.maps.SymbolPath.CIRCLE,
+        scale:9,
+        fillColor:"#2563eb",
+        fillOpacity:1,
+        strokeColor:"#ffffff",
+        strokeWeight:3
+      }
+    });
+
+}
+
+
+/* ============================================================
+   OFFICIAL GOOGLE ROAD ROUTE
+============================================================ */
+
+function calculateGoogleOfficialRoute(){
+
+  if(
+    !mapsReady ||
+    !directionsService ||
+    !directionsRenderer
+  ){
+
+    loadGoogleMaps();
+
+    return;
+
+  }
+
+  if(
+    !pickupLocation ||
+    !destinationLocation
+  ){
+
+    updateFarePreview();
+
+    return;
+
+  }
+
+
+  showMapMessage(
+    "🗺️ Google road route निकाली जा रही है..."
+  );
+
+
+  const request = {
+
+    origin:pickupLocation,
+
+    destination:destinationLocation,
+
+    travelMode:
+      google.maps.TravelMode.DRIVING,
+
+    provideRouteAlternatives:false
+
+  };
+
+
+  directionsService.route(
+    request,
+    (result,status)=>{
+
+      if(
+        status !==
+        google.maps.DirectionsStatus.OK ||
+        !result ||
+        !result.routes ||
+        !result.routes.length
+      ){
+
+        console.error(
+          "Directions error:",
+          status
+        );
+
+        showMapMessage(
+          "❌ Road route नहीं मिल पाया: "+
+          status,
+          true
+        );
+
+        document.getElementById(
+          "distanceKm"
+        ).value = "";
+
+        document.getElementById(
+          "distanceDisplay"
+        ).textContent = "— km";
+
+        document.getElementById(
+          "durationDisplay"
+        ).textContent = "—";
+
+        updateFarePreview();
+
+        return;
+
+      }
+
+
+      directionsRenderer.setDirections(
+        result
+      );
+
+
+      const leg =
+        result.routes[0]
+          .legs[0];
+
+
+      if(!leg){
+        return;
+      }
+
+
+      const meters =
+        leg.distance?.value || 0;
+
+      const km =
+        meters / 1000;
+
+
+      const distance =
+        Number(
+          km.toFixed(2)
+        );
+
+
+      document.getElementById(
+        "distanceKm"
+      ).value =
+        distance;
+
+
+      document.getElementById(
+        "distanceDisplay"
+      ).textContent =
+        distance.toFixed(2)+
+        " km";
+
+
+      document.getElementById(
+        "durationDisplay"
+      ).textContent =
+        leg.duration?.text ||
+        "—";
+
+
+      document.getElementById(
+        "distanceStatus"
+      ).className =
+        "status ok";
+
+
+      document.getElementById(
+        "distanceStatus"
+      ).textContent =
+        "✅ Google Maps road distance verified।";
+
+
+      hideMapMessage();
+
+
+      updateFarePreview();
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   ROUTE CHANGED
+============================================================ */
+
+function routeChanged(){
+
+  /*
+   * Compatibility function.
+   * Search selection ही actual coordinates set करती है।
+   */
+
+  updateFarePreview();
+
+}
+
+
+/* ============================================================
+   FARE ENGINE
+============================================================ */
+
+function calculateFare(
+  vehicle,
+  type,
+  distance,
+  passengers
+){
+
+  const d =
+    Number(distance);
+
+  let p =
+    Number(passengers);
+
+
+  if(
+    !Number.isFinite(d) ||
+    d <= 0
+  ){
+
+    return {
+      ok:false,
+      message:"Valid distance डालें।"
+    };
+
+  }
+
+
+  if(
+    !Number.isFinite(p) ||
+    p < 1
+  ){
+    p = 1;
+  }
+
+
+  p =
+    Math.min(
+      Math.floor(p),
+      10
+    );
+
+
+  /*
+   * E-RICKSHAW
+   */
+
+  if(vehicle === "e-rickshaw"){
+
+    if(type === "share"){
+
+      if(d <= 2){
+        return {
+          ok:true,
+          fare:10,
+          note:"E-Rickshaw Share"
+        };
+      }
+
+      if(d <= 4){
+        return {
+          ok:true,
+          fare:20,
+          note:"E-Rickshaw Share"
+        };
+      }
+
+      if(d <= 6){
+        return {
+          ok:true,
+          fare:30,
+          note:"E-Rickshaw Share"
+        };
+      }
+
+      if(d <= 8){
+        return {
+          ok:true,
+          fare:40,
+          note:"E-Rickshaw Share"
+        };
+      }
+
+      if(d <= 10){
+        return {
+          ok:true,
+          fare:50,
+          note:"E-Rickshaw Share"
+        };
+      }
+
+      return {
+        ok:false,
+        message:
+          "E-Rickshaw Share 10 km से ऊपर उपलब्ध नहीं है।"
+      };
+
+    }
+
+
+    let fare;
+
+    if(d <= 2) fare=40;
+    else if(d <= 4) fare=60;
+    else if(d <= 6) fare=75;
+    else if(d <= 8) fare=90;
+    else if(d <= 10) fare=105;
+    else fare=105+(d-10)*10;
+
+    return {
+      ok:true,
+      fare:Math.round(fare),
+      note:"E-Rickshaw Direct"
+    };
+
+  }
+
+
+  /*
+   * AUTO
+   */
+
+  if(vehicle === "auto"){
+
+    if(type === "share"){
+
+      const fare =
+        d * 10 * p;
+
+      return {
+        ok:true,
+        fare:Math.round(fare),
+        note:
+          "Auto Share • "+
+          p+
+          " passenger"
+      };
+
+    }
+
+
+    let fare;
+
+    if(d <= 5) fare=200;
+    else if(d <= 10) fare=325;
+    else if(d <= 20) fare=525;
+    else if(d <= 30) fare=675;
+    else if(d <= 40) fare=775;
+    else if(d <= 50) fare=825;
+    else fare=825+(d-50)*5;
+
+    let note =
+      "Auto Direct";
+
+    if(d >= 100){
+      note +=
+        " • 2L free water";
+    }else if(d >= 50){
+      note +=
+        " • 1L free water";
+    }
+
+    return {
+      ok:true,
+      fare:Math.round(fare),
+      note:note
+    };
+
+  }
+
+
+  /*
+   * BIKE
+   */
+
+  if(vehicle === "bike"){
+
+    if(type === "share"){
+
+      return {
+        ok:false,
+        message:
+          "Bike Share अभी उपलब्ध नहीं है।"
+      };
+
+    }
+
+
+    let fare;
+
+    if(d <= 2) fare=30;
+    else if(d <= 5) fare=50;
+    else if(d <= 10) fare=90;
+    else if(d <= 15) fare=140;
+    else if(d <= 20) fare=190;
+    else if(d <= 25) fare=280;
+    else if(d <= 30) fare=370;
+    else if(d <= 40) fare=480;
+    else if(d <= 50) fare=600;
+    else fare=600+(d-50)*12;
+
+    return {
+      ok:true,
+      fare:Math.round(fare),
+      note:"Bike Direct"
+    };
+
+  }
+
+
+  /*
+   * CAR
+   */
+
+  if(vehicle === "car"){
+
+    if(type === "share"){
+
+      return {
+        ok:false,
+        message:
+          "Car Share अभी उपलब्ध नहीं है।"
+      };
+
+    }
+
+
+    let fare;
+
+    if(d <= 5) fare=200;
+    else if(d <= 10) fare=400;
+    else if(d <= 20) fare=800;
+    else if(d <= 30) fare=1200;
+    else if(d <= 40) fare=1500;
+    else if(d <= 50) fare=1800;
+    else if(d <= 60) fare=2100;
+    else if(d <= 70) fare=2400;
+    else if(d <= 80) fare=2700;
+    else if(d <= 100) fare=3200;
+    else fare=3200+(d-100)*30;
+
+    let note =
+      "Car Direct";
+
+    if(d >= 100){
+      note +=
+        " • 2L free water";
+    }else if(d >= 50){
+      note +=
+        " • 1L free water";
+    }
+
+    return {
+      ok:true,
+      fare:Math.round(fare),
+      note:note
+    };
+
+  }
+
+
+  return {
+    ok:false,
+    message:"Vehicle select करें।"
+  };
+
+}
+
+
+/* ============================================================
+   FARE PREVIEW
+============================================================ */
+
+function updateFarePreview(){
+
+  const distance =
+    Number(
+      document.getElementById(
+        "distanceKm"
+      )?.value
+    );
+
+  const vehicle =
+    document.getElementById(
+      "vehicle"
+    )?.value ||
+    "e-rickshaw";
+
+  const passengers =
+    Number(
+      document.getElementById(
+        "passengers"
+      )?.value
+    ) || 1;
+
+
+  const result =
+    calculateFare(
+      vehicle,
+      S.type,
+      distance,
+      passengers
+    );
+
+
+  const fare =
+    document.getElementById(
+      "farePreview"
+    );
+
+  const note =
+    document.getElementById(
+      "fareNote"
+    );
+
+
+  if(!result.ok){
+
+    fare.textContent =
+      "₹ —";
+
+    note.textContent =
+      result.message ||
+      "Route select करें।";
+
+    return;
+
+  }
+
+
+  fare.textContent =
+    "₹ "+
+    result.fare.toLocaleString(
+      "en-IN"
+    );
+
+  note.textContent =
+    result.note || "";
+
+}
+
+
+/* ============================================================
+   RIDE TYPE
+============================================================ */
+
+function setType(type){
+
+  S.type =
+    type === "direct"
+      ? "direct"
+      : "share";
+
+  saveState();
+
+
+  document
+    .getElementById("share")
+    .classList.toggle(
+      "selected",
+      S.type === "share"
+    );
+
+
+  document
+    .getElementById("direct")
+    .classList.toggle(
+      "selected",
+      S.type === "direct"
+    );
+
+
+  updateFarePreview();
+
+}
+
+
+/* ============================================================
+   VEHICLE
+============================================================ */
+
+function vehicleChanged(){
+
+  updateFarePreview();
+
+}
+
+
+/* ============================================================
+   BOOK RIDE
+============================================================ */
+
+async function book(){
+
+  const button =
+    document.getElementById(
+      "bookBtn"
+    );
+
+  const output =
+    document.getElementById(
+      "booking"
+    );
+
+
+  if(
+    S.allowBook === false
+  ){
+
+    showBookingMessage(
+      "❌ अभी booking बंद है।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  const pickup =
+    document.getElementById(
+      "pickup"
+    ).value.trim();
+
+
+  const destination =
+    document.getElementById(
+      "destination"
+    ).value.trim();
+
+
+  const mobile =
+    document.getElementById(
+      "mobile"
+    ).value.trim();
+
+
+  const passengers =
+    Number(
+      document.getElementById(
+        "passengers"
+      ).value
+    ) || 1;
+
+
+  const distance =
+    Number(
+      document.getElementById(
+        "distanceKm"
+      ).value
+    );
+
+
+  const vehicle =
+    document.getElementById(
+      "vehicle"
+    ).value;
+
+
+  if(!pickup){
+
+    showBookingMessage(
+      "❌ Pickup location डालें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  if(!destination){
+
+    showBookingMessage(
+      "❌ Destination डालें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !destinationLocation
+  ){
+
+    showBookingMessage(
+      "❌ पहले Destination की Google Maps location select करें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !/^[0-9]{10}$/.test(mobile)
+  ){
+
+    showBookingMessage(
+      "❌ सही 10 digit mobile number डालें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !Number.isFinite(distance) ||
+    distance <= 0
+  ){
+
+    showBookingMessage(
+      "❌ पहले Google Maps route निकालें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  const fare =
+    calculateFare(
+      vehicle,
+      S.type,
+      distance,
+      passengers
+    );
+
+
+  if(!fare.ok){
+
+    showBookingMessage(
+      "❌ "+
+      fare.message,
+      true
+    );
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.innerHTML =
+    '<span class="loader"></span> Booking हो रही है...';
+
+
+  const booking = {
+
+    pickup:pickup,
+
+    destination:destination,
+
+    pickupLocation:{
+      lat:pickupLocation.lat,
+      lng:pickupLocation.lng
+    },
+
+    destinationLocation:{
+      lat:destinationLocation.lat,
+      lng:destinationLocation.lng
+    },
+
+    distanceKm:Number(
+      distance.toFixed(2)
+    ),
+
+    duration:
+      document.getElementById(
+        "durationDisplay"
+      ).textContent,
+
+    type:S.type,
+
+    vehicle:vehicle,
+
+    passengers:passengers,
+
+    mobile:mobile,
+
+    fare:Number(fare.fare),
+
+    fareNote:fare.note,
+
+    status:"pending",
+
+    driverId:null,
+
+    driverName:null,
+
+    createdAt:
+      firebaseReady && firebase.firestore
+        ? firebase.firestore.FieldValue.serverTimestamp()
+        : new Date().toISOString()
+
+  };
+
+
+  /*
+   * Local ID पहले बना देते हैं,
+   * ताकि Firebase fail होने पर भी
+   * booking गायब न हो।
+   */
+
+  const localId =
+    "SS-"+Date.now()+"-"+Math.random()
+      .toString(36)
+      .slice(2,7);
+
+  booking.id = localId;
+
+
+  try{
+
+    /*
+     * LOCAL SAVE
+     */
+
+    const local =
+      getLocalBookings();
+
+    local.unshift(
+      booking
+    );
+
+    saveLocalBookings(
+      local.slice(0,200)
+    );
+
+
+    /*
+     * FIRESTORE SAVE
+     */
+
+    if(
+      firebaseReady &&
+      bookingsRef
+    ){
+
+      const docRef =
+        await bookingsRef.add(
+          {
+            ...booking,
+            createdAt:
+              firebase.firestore
+                .FieldValue
+                .serverTimestamp()
+          }
+        );
+
+      booking.id =
+        docRef.id;
+
+      booking.cloudId =
+        docRef.id;
+
+      const updated =
+        getLocalBookings()
+          .filter(
+            x=>x.id !== localId
+          );
+
+      updated.unshift(
+        booking
+      );
+
+      saveLocalBookings(
+        updated.slice(0,200)
+      );
+
+    }
+
+
+    S.currentBookingId =
+      booking.id;
+
+    saveState();
+
+
+    showBookingMessage(
+      "✅ राइड सफलतापूर्वक बुक हो गई। Booking ID: "+
+      booking.id,
+      false
+    );
+
+
+    renderHistory();
+
+
+  }catch(error){
+
+    console.error(
+      "Booking error:",
+      error
+    );
+
+
+    /*
+     * Local booking already saved.
+     * इसलिए user की ride खोएगी नहीं।
+     */
+
+    showBookingMessage(
+      "⚠️ राइड local device में save हो गई, लेकिन cloud sync नहीं हुआ। "+
+      (error.message || ""),
+      true
+    );
+
+
+    renderHistory();
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "🚕 राइड बुक करें";
+
+  }
+
+}
+
+
+/* ============================================================
+   BOOKING MESSAGE
+============================================================ */
+
+function showBookingMessage(
+  text,
+  error
+){
+
+  const el =
+    document.getElementById(
+      "booking"
+    );
+
+  el.classList.remove(
+    "hidden",
+    "ok",
+    "error"
+  );
+
+  el.classList.add(
+    error ? "error" : "ok"
+  );
+
+  el.textContent = text;
+
+}
+
+
+/* ============================================================
+   CUSTOMER HISTORY
+============================================================ */
 
 function renderHistory(){
-  const el=document.getElementById('history');
-  if(!allBookings.length){el.textContent='कोई पिछली सवारी नहीं';return;}
-  el.innerHTML=allBookings.slice(0,5).map(b=>'<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>₹'+b.fare+' • '+b.distanceKm+' km<br>'+escapeHtml(b.status)+'</div>').join('');
+
+  const container =
+    document.getElementById(
+      "history"
+    );
+
+  if(!container) return;
+
+
+  const mobile =
+    document.getElementById(
+      "mobile"
+    )?.value.trim();
+
+
+  let list =
+    getAllBookings();
+
+
+  if(mobile){
+
+    list =
+      list.filter(
+        b=>String(b.mobile || "") === mobile
+      );
+
+  }else{
+
+    /*
+     * बिना mobile के केवल
+     * इस device की local bookings दिखाएँ।
+     */
+
+    const local =
+      getLocalBookings();
+
+    list =
+      local;
+
+  }
+
+
+  if(!list.length){
+
+    container.innerHTML =
+      "अभी कोई राइड नहीं।";
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    list
+      .slice(0,20)
+      .map(
+        bookingToCustomerHtml
+      )
+      .join("");
+
 }
+
+
+/* ============================================================
+   CUSTOMER BOOKING HTML
+============================================================ */
+
+function bookingToCustomerHtml(b){
+
+  const status =
+    getStatusText(
+      b.status
+    );
+
+
+  return `
+    <div class="history-item">
+
+      <div class="history-top">
+
+        <div class="history-route">
+          📍 ${escapeHtml(
+            b.pickup || ""
+          )}
+          <br>
+          🏁 ${escapeHtml(
+            b.destination || ""
+          )}
+        </div>
+
+        <span class="badge ${
+          b.status === "completed"
+            ? "green"
+            : b.status === "cancelled"
+              ? "orange"
+              : ""
+        }">
+          ${status}
+        </span>
+
+      </div>
+
+      <div class="history-date">
+        ${escapeHtml(
+          formatDate(b.createdAt)
+        )}
+        •
+        ${Number(
+          b.distanceKm || 0
+        ).toFixed(2)} km
+        •
+        ₹${Number(
+          b.fare || 0
+        ).toLocaleString("en-IN")}
+      </div>
+
+      <div class="history-date">
+        ${escapeHtml(
+          getVehicleName(
+            b.vehicle
+          )
+        )}
+        •
+        ${escapeHtml(
+          b.type === "share"
+            ? "Share"
+            : "Direct"
+        )}
+        •
+        ${Number(
+          b.passengers || 1
+        )} passenger
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* ============================================================
+   DRIVER ONLINE
+============================================================ */
 
 function toggleOnline(){
-  driverOnline = !driverOnline;
-  const btn=document.getElementById('onlineBtn');
-  if(driverOnline){
-    btn.textContent='🟢 Online (बुकिंग चालू)';
-    btn.className='primary';
-  }else{
-    btn.textContent='🔴 Offline';
-    btn.className='primary danger';
+
+  if(!S.allowDriver){
+
+    setDriverStatus(
+      "❌ Driver service अभी बंद है।",
+      true
+    );
+
+    return;
+
   }
-  renderDriverRide();
+
+
+  driverOnline =
+    !driverOnline;
+
+  S.online =
+    driverOnline;
+
+  saveState();
+
+
+  renderDriver();
+
+
+  if(driverOnline){
+
+    setDriverStatus(
+      "🟢 ड्राइवर ऑनलाइन है। नई राइड का इंतज़ार...",
+      false
+    );
+
+  }else{
+
+    setDriverStatus(
+      "🔴 ड्राइवर offline है।",
+      true
+    );
+
+  }
+
 }
 
-function acceptRide(id){
-  const b=allBookings.find(x=>x.id===id);
-  if(!b)return;
-  b.status='accepted';
-  if(bookingsRef&&id){bookingsRef.doc(id).update({status:'accepted'}).catch(e=>console.warn(e));}
-  renderDriverRide();renderHistory();renderAdmin();
+
+/* ============================================================
+   DRIVER RENDER
+============================================================ */
+
+function renderDriver(){
+
+  const button =
+    document.getElementById(
+      "onlineBtn"
+    );
+
+  if(button){
+
+    button.className =
+      "online-btn "+
+      (
+        driverOnline
+          ? "online"
+          : "offline"
+      );
+
+    button.textContent =
+      driverOnline
+        ? "🟢 Online"
+        : "🔴 Offline";
+
+  }
+
+
+  const bookings =
+    getAllBookings();
+
+
+  const accepted =
+    bookings.filter(
+      b=>
+        b.driverId ===
+        "demo-driver-ram"
+    );
+
+
+  const completed =
+    accepted.filter(
+      b=>
+        b.status ===
+        "completed"
+    );
+
+
+  const count =
+    document.getElementById(
+      "driverRideCount"
+    );
+
+  if(count){
+    count.textContent =
+      completed.length;
+  }
+
+
+  const earnings =
+    completed.reduce(
+      (sum,b)=>
+        sum +
+        Number(b.fare || 0),
+      0
+    );
+
+
+  S.earn = earnings;
+
+  saveState();
+
+
+  const earn =
+    document.getElementById(
+      "earn"
+    );
+
+  if(earn){
+
+    earn.textContent =
+      "₹"+
+      earnings.toLocaleString(
+        "en-IN"
+      );
+
+  }
+
+
+  renderDriverHistory();
+
+  checkDriverNewRides();
+
 }
 
-function rejectRide(id){
-  const b=allBookings.find(x=>x.id===id);
-  if(!b)return;
-  b.status='rejected';
-  if(bookingsRef&&id){bookingsRef.doc(id).update({status:'rejected'}).catch(e=>console.warn(e));}
-  renderDriverRide();renderHistory();renderAdmin();
+
+/* ============================================================
+   DRIVER STATUS
+============================================================ */
+
+function setDriverStatus(
+  text,
+  error
+){
+
+  const el =
+    document.getElementById(
+      "driverStatus"
+    );
+
+  if(!el) return;
+
+  el.className =
+    "status "+
+    (
+      error
+        ? "error"
+        : "ok"
+    );
+
+  el.textContent = text;
+
 }
 
-function renderDriverRide(){
-  const el=document.getElementById('driverRide'), n=document.getElementById('newRideCount');
-  const pending=allBookings.filter(b=>b.status==='new');
-  n.textContent=pending.length;
-  document.getElementById('todayEarnings').textContent='₹'+(localState.earnings||0);
+
+/* ============================================================
+   DRIVER NEW RIDES
+============================================================ */
+
+function checkDriverNewRides(){
+
+  const container =
+    document.getElementById(
+      "newRide"
+    );
+
+  if(!container) return;
+
 
   if(!driverOnline){
-    el.innerHTML='<div class="status warning">🔴 ड्राइवर Offline है। बुकिंग देखने के लिए ऊपर का बटन दबाकर <b>Online</b> करें।</div>';
+
+    container.innerHTML =
+      "🔴 Driver offline है।";
+
     return;
+
   }
+
+
+  const pending =
+    getAllBookings()
+      .filter(
+        b=>
+          b.status ===
+          "pending"
+      )
+      .slice(0,10);
+
 
   if(!pending.length){
-    el.innerHTML='<div class="status success">🟢 ड्राइवर Online है। अभी कोई नई बुकिंग नहीं है।</div>';
+
+    container.innerHTML =
+      "अभी कोई नई राइड नहीं।";
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    pending
+      .map(
+        driverRideHtml
+      )
+      .join("");
+
+}
+
+
+/* ============================================================
+   DRIVER RIDE HTML
+============================================================ */
+
+function driverRideHtml(b){
+
+  return `
+    <div class="history-item">
+
+      <div class="history-top">
+
+        <div class="history-route">
+          📍 ${escapeHtml(
+            b.pickup || ""
+          )}
+          <br>
+          🏁 ${escapeHtml(
+            b.destination || ""
+          )}
+        </div>
+
+        <span class="badge">
+          ₹${Number(
+            b.fare || 0
+          ).toLocaleString("en-IN")}
+        </span>
+
+      </div>
+
+      <div class="history-date">
+        ${Number(
+          b.distanceKm || 0
+        ).toFixed(2)} km
+        •
+        ${escapeHtml(
+          getVehicleName(b.vehicle)
+        )}
+        •
+        ${b.passengers || 1} passenger
+      </div>
+
+      <div style="height:9px"></div>
+
+      <div class="row">
+
+        <button
+          class="primary"
+          onclick="acceptRide('${escapeJs(b.id)}')">
+          🚖 Ride Accept
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* ============================================================
+   ACCEPT RIDE
+============================================================ */
+
+async function acceptRide(id){
+
+  if(!driverOnline){
+
+    setDriverStatus(
+      "पहले Driver को Online करें।",
+      true
+    );
+
+    return;
+
+  }
+
+
+  const booking =
+    getAllBookings()
+      .find(
+        b=>b.id === id
+      );
+
+
+  if(!booking){
     return;
   }
 
-  el.innerHTML=pending.slice(0,5).map(b=>{
-    const id=b.id||'';
-    return '<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>📏 '+escapeHtml(String(b.distanceKm||''))+' km • 💰 ₹'+escapeHtml(String(b.fare||0))+'<br>👤 '+escapeHtml(String(b.passengers||1))+' सवारी • 🚕 '+escapeHtml(String(b.vehicle||''))+'<br>📱 '+escapeHtml(String(b.mobile||''))+'<div class="contact-buttons"><button class="secondary" onclick="acceptRide(\''+escapeHtml(id)+'\')">✅ Accept</button><button class="danger" onclick="rejectRide(\''+escapeHtml(id)+'\')">❌ Reject</button></div></div>';
-  }).join('');
-}
 
-function renderAdmin(){
-  document.getElementById('bookingCount').textContent=allBookings.length;
-  const revenue=allBookings.reduce((s,b)=>s+(Number(b.fare)||0),0);
-  const cp=Number(document.getElementById('commission').value)||0;
-  document.getElementById('adminRevenue').textContent='₹'+revenue;
-  document.getElementById('adminCommission').textContent='₹'+Math.round(revenue*cp/100);
-  const h=document.getElementById('adminHistory');
-  h.innerHTML=allBookings.length?allBookings.map(b=>'<div class="history-item">'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'<br>₹'+b.fare+' • '+b.distanceKm+' km</div>').join(''):'कोई booking नहीं';
-}
+  const updated = {
+    ...booking,
+    status:"accepted",
+    driverId:"demo-driver-ram",
+    driverName:"राम कुमार",
+    acceptedAt:
+      new Date().toISOString()
+  };
 
-function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-window.addEventListener('load',()=>{
-  document.getElementById('shareBtn').classList.toggle('selected',localState.rideType==='Share');
-  document.getElementById('directBtn').classList.toggle('selected',localState.rideType==='Direct');
-  loadGoogleMaps();
-  updateFarePreview();
+  updateLocalBooking(
+    updated
+  );
+
+
+  if(
+    firebaseReady &&
+    bookingsRef &&
+    booking.cloudId
+  ){
+
+    try{
+
+      await bookingsRef
+        .doc(booking.cloudId)
+        .update({
+          status:"accepted",
+          driverId:"demo-driver-ram",
+          driverName:"राम कुमार",
+          acceptedAt:
+            firebase.firestore
+              .FieldValue
+              .serverTimestamp()
+        });
+
+    }catch(error){
+
+      console.warn(
+        "Cloud accept update:",
+        error
+      );
+
+    }
+
+  }
+
+
+  setDriverStatus(
+    "✅ Ride accept हो गई।",
+    false
+  );
+
+
+  renderDriver();
   renderHistory();
-  renderDriverRide();
   renderAdmin();
 
-  if(bookingsRef){
-    bookingsRef.orderBy('createdAt','desc').limit(50).onSnapshot(s=>{
-      allBookings=s.docs.map(d=>Object.assign({id:d.id},d.data()));
-      renderHistory();
-      renderDriverRide();
-      renderAdmin();
-    },e=>console.warn(e));
+}
+
+
+/* ============================================================
+   DRIVER HISTORY
+============================================================ */
+
+function renderDriverHistory(){
+
+  const container =
+    document.getElementById(
+      "driverHistory"
+    );
+
+  if(!container) return;
+
+
+  const list =
+    getAllBookings()
+      .filter(
+        b=>
+          b.driverId ===
+          "demo-driver-ram"
+      )
+      .slice(0,20);
+
+
+  if(!list.length){
+
+    container.innerHTML =
+      "अभी कोई राइड नहीं।";
+
+    return;
+
   }
-});
+
+
+  container.innerHTML =
+    list.map(
+      b=>`
+        <div class="history-item">
+
+          <div class="history-top">
+
+            <div class="history-route">
+              📍 ${escapeHtml(
+                b.pickup || ""
+              )}
+              <br>
+              🏁 ${escapeHtml(
+                b.destination || ""
+              )}
+            </div>
+
+            <span class="badge">
+              ${getStatusText(
+                b.status
+              )}
+            </span>
+
+          </div>
+
+          <div class="history-date">
+            ₹${Number(
+              b.fare || 0
+            ).toLocaleString("en-IN")}
+            •
+            ${Number(
+              b.distanceKm || 0
+            ).toFixed(2)} km
+          </div>
+
+        </div>
+      `
+    ).join("");
+
+}
+
+
+/* ============================================================
+   ADMIN
+============================================================ */
+
+function renderAdmin(){
+
+  const list =
+    getAllBookings();
+
+
+  const count =
+    list.length;
+
+
+  const revenue =
+    list.reduce(
+      (sum,b)=>
+        sum +
+        Number(b.fare || 0),
+      0
+    );
+
+
+  const commissionPercent =
+    Number(
+      document.getElementById(
+        "cp"
+      )?.value
+    ) || 0;
+
+
+  const commission =
+    revenue *
+    commissionPercent /
+    100;
+
+
+  const payout =
+    revenue -
+    commission;
+
+
+  setText(
+    "count",
+    count
+  );
+
+  setText(
+    "rev",
+    "₹"+
+    Math.round(
+      revenue
+    ).toLocaleString("en-IN")
+  );
+
+  setText(
+    "comm",
+    "₹"+
+    Math.round(
+      commission
+    ).toLocaleString("en-IN")
+  );
+
+  setText(
+    "payout",
+    "₹"+
+    Math.round(
+      payout
+    ).toLocaleString("en-IN")
+  );
+
+
+  const allowBook =
+    document.getElementById(
+      "allowBook"
+    );
+
+  const allowDriver =
+    document.getElementById(
+      "allowDriver"
+    );
+
+
+  if(allowBook){
+    allowBook.checked =
+      S.allowBook !== false;
+  }
+
+
+  if(allowDriver){
+    allowDriver.checked =
+      S.allowDriver !== false;
+  }
+
+
+  const history =
+    document.getElementById(
+      "adminHistory"
+    );
+
+
+  if(!history) return;
+
+
+  if(!list.length){
+
+    history.innerHTML =
+      "अभी कोई बुकिंग नहीं।";
+
+    return;
+
+  }
+
+
+  history.innerHTML =
+    list
+      .slice(0,50)
+      .map(
+        adminBookingHtml
+      )
+      .join("");
+
+}
+
+
+/* ============================================================
+   ADMIN BOOKING HTML
+============================================================ */
+
+function adminBookingHtml(b){
+
+  return `
+    <div class="history-item">
+
+      <div class="history-top">
+
+        <div class="history-route">
+          📍 ${escapeHtml(
+            b.pickup || ""
+          )}
+          <br>
+          🏁 ${escapeHtml(
+            b.destination || ""
+          )}
+        </div>
+
+        <span class="badge">
+          ₹${Number(
+            b.fare || 0
+          ).toLocaleString("en-IN")}
+        </span>
+
+      </div>
+
+      <div class="history-date">
+        📱 ${escapeHtml(
+          b.mobile || "-"
+        )}
+        •
+        ${escapeHtml(
+          formatDate(b.createdAt)
+        )}
+      </div>
+
+      <div class="history-date">
+        ${escapeHtml(
+          getStatusText(
+            b.status
+          )
+        )}
+        •
+        ${escapeHtml(
+          b.driverName ||
+          "Driver assign नहीं"
+        )}
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* ============================================================
+   ADMIN SETTINGS
+============================================================ */
+
+function saveSettings(){
+
+  const allowBook =
+    document.getElementById(
+      "allowBook"
+    );
+
+  const allowDriver =
+    document.getElementById(
+      "allowDriver"
+    );
+
+
+  S.allowBook =
+    allowBook
+      ? allowBook.checked
+      : true;
+
+
+  S.allowDriver =
+    allowDriver
+      ? allowDriver.checked
+      : true;
+
+
+  saveState();
+
+  renderAdmin();
+
+}
+
+
+/* ============================================================
+   UPDATE LOCAL BOOKING
+============================================================ */
+
+function updateLocalBooking(
+  updated
+){
+
+  const list =
+    getLocalBookings();
+
+
+  const index =
+    list.findIndex(
+      b=>b.id === updated.id
+    );
+
+
+  if(index >= 0){
+
+    list[index] =
+      {
+        ...list[index],
+        ...updated
+      };
+
+  }else{
+
+    list.unshift(
+      updated
+    );
+
+  }
+
+
+  saveLocalBookings(
+    list.slice(0,200)
+  );
+
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+function getStatusText(status){
+
+  switch(status){
+
+    case "accepted":
+      return "Driver ने Accept किया";
+
+    case "arrived":
+      return "Driver पहुँच गया";
+
+    case "started":
+      return "Ride शुरू";
+
+    case "completed":
+      return "Completed";
+
+    case "cancelled":
+      return "Cancelled";
+
+    default:
+      return "नई Booking";
+
+  }
+
+}
+
+
+/* ============================================================
+   VEHICLE NAME
+============================================================ */
+
+function getVehicleName(value){
+
+  switch(value){
+
+    case "e-rickshaw":
+      return "ई-रिक्शा";
+
+    case "auto":
+      return "ऑटो रिक्शा";
+
+    case "bike":
+      return "बाइक";
+
+    case "car":
+      return "कार";
+
+    default:
+      return value || "-";
+
+  }
+
+}
+
+
+/* ============================================================
+   UI HELPERS
+============================================================ */
+
+function setText(id,value){
+
+  const el =
+    document.getElementById(id);
+
+  if(el){
+    el.textContent = value;
+  }
+
+}
+
+
+function setLocationStatus(
+  text,
+  error
+){
+
+  const el =
+    document.getElementById(
+      "locationStatus"
+    );
+
+  if(!el) return;
+
+  el.textContent = text;
+
+  el.style.color =
+    error
+      ? "#b91c1c"
+      : "#64748b";
+
+}
+
+
+/* ============================================================
+   SUGGESTIONS
+============================================================ */
+
+function hideSuggestions(field){
+
+  const id =
+    field === "pickup"
+      ? "pickupSuggestions"
+      : "destinationSuggestions";
+
+  const el =
+    document.getElementById(id);
+
+  if(el){
+    el.classList.add("hidden");
+  }
+
+}
+
+
+/* ============================================================
+   CLICK OUTSIDE SEARCH
+============================================================ */
+
+document.addEventListener(
+  "click",
+  function(event){
+
+    if(
+      !event.target.closest(
+        ".input-wrap"
+      )
+    ){
+
+      hideSuggestions(
+        "pickup"
+      );
+
+      hideSuggestions(
+        "destination"
+      );
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function escapeJs(value){
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll("\\","\\\\")
+    .replaceAll("'","\\'")
+    .replaceAll('"','\\"');
+
+}
+
+
+/* ============================================================
+   INITIALIZE APP
+============================================================ */
+
+function initializeApp(){
+
+  /*
+   * Restore ride type.
+   */
+
+  setType(
+    S.type === "direct"
+      ? "direct"
+      : "share"
+  );
+
+
+  /*
+   * Restore admin settings.
+   */
+
+  if(
+    S.allowBook === undefined
+  ){
+    S.allowBook = true;
+  }
+
+  if(
+    S.allowDriver === undefined
+  ){
+    S.allowDriver = true;
+  }
+
+
+  driverOnline =
+    S.online !== false;
+
+
+  /*
+   * Firebase.
+   */
+
+  initializeFirebase();
+
+
+  /*
+   * Google Maps.
+   */
+
+  loadGoogleMaps();
+
+
+  /*
+   * Initial UI.
+   */
+
+  renderHistory();
+  renderDriver();
+  renderAdmin();
+
+
+  /*
+   * Network status.
+   */
+
+  window.addEventListener(
+    "online",
+    ()=>{
+      updateConnection(
+        firebaseReady
+          ? "Cloud Connected"
+          : "Online",
+        firebaseReady
+      );
+
+      if(
+        !firebaseReady
+      ){
+        initializeFirebase();
+      }
+    }
+  );
+
+
+  window.addEventListener(
+    "offline",
+    ()=>{
+      updateConnection(
+        "Offline",
+        false
+      );
+    }
+  );
+
+}
+
+
+/* ============================================================
+   START
+============================================================ */
+
+if(
+  document.readyState ===
+  "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeApp
+  );
+
+}else{
+
+  initializeApp();
+
+}
+
 </script>
+
 </body>
 </html>
