@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>सवारी सेतु</title>
+
+<style>
+*{box-sizing:border-box}
+
+html{
+  background:#f4f7fb;
+  min-height:100%;
+}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:#f4f7fb;
+  color:#172033;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+header{
+  background:linear-gradient(135deg,#087f5b,#0b9b70);
+  color:#fff;
+  padding:18px 15px 20px;
+  text-align:center;
+  box-shadow:0 4px 18px #0002;
+}
+
+.logo{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:#fff;
+  object-fit:contain;
+  padding:5px;
+}
+
+header h1{
+  margin:8px 0 2px;
+  font-size:26px;
+}
+
+header p{
+  margin:0;
+  opacity:.92;
+}
+
+.tabs{
+  display:flex;
+  background:#fff;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 2px 8px #0001;
+}
+
+.tab{
+  flex:1;
+  padding:14px 5px;
+  border:0;
+  background:#fff;
+  font-weight:700;
+  color:#555;
+}
+
+.tab.active{
+  color:#087f5b;
+  border-bottom:3px solid #087f5b;
+}
+
+.page{
+  display:none;
+  padding:14px 14px calc(28px + env(safe-area-inset-bottom));
+  max-width:700px;
+  margin:auto;
+}
+
+.page.active{
+  display:block;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 6px 22px #102a430f;
+  border:1px solid #edf1f5;
+}
+
+h2,h3{
+  margin-top:0;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:12px 0 6px;
+}
+
+input,select{
+  width:100%;
+  padding:14px;
+  border:1px solid #d8dee8;
+  border-radius:10px;
+  font-size:15px;
+  background:#fff;
+}
+
+input[readonly]{
+  background:#f2f5f8;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:13px 16px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  width:100%;
+  background:#087f5b;
+  color:#fff;
+  margin-top:14px;
+}
+
+.secondary{
+  background:#e8f6f1;
+  color:#087f5b;
+}
+
+.danger{
+  background:#ffe9e9;
+  color:#c62828;
+}
+
+.blue{
+  background:#e9f1ff;
+  color:#1557b0;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+}
+
+.row>*{
+  flex:1;
+}
+
+.choice{
+  display:flex;
+  gap:8px;
+}
+
+.choice button{
+  flex:1;
+  background:#f0f3f6;
+  color:#333;
+}
+
+.choice button.selected{
+  background:#087f5b;
+  color:#fff;
+}
+
+.mapbox{
+  height:260px;
+  border-radius:14px;
+  overflow:hidden;
+  margin-top:12px;
+  background:#e8edf2;
+  position:relative;
+}
+
+#map{
+  width:100%;
+  height:100%;
+}
+
+.search-wrap{position:relative}
+.suggestions{position:absolute;left:0;right:0;top:100%;z-index:1000;background:#fff;border:1px solid #d8dee8;border-radius:0 0 12px 12px;box-shadow:0 8px 20px #0002;overflow:hidden}
+.suggestion{display:block;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #eef1f4;border-radius:0;padding:11px 12px;color:#172033;font-weight:600}
+.suggestion:last-child{border-bottom:0}
+.suggestion small{display:block;color:#687386;font-weight:400;margin-top:3px}
+.nearby-note{font-size:12px;color:#687386;margin-top:8px}
+
+.map-message{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+  color:#667;
+  background:#eef2f5;
+  z-index:1;
+}
+
+#map.loaded + .map-message{
+  display:none;
+}
+
+.gps-btn{
+  margin-top:8px;
+  width:100%;
+  background:#eaf2ff;
+  color:#1557b0;
+}
+
+.fare{
+  background:#f0faf6;
+  border:1px solid #cdeee1;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px;
+}
+
+.fare strong{
+  font-size:24px;
+  color:#087f5b;
+}
+
+.status{
+  padding:12px;
+  border-radius:10px;
+  background:#f5f6f8;
+  margin-top:10px;
+}
+
+.small{
+  font-size:13px;
+  color:#687386;
+}
+
+.success{
+  color:#087f5b;
+  font-weight:700;
+}
+
+.warning{
+  color:#b26a00;
+  font-weight:700;
+}
+
+.history-item{
+  border:1px solid #e1e5ea;
+  border-radius:12px;
+  padding:12px;
+  margin-top:9px;
+}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.stat{
+  background:#f7f9fb;
+  border-radius:12px;
+  padding:14px;
+}
+
+.stat b{
+  display:block;
+  font-size:22px;
+  color:#087f5b;
+}
+
+.toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+}
+
+.toggle input{
+  width:auto;
+}
+
+.contact-buttons{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.contact-buttons button{
+  flex:1;
+}
+
+.support-card{background:linear-gradient(135deg,#fff,#f8fbff)}
+.support-title{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.support-title span{font-size:24px}
+.support-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.support-actions a{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:13px 10px;font-weight:800}
+.call-btn{background:#e8f6f1;color:#087f5b}
+.wa-btn{background:#eaf8ef;color:#137333}
+.email-btn{grid-column:1/-1;background:#e9f1ff;color:#1557b0}
+.trip-location{font-size:12px;color:#687386;margin-top:8px;line-height:1.45}
+.trip-actions{display:flex;gap:8px;margin-top:12px}
+.trip-actions button{flex:1}
+
+.hidden{
+  display:none!important;
+}
+
+@media(max-width:420px){
+  .row{
+    flex-direction:column;
+  }
+}
+
+/* ---- नया: search / current location / results ---- */
+.search-wrap input{padding-right:58px}
+.in-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;padding:0;border-radius:10px;background:#e9f1ff;color:#1557b0;font-size:18px;line-height:1}
+.suggestions{max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.suggestion.special{background:#f0faf6;color:#087f5b}
+.suggestion-note{padding:10px 12px;font-size:12px;color:#b26a00;background:#fff8e6}
+.hint{font-size:12px;color:#687386;margin-top:8px}
+.map-fab{position:absolute;left:10px;top:10px;z-index:5;width:42px;height:42px;padding:0;border-radius:50%;background:#fff;color:#1a73e8;font-size:22px;box-shadow:0 2px 8px #0004}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;-webkit-overflow-scrolling:touch}
+.chip{flex:none;background:#f0f3f6;color:#172033;padding:9px 13px;border-radius:20px;font-size:13px;white-space:nowrap}
+.results{margin-top:10px;border:1px solid #e1e5ea;border-radius:14px;padding:12px;background:#fbfcfd}
+.results-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.results-head b{font-size:14px}
+.result-list{max-height:340px;overflow-y:auto}
+.result-item{border:1px solid #e1e5ea;border-radius:12px;padding:10px;margin-top:8px;background:#fff}
+.result-name{font-weight:700;margin-bottom:2px}
+.result-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.mini{padding:8px 10px;font-size:12px;border-radius:8px}
+.nav-links{display:flex;gap:8px;margin-top:10px}
+.nav-link{flex:1;text-align:center;text-decoration:none;background:#e9f1ff;color:#1557b0;padding:10px;border-radius:10px;font-weight:700;font-size:13px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" class="logo" onerror="this.style.display='none'">
+  <h1>सवारी सेतु</h1>
+  <p>आपकी सवारी, आपके पास</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('customer',this)">Customer</button>
+  <button class="tab" onclick="showTab('driver',this)">Driver</button>
+  <button class="tab" onclick="showTab('admin',this)">Admin</button>
+</div>
+
+<!-- CUSTOMER -->
+<section id="customer" class="page active">
+
+  <div class="card">
+    <h2>🚕 Ride Book</h2>
+
+    <label>Pickup (कहाँ से)</label>
+    <div class="search-wrap">
+      <input id="pickup" value="Sirsa, Prayagraj, Uttar Pradesh" autocomplete="off"
+             placeholder="जगह, अस्पताल, दुकान, पता — कुछ भी खोजें"
+             oninput="inputChanged('pickup')" onfocus="pickupFocus()" onkeydown="searchKey(event,'pickup')">
+      <button type="button" class="in-btn" onclick="useCurrentLocation()" aria-label="मेरी वर्तमान लोकेशन">📍</button>
+      <div id="pickupSuggestions" class="suggestions"></div>
+    </div>
+
+    <button type="button" class="gps-btn" onclick="useCurrentLocation()">
+      📍 मेरी वर्तमान लोकेशन
+    </button>
+
+    <label>Destination (कहाँ जाना है)</label>
+    <div class="search-wrap">
+      <input id="destination" value="Meja Road, Prayagraj, Uttar Pradesh" autocomplete="off"
+             placeholder="जैसे: Meja Road hospital"
+             oninput="inputChanged('destination')" onkeydown="searchKey(event,'destination')">
+      <button type="button" class="in-btn" onclick="showAllResults('destination')" aria-label="खोजें">🔍</button>
+      <div id="destinationSuggestions" class="suggestions"></div>
+    </div>
+    <div class="hint">💡 “Meja Road hospital” जैसा कुछ भी लिखकर Enter या 🔍 दबाएँ — सारे नतीजे मैप पर दिखेंगे।</div>
+
+    <div class="mapbox">
+      <div id="map"></div>
+      <div id="mapMessage" class="map-message">
+        Google Maps लोड हो रहा है...
+      </div>
+      <button type="button" class="map-fab" onclick="useCurrentLocation()" aria-label="मेरी लोकेशन">◎</button>
+    </div>
+
+    <div class="chips">
+      <button type="button" class="chip" onclick="nearbySearch('hospital','🏥 अस्पताल')">🏥 अस्पताल</button>
+      <button type="button" class="chip" onclick="nearbySearch('pharmacy','💊 दवाई की दुकान')">💊 दवाई</button>
+      <button type="button" class="chip" onclick="nearbySearch('gas_station','⛽ पेट्रोल पंप')">⛽ पेट्रोल पंप</button>
+      <button type="button" class="chip" onclick="nearbySearch('restaurant','🍽️ रेस्टोरेंट')">🍽️ खाना</button>
+      <button type="button" class="chip" onclick="nearbySearch('atm','🏧 ATM')">🏧 ATM</button>
+      <button type="button" class="chip" onclick="nearbySearch('bus_station','🚌 बस स्टैंड')">🚌 बस स्टैंड</button>
+    </div>
+    <div id="nearbyNote" class="nearby-note"></div>
+
+    <div id="resultsPanel" class="results hidden">
+      <div class="results-head">
+        <b id="resultsTitle"></b>
+        <button type="button" class="danger mini" onclick="clearResults()">✕ हटाएँ</button>
+      </div>
+      <div id="resultsList" class="result-list"></div>
+    </div>
+
+    <label>Automatic Road Distance</label>
+    <input id="distanceKm"
+           readonly
+           placeholder="Route मिलने के बाद दूरी अपने आप आएगी">
+
+    <div class="choice" style="margin-top:12px">
+      <button id="shareBtn" class="selected" onclick="setRideType('Share')">
+        Share Ride
+      </button>
+      <button id="directBtn" onclick="setRideType('Direct')">
+        Direct Ride
+      </button>
+    </div>
+
+    <label>Vehicle</label>
+    <select id="vehicle" onchange="updateFarePreview()">
+      <option value="e-rickshaw">ई-रिक्शा</option>
+      <option value="auto">ऑटो रिक्शा</option>
+      <option value="bike">बाइक</option>
+      <option value="car">कार</option>
+    </select>
+
+    <label>Passenger</label>
+    <input id="passengers" type="number" min="1" value="1"
+           onchange="updateFarePreview()">
+
+    <label>Mobile Number</label>
+    <input id="mobile" type="tel" maxlength="10"
+           placeholder="10 अंकों का मोबाइल नंबर">
+
+    <div class="fare">
+      <div>किराया</div>
+      <strong id="fareAmount">₹0</strong>
+      <div id="fareInfo" class="small"></div>
+    </div>
+
+    <button class="primary" onclick="book()">
+      🚕 Book Ride
+    </button>
+
+    <div id="customerStatus"></div>
+  </div>
+
+  <div class="card support-card">
+    <div class="support-title"><span>🆘</span><div><h3 style="margin:0">Help & Support</h3><div class="small">सवारी सेतु सहायता</div></div></div>
+    <div class="support-actions">
+      <a class="call-btn" href="tel:9450985355">📞 Call Helpline</a>
+      <a class="wa-btn" href="https://wa.me/919450985355" target="_blank">💬 WhatsApp</a>
+      <a class="email-btn" href="mailto:Sawarisetu@gmail.com">✉️ Sawarisetu@gmail.com</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Previous Ride</h3>
+    <div id="history">कोई पिछली सवारी नहीं</div>
+  </div>
+
+</section>
+
+
+<!-- DRIVER -->
+<section id="driver" class="page">
+
+  <div class="card">
+    <h2>🛺 Driver Panel</h2>
+
+    <div class="status">
+      Driver: <b>राम कुमार</b><br>
+      Vehicle: ई-रिक्शा<br>
+      Rating: ⭐ 4.8
+    </div>
+
+    <button id="onlineBtn" class="primary" onclick="toggleOnline()">
+      ⚪ Offline
+    </button>
+
+    <div class="stat-grid" style="margin-top:12px">
+      <div class="stat">
+        <span>New Ride</span>
+        <b id="newRideCount">0</b>
+      </div>
+
+      <div class="stat">
+        <span>Today's Earnings</span>
+        <b id="todayEarnings">₹0</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📍 New Ride</h3>
+    <div id="driverRide">
+      Online होने पर नई ride यहाँ दिखाई देगी।
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ADMIN -->
+<section id="admin" class="page">
+
+  <div class="card">
+    <h2>⚙️ Admin Panel</h2>
+
+    <div class="stat-grid">
+
+      <div class="stat">
+        <span>Drivers</span>
+        <b id="driverCount">24</b>
+      </div>
+
+      <div class="stat">
+        <span>Bookings</span>
+        <b id="bookingCount">0</b>
+      </div>
+
+      <div class="stat">
+        <span>Revenue</span>
+        <b id="adminRevenue">₹0</b>
+      </div>
+
+      <div class="stat">
+        <span>Commission</span>
+        <b id="adminCommission">₹0</b>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="toggle">
+      <span>Commission %</span>
+      <input id="commission" type="number" value="10"
+             style="width:90px">
+    </div>
+
+    <div class="toggle">
+      <span>Booking</span>
+      <input id="bookingToggle" type="checkbox" checked>
+    </div>
+
+    <div class="toggle">
+      <span>Driver Registration</span>
+      <input id="driverRegistration" type="checkbox" checked>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3>📋 Booking History</h3>
+    <div id="adminHistory">कोई booking नहीं</div>
+  </div>
+
+  <div class="card">
+    <h3>🛰️ Trip / Driver Location History</h3>
+    <div class="small">Completed/active rides का Driver और recorded GPS trail यहाँ दिखाई जाएगा।</div>
+    <div id="adminTripHistory" style="margin-top:10px">अभी कोई trip location history नहीं है।</div>
+  </div>
+
+</section>
+
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script>
+const GOOGLE_MAPS_API_KEY = "AIzaSyCYbMUnUNe4EFVGIgvz2QJw9YYipIw0rzU";
+const firebaseConfig = {apiKey:"AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",authDomain:"sawari-setu.firebaseapp.com",projectId:"sawari-setu",storageBucket:"sawari-setu.firebasestorage.app",messagingSenderId:"292605368862",appId:"1:292605368862:web:b9945354dfd21f7eb62c0f",measurementId:"G-567NSGD4R4"};
+let db=null, bookingsRef=null;
+let lastRouteKey='';
+try{firebase.initializeApp(firebaseConfig);db=firebase.firestore();bookingsRef=db.collection("bookings");}catch(e){console.warn(e);}
+const STORAGE_KEY="sawari_setu_v2";
+let localState={rideType:"Share",earnings:0};
+try{const x=localStorage.getItem(STORAGE_KEY);if(x)localState=Object.assign(localState,JSON.parse(x));}catch(e){}
+let allBookings=[];let driverOnline=false;let map=null;let currentGpsOrigin=null;
+let activeTripBookingId=null;
+const DRIVER_ID='driver_ram_001', DRIVER_NAME='राम कुमार', DRIVER_VEHICLE='ई-रिक्शा';let googleReady=false;let currentDistanceKm=0;let routePolylines=[];
+function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(localState));}catch(e){}}
+function showTab(name,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(name).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');if(name==='customer'&&map&&window.google)setTimeout(()=>google.maps.event.trigger(map,'resize'),100);if(name==='driver')renderDriverRide();if(name==='admin')renderAdmin();}
+function setRideType(type){localState.rideType=type;document.getElementById('shareBtn').classList.toggle('selected',type==='Share');document.getElementById('directBtn').classList.toggle('selected',type==='Direct');saveLocal();updateFarePreview();}
+function calculateFare(vehicle,type,distance,passengers){const d=parseFloat(distance),p=Math.max(1,parseInt(passengers)||1);if(!isFinite(d)||d<=0)return {ok:false,message:'Valid distance डालें.'};let fare=0,info='';if(vehicle==='e-rickshaw'){if(type==='Share'){if(d<=2)fare=10;else if(d<=4)fare=20;else if(d<=6)fare=30;else if(d<=8)fare=40;else if(d<=10)fare=50;else return {ok:false,message:'E-Rickshaw Share 10 km से ऊपर उपलब्ध नहीं है.'};}else{if(d<=2)fare=40;else if(d<=4)fare=60;else if(d<=6)fare=75;else if(d<=8)fare=90;else if(d<=10)fare=105;else fare=105+(d-10)*10;}}else if(vehicle==='auto'){if(type==='Share'){fare=d*10*p;info='Share fare प्रति passenger के हिसाब से है।';}else{if(d<=5)fare=200;else if(d<=10)fare=325;else if(d<=20)fare=525;else if(d<=30)fare=675;else if(d<=40)fare=775;else if(d<=50)fare=825;else fare=825+(d-50)*5;if(d>=100)info='2L पानी शामिल है।';else if(d>=50)info='1L पानी शामिल है।';}}else if(vehicle==='bike'){if(type==='Share')return {ok:false,message:'Bike Share उपलब्ध नहीं है.'};if(d<=2)fare=30;else if(d<=5)fare=50;else if(d<=10)fare=90;else if(d<=15)fare=140;else if(d<=20)fare=190;else if(d<=25)fare=280;else if(d<=30)fare=370;else if(d<=40)fare=480;else if(d<=50)fare=600;else fare=600+(d-50)*12;}else if(vehicle==='car'){if(type==='Share')return {ok:false,message:'Car Share उपलब्ध नहीं है.'};if(d<=5)fare=200;else if(d<=10)fare=400;else if(d<=20)fare=800;else if(d<=30)fare=1200;else if(d<=40)fare=1500;else if(d<=50)fare=1800;else if(d<=60)fare=2100;else if(d<=70)fare=2400;else if(d<=80)fare=2700;else if(d<=100)fare=3200;else fare=3200+(d-100)*30;if(d>=100)info='2L पानी शामिल है।';else if(d>=50)info='1L पानी शामिल है।';}return {ok:true,fare:Math.round(fare),info};}
+function updateFarePreview(){const r=calculateFare(document.getElementById('vehicle').value,localState.rideType,document.getElementById('distanceKm').value,document.getElementById('passengers').value);document.getElementById('fareAmount').textContent=r.ok?'₹'+r.fare:'₹0';document.getElementById('fareInfo').textContent=r.ok?(r.info||''):(r.message||'');}
+/* ================= MAP + SEARCH + CURRENT LOCATION ================= */
+const $=id=>document.getElementById(id);
+const DEFAULT_CENTER={lat:25.366,lng:81.879};
+const sel={pickup:null,destination:null};          // चुनी हुई जगहें {name,address,lat,lng,isGps}
+const pointMarkers={pickup:null,destination:null};
+const searchSeq={pickup:0,destination:0};
+const searchCache={};
+let accCircle=null,currentGps=null,resultMarkers=[],infoWin=null,routeSeq=0;
+
+function ll(loc){
+  if(!loc)return null;
+  if(typeof loc.lat==='function')return {lat:loc.lat(),lng:loc.lng()};
+  return {lat:Number(loc.lat),lng:Number(loc.lng)};
+}
+function normPlace(p){
+  const l=ll(p&&p.location);
+  if(!l||!isFinite(l.lat)||!isFinite(l.lng))return null;
+  return {id:p.id||null,name:String(p.displayName||''),address:String(p.formattedAddress||''),lat:l.lat,lng:l.lng};
+}
+function labelOf(pl){
+  const n=pl.name||'',a=pl.address||'';
+  if(n&&a&&a.indexOf(n)===-1)return n+', '+a;
+  return a||n||'चुनी हुई जगह';
+}
+function setNote(t){const n=$('nearbyNote');if(n)n.textContent=t||'';}
+function mkBtn(text,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=text;b.onclick=fn;return b;}
+
+/* ---------- Google Maps load ---------- */
+function loadGoogleMaps(){
+  if(!GOOGLE_MAPS_API_KEY||GOOGLE_MAPS_API_KEY==='PASTE_WEB_API_KEY_HERE'){
+    $('mapMessage').textContent='Google Maps API key सेट नहीं है।';
+    return;
+  }
+  if(window.google&&google.maps){initializeGoogleMap();return;}
+  if($('googleMapsScript'))return;
+  const script=document.createElement('script');
+  script.id='googleMapsScript';
+  script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places,marker&v=weekly';
+  script.async=true;
+  script.defer=true;
+  script.onload=initializeGoogleMap;
+  script.onerror=()=>{$('mapMessage').textContent='Google Maps लोड नहीं हो पाया। API key/Maps JavaScript API settings जाँचें।';};
+  document.head.appendChild(script);
+}
+
+async function initializeGoogleMap(){
+  if(!window.google||!google.maps)return;
+  try{
+    await google.maps.importLibrary('maps');
+    await google.maps.importLibrary('places');
+    await google.maps.importLibrary('routes');
+    await google.maps.importLibrary('marker');
+    googleReady=true;
+    map=new google.maps.Map($('map'),{
+      center:DEFAULT_CENTER,
+      zoom:12,
+      mapTypeId:'roadmap',
+      mapTypeControl:true,
+      mapTypeControlOptions:{style:google.maps.MapTypeControlStyle.HORIZONTAL_BAR,position:google.maps.ControlPosition.TOP_RIGHT,mapTypeIds:['roadmap','hybrid','satellite']},
+      streetViewControl:false,
+      fullscreenControl:true,
+      gestureHandling:'greedy'
+    });
+    infoWin=new google.maps.InfoWindow();
+    map.addListener('click',onMapClick);
+    $('map').classList.add('loaded');
+    $('mapMessage').style.display='none';
+    calculateRoute();
+    if(window._pendingNativeLocation){
+      const p=window._pendingNativeLocation;
+      window._pendingNativeLocation=null;
+      applyCurrentLocation(p.lat,p.lng,p.accuracy);
+    }
+  }catch(e){
+    console.error('Google Maps init:',e);
+    $('mapMessage').textContent='Google Maps शुरू नहीं हो पाया।';
+  }
+}
+
+/* ---------- खोज (Places -> Geocoder -> OpenStreetMap) ---------- */
+function searchCenter(field){
+  if(field==='destination'&&sel.pickup)return {lat:sel.pickup.lat,lng:sel.pickup.lng};
+  if(currentGps)return {lat:currentGps.lat,lng:currentGps.lng};
+  if(map){const c=map.getCenter();if(c)return {lat:c.lat(),lng:c.lng()};}
+  return DEFAULT_CENTER;
+}
+
+async function searchPlaces(q,max,field){
+  const c=searchCenter(field);
+  const ck=[q.toLowerCase(),max,c.lat.toFixed(2),c.lng.toFixed(2)].join('|');
+  if(searchCache[ck])return searchCache[ck];
+  let places=[],source='',placesFailed=false;
+
+  if(googleReady){
+    try{
+      const {Place}=await google.maps.importLibrary('places');
+      // NOTE: locationBias radius की अधिकतम सीमा 50000 m है (पहले 150000 था -> error आता था)
+      const r=await Place.searchByText({
+        textQuery:q,
+        fields:['id','displayName','formattedAddress','location'],
+        locationBias:{center:c,radius:50000},
+        maxResultCount:Math.max(1,Math.min(max,20)),
+        language:'hi',region:'in'
+      });
+      places=((r&&r.places)||[]).map(normPlace).filter(Boolean);
+      if(places.length)source='places';
+    }catch(e){placesFailed=true;console.warn('Places searchByText:',e);}
+
+    if(!places.length){
+      try{
+        const g=await new google.maps.Geocoder().geocode({address:q,region:'in',language:'hi'});
+        places=((g&&g.results)||[]).slice(0,max).map(r=>({
+          id:r.place_id||null,
+          name:(r.address_components&&r.address_components[0]&&r.address_components[0].long_name)||r.formatted_address||'',
+          address:r.formatted_address||'',
+          lat:r.geometry.location.lat(),lng:r.geometry.location.lng()
+        }));
+        if(places.length)source='geocoder';
+      }catch(e){}
+    }
+  }
+
+  if(!places.length){
+    try{
+      const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit='+Math.min(max,10)+'&countrycodes=in&q='+encodeURIComponent(q);
+      const r=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hi,en'}});
+      if(r.ok){
+        const data=await r.json();
+        places=data.map(x=>({id:null,name:x.name||String(x.display_name||'').split(',')[0],address:x.display_name||'',lat:Number(x.lat),lng:Number(x.lon)}))
+                   .filter(p=>isFinite(p.lat)&&isFinite(p.lng));
+        if(places.length)source='osm';
+      }
+    }catch(e){console.warn('OSM search:',e);}
+  }
+
+  const out={places,source,placesFailed};
+  if(places.length)searchCache[ck]=out;
+  return out;
+}
+
+/* ---------- Suggestion dropdown ---------- */
+function boxOf(f){return $(f==='pickup'?'pickupSuggestions':'destinationSuggestions');}
+function clearSuggestions(f){const b=boxOf(f);if(b)b.innerHTML='';}
+function mkItem(title,sub,special){
+  const b=document.createElement('button');
+  b.type='button';b.className='suggestion'+(special?' special':'');
+  b.appendChild(document.createTextNode(title));
+  if(sub){const s=document.createElement('small');s.textContent=sub;b.appendChild(s);}
+  return b;
+}
+function addNote(box,text){const d=document.createElement('div');d.className='suggestion-note';d.textContent=text;box.appendChild(d);}
+function gpsItem(){
+  const b=mkItem('📍 मेरी वर्तमान लोकेशन','GPS से अभी की जगह',true);
+  b.onclick=()=>{clearSuggestions('pickup');useCurrentLocation();};
+  return b;
+}
+function pickupFocus(){
+  const box=boxOf('pickup');
+  if(box&&!box.children.length)box.appendChild(gpsItem());
+}
+function renderLoading(field){
+  const box=boxOf(field);box.innerHTML='';
+  if(field==='pickup')box.appendChild(gpsItem());
+  const d=document.createElement('div');d.className='suggestion';d.textContent='🔎 जगह खोजी जा रही है...';box.appendChild(d);
+}
+function renderSuggestions(field,q,res){
+  const box=boxOf(field);box.innerHTML='';
+  if(field==='pickup')box.appendChild(gpsItem());
+  const places=res.places;
+  if(!places.length){
+    addNote(box,'कोई matching location नहीं मिली। दूसरा नाम या शब्द आज़माएँ।');
+  }else{
+    if(places.length>1){
+      const b=mkItem('🗺️ “'+q+'” के सभी '+places.length+' नतीजे मैप पर देखें','सूची + मैप मार्कर',true);
+      b.onclick=()=>showAllResults(field);
+      box.appendChild(b);
+    }
+    places.slice(0,8).forEach(pl=>{
+      const b=mkItem(pl.name||pl.address,pl.address);
+      b.onclick=()=>setPoint(field,pl);
+      box.appendChild(b);
+    });
+  }
+  if(res.placesFailed)addNote(box,'⚠️ Google Places से नतीजे नहीं मिले, इसलिए सिर्फ़ पते की खोज चल रही है। Google Cloud में “Places API (New)” चालू करें।');
+}
+
+function inputChanged(field){
+  const input=$(field);
+  sel[field]=null;removePointMarker(field);
+  resetRoute();
+  clearTimeout(input._t);
+  const q=input.value.trim();
+  if(q.length<3){
+    if(field==='pickup'){const b=boxOf('pickup');b.innerHTML='';b.appendChild(gpsItem());}
+    else clearSuggestions(field);
+    return;
+  }
+  renderLoading(field);
+  input._t=setTimeout(async()=>{
+    const seq=++searchSeq[field];
+    const res=await searchPlaces(q,20,field);
+    if(seq!==searchSeq[field]||$(field).value.trim()!==q)return;
+    renderSuggestions(field,q,res);
+  },450);
+}
+function searchKey(e,field){
+  if(e.key==='Enter'){e.preventDefault();showAllResults(field);}
+}
+
+/* ---------- सभी नतीजे मैप पर ---------- */
+async function showAllResults(field){
+  const q=$(field).value.trim();
+  if(q.length<2)return;
+  clearSuggestions(field);
+  setNote('🔎 “'+q+'” खोजा जा रहा है...');
+  const res=await searchPlaces(q,20,field);
+  if(!res.places.length){setNote('कोई नतीजा नहीं मिला। दूसरा शब्द आज़माएँ।');return;}
+  if(res.places.length===1){setNote('');setPoint(field,res.places[0]);return;}
+  showResults(res.places,'“'+q+'” — '+res.places.length+' नतीजे');
+  setNote(res.placesFailed?'⚠️ सिर्फ़ पते की खोज चली — Google Cloud में “Places API (New)” चालू करें।':'');
+}
+
+function clearResults(){
+  resultMarkers.forEach(m=>m.setMap(null));
+  resultMarkers=[];
+  if(infoWin)infoWin.close();
+  const p=$('resultsPanel');if(p)p.classList.add('hidden');
+}
+
+function showResults(places,title){
+  clearResults();
+  if(map){
+    const b=new google.maps.LatLngBounds();
+    places.forEach((pl,i)=>{
+      const m=new google.maps.Marker({position:{lat:pl.lat,lng:pl.lng},map,title:pl.name||pl.address,label:{text:String(i+1),color:'#fff',fontSize:'12px',fontWeight:'700'}});
+      m.addListener('click',()=>openPlaceInfo(pl,m));
+      resultMarkers.push(m);b.extend(m.getPosition());
+    });
+    map.fitBounds(b,{top:40,bottom:30,left:25,right:25});
+  }
+  $('resultsTitle').textContent=title;
+  const list=$('resultsList');list.innerHTML='';
+  places.forEach((pl,i)=>{
+    const d=document.createElement('div');d.className='result-item';
+    const h=document.createElement('div');h.className='result-name';h.textContent=(i+1)+'. '+(pl.name||pl.address);
+    const a=document.createElement('div');a.className='small';a.textContent=pl.address;
+    const acts=document.createElement('div');acts.className='result-actions';
+    acts.appendChild(mkBtn('📍 Pickup','secondary mini',()=>setPoint('pickup',pl)));
+    acts.appendChild(mkBtn('🏁 Destination','blue mini',()=>setPoint('destination',pl)));
+    acts.appendChild(mkBtn('🗺️ मैप पर','secondary mini',()=>{
+      if(!map)return;
+      map.panTo({lat:pl.lat,lng:pl.lng});map.setZoom(17);
+      openPlaceInfo(pl,resultMarkers[i]);
+      $('map').scrollIntoView({behavior:'smooth',block:'center'});
+    }));
+    d.appendChild(h);d.appendChild(a);d.appendChild(acts);list.appendChild(d);
+  });
+  $('resultsPanel').classList.remove('hidden');
+  $('map').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function openPlaceInfo(pl,marker){
+  if(!map||!infoWin)return;
+  const box=document.createElement('div');box.style.cssText='max-width:230px';
+  const t=document.createElement('b');t.textContent=pl.name||'चुनी हुई जगह';
+  const a=document.createElement('div');a.style.cssText='font-size:12px;color:#555;margin:4px 0 8px';a.textContent=pl.address||'';
+  const row=document.createElement('div');row.style.cssText='display:flex;gap:6px';
+  row.appendChild(mkBtn('📍 Pickup','secondary mini',()=>setPoint('pickup',pl)));
+  row.appendChild(mkBtn('🏁 Destination','blue mini',()=>setPoint('destination',pl)));
+  box.appendChild(t);box.appendChild(a);box.appendChild(row);
+  infoWin.setContent(box);
+  if(marker)infoWin.open({map,anchor:marker});
+  else{infoWin.setPosition({lat:pl.lat,lng:pl.lng});infoWin.open({map});}
+}
+
+/* मैप पर कहीं भी टैप करो (या किसी दुकान/अस्पताल के आइकन पर) -> Pickup/Destination बनाओ */
+async function onMapClick(e){
+  if(!e.latLng)return;
+  const pos={lat:e.latLng.lat(),lng:e.latLng.lng()};
+  let pl=null;
+  if(e.placeId){
+    if(typeof e.stop==='function')e.stop();
+    try{
+      const {Place}=await google.maps.importLibrary('places');
+      const p=new Place({id:e.placeId,requestedLanguage:'hi'});
+      await p.fetchFields({fields:['displayName','formattedAddress','location']});
+      pl=normPlace({id:e.placeId,displayName:p.displayName,formattedAddress:p.formattedAddress,location:p.location});
+    }catch(err){console.warn('Place details:',err);}
+  }
+  if(!pl){
+    let address='';
+    try{
+      const r=await new google.maps.Geocoder().geocode({location:pos,language:'hi',region:'in'});
+      address=(r.results&&r.results[0]&&r.results[0].formatted_address)||'';
+    }catch(err){}
+    pl={id:null,name:'चुनी हुई जगह',address:address||(pos.lat.toFixed(5)+', '+pos.lng.toFixed(5)),lat:pos.lat,lng:pos.lng};
+  }
+  openPlaceInfo(pl,null);
+}
+
+/* ---------- आसपास खोजें (chips) ---------- */
+async function nearbySearch(type,label){
+  if(!googleReady||!map){setNote('मैप अभी लोड हो रहा है...');return;}
+  setNote('🔎 '+label+' खोजे जा रहे हैं...');
+  try{
+    const {Place,SearchNearbyRankPreference}=await google.maps.importLibrary('places');
+    const c=map.getCenter();
+    const r=await Place.searchNearby({
+      fields:['id','displayName','formattedAddress','location'],
+      locationRestriction:{center:{lat:c.lat(),lng:c.lng()},radius:5000},
+      includedTypes:[type],
+      maxResultCount:20,
+      rankPreference:SearchNearbyRankPreference.DISTANCE,
+      language:'hi',region:'in'
+    });
+    const places=((r&&r.places)||[]).map(normPlace).filter(Boolean);
+    if(!places.length){setNote('इस इलाके में '+label+' नहीं मिले। मैप को खिसकाकर दोबारा दबाएँ।');return;}
+    showResults(places,label+' — मैप के आसपास '+places.length+' नतीजे');
+    setNote('');
+  }catch(e){
+    console.warn('Nearby:',e);
+    setNote('⚠️ आसपास की खोज नहीं चली — Google Cloud में “Places API (New)” चालू करें।');
+  }
+}
+
+/* ---------- Pickup / Destination चुनना ---------- */
+function removePointMarker(field){
+  if(pointMarkers[field]){pointMarkers[field].setMap(null);pointMarkers[field]=null;}
+  if(field==='pickup'&&accCircle){accCircle.setMap(null);accCircle=null;}
+}
+function drawPointMarker(field,pl){
+  removePointMarker(field);
+  if(!map)return;
+  const pos={lat:pl.lat,lng:pl.lng};
+  let icon,label;
+  if(pl.isGps){
+    icon={path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:'#1a73e8',fillOpacity:1,strokeColor:'#ffffff',strokeWeight:3};
+  }else{
+    icon={path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:field==='pickup'?'#087f5b':'#d93025',fillOpacity:1,strokeColor:'#ffffff',strokeWeight:2};
+    label={text:field==='pickup'?'P':'D',color:'#ffffff',fontSize:'12px',fontWeight:'700'};
+  }
+  pointMarkers[field]=new google.maps.Marker({position:pos,map,icon,label,title:pl.name||field,zIndex:999});
+  if(pl.isGps&&pl.accuracy>0){
+    accCircle=new google.maps.Circle({map,center:pos,radius:pl.accuracy,strokeColor:'#1a73e8',strokeOpacity:.4,strokeWeight:1,fillColor:'#1a73e8',fillOpacity:.12,clickable:false});
+  }
+}
+function applyPoint(field,pl){
+  sel[field]=pl;
+  $(field).value=labelOf(pl);
+  drawPointMarker(field,pl);
+  clearSuggestions(field);
+}
+function setPoint(field,pl){
+  applyPoint(field,pl);
+  clearResults();
+  resetRoute();
+  const other=field==='pickup'?sel.destination:sel.pickup;
+  if(!other&&map){map.panTo({lat:pl.lat,lng:pl.lng});map.setZoom(16);}
+  calculateRoute();
+}
+
+/* टाइप किया हुआ नाम बिना suggestion चुने भी चलेगा -> पहला नतीजा अपने-आप चुन लेता है */
+async function resolveField(field){
+  if(sel[field])return sel[field];
+  const q=$(field).value.trim();
+  if(q.length<2)return null;
+  const res=await searchPlaces(q,1,field);
+  if(sel[field])return sel[field];
+  if($(field).value.trim()!==q)return null;
+  if(!res.places.length)return null;
+  applyPoint(field,res.places[0]);
+  return sel[field];
+}
+
+/* ---------- वर्तमान लोकेशन ---------- */
+function gpsFail(text){
+  const m=$('mapMessage');if(googleReady)m.style.display='none';
+  $('customerStatus').innerHTML='<div class="status warning">'+escapeHtml(text)+'</div>';
+}
+
+function applyCurrentLocation(lat,lng,accuracy){
+  if(!map||!googleReady){window._pendingNativeLocation={lat:lat,lng:lng,accuracy:accuracy};return;}
+  currentGps={lat:Number(lat),lng:Number(lng),accuracy:Number(accuracy)||0};
+  const pl={id:null,name:'मेरी वर्तमान लोकेशन',address:'',lat:currentGps.lat,lng:currentGps.lng,isGps:true,accuracy:currentGps.accuracy};
+  clearResults();
+  applyPoint('pickup',pl);
+  $('pickup').value='वर्तमान लोकेशन का पता खोजा जा रहा है...';
+  $('mapMessage').style.display='none';
+  map.setCenter({lat:pl.lat,lng:pl.lng});map.setZoom(17);
+  setNote('📍 GPS location मिल गई • सटीकता लगभग '+Math.round(pl.accuracy)+' m');
+  reverseGeocode(pl);
+  resetRoute();
+  calculateRoute();
+}
+
+// Native Android GPS bridge (MainActivity इसे GPS fix मिलने पर call करता है)
+window.onNativeLocation=function(lat,lng,accuracy){
+  applyCurrentLocation(lat,lng,accuracy);
+};
+window.showNativeLocationMessage=function(message,isError){
+  const box=$('customerStatus');
+  if(box)box.innerHTML='<div class="status '+(isError?'warning':'')+'">'+escapeHtml(message||'')+'</div>';
+  if(isError&&googleReady)$('mapMessage').style.display='none';
+};
+
+function useCurrentLocation(){
+  const msg=$('mapMessage');
+  msg.style.display='flex';msg.textContent='📍 वर्तमान लोकेशन प्राप्त हो रही है...';
+
+  if(window.AndroidLocation&&typeof window.AndroidLocation.requestLocation==='function'){
+    try{window.AndroidLocation.requestLocation();return;}catch(e){console.warn('Native GPS:',e);}
+  }
+  if(!navigator.geolocation){gpsFail('लोकेशन नहीं मिल पाई: इस फोन/ब्राउज़र में GPS उपलब्ध नहीं है।');return;}
+
+  const ok=pos=>applyCurrentLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy||0);
+  navigator.geolocation.getCurrentPosition(ok,err=>{
+    if(err&&err.code===1){gpsFail('लोकेशन की अनुमति बंद है। ब्राउज़र/ऐप settings में Location की अनुमति दें, फिर दोबारा दबाएँ।');return;}
+    // High accuracy न मिले तो कम accuracy से एक बार और कोशिश
+    navigator.geolocation.getCurrentPosition(ok,err2=>{
+      gpsFail('लोकेशन नहीं मिल पाई: '+((err2&&err2.message)||'GPS चालू करें और खुली जगह में कोशिश करें')+'. (ध्यान दें: GPS सिर्फ़ https या localhost पर चलता है।)');
+    },{enableHighAccuracy:false,timeout:15000,maximumAge:120000});
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+
+async function reverseGeocode(pl){
+  const lat=pl.lat,lng=pl.lng;
+  let address='';
+  if(googleReady){
+    try{
+      const r=await new google.maps.Geocoder().geocode({location:{lat,lng},language:'hi',region:'in'});
+      address=(r.results&&r.results[0]&&r.results[0].formatted_address)||'';
+    }catch(e){console.warn('Google reverse geocode:',e);}
+  }
+  if(!address){
+    try{
+      const url='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lng)+'&zoom=18';
+      const r=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hi,en'}});
+      if(r.ok){const d=await r.json();address=d.display_name||'';}
+    }catch(e){console.warn('OSM reverse geocode:',e);}
+  }
+  if(sel.pickup!==pl)return;                 // इस बीच user ने pickup बदल दिया
+  if(address){pl.address=address;$('pickup').value=address;}
+  else $('pickup').value='वर्तमान लोकेशन ('+lat.toFixed(6)+', '+lng.toFixed(6)+')';
+}
+
+/* ---------- Route / दूरी ---------- */
+function clearRoutePolylines(){
+  if(routePolylines){routePolylines.forEach(p=>p.setMap(null));routePolylines=[];}
+}
+function resetRoute(){
+  routeSeq++;lastRouteKey='';currentDistanceKm=0;
+  clearRoutePolylines();
+  $('distanceKm').value='';
+  updateFarePreview();
+  if(googleReady)$('mapMessage').style.display='none';
+}
+
+async function calculateRoute(){
+  if(!googleReady)return;
+  const [o,d]=await Promise.all([resolveField('pickup'),resolveField('destination')]);
+  if(!o||!d)return;
+  const key=[o.lat,o.lng,d.lat,d.lng].map(n=>Number(n).toFixed(5)).join('|');
+  if(key===lastRouteKey&&currentDistanceKm)return;
+  const seq=++routeSeq;
+  const msg=$('mapMessage');
+  try{
+    const {Route}=await google.maps.importLibrary('routes');
+    msg.style.display='flex';msg.textContent='सड़क की दूरी निकाली जा रही है...';
+    clearRoutePolylines();
+    const response=await Route.computeRoutes({
+      origin:{lat:o.lat,lng:o.lng},
+      destination:{lat:d.lat,lng:d.lng},
+      travelMode:'DRIVING',
+      fields:['distanceMeters','durationMillis','path','viewport']
+    });
+    if(seq!==routeSeq)return;
+    if(!response.routes||!response.routes.length)throw Error('Road route नहीं मिला');
+    const route=response.routes[0];
+    currentDistanceKm=(route.distanceMeters||0)/1000;
+    $('distanceKm').value=currentDistanceKm.toFixed(2);
+    updateFarePreview();
+    routePolylines=route.createPolylines();
+    routePolylines.forEach(p=>p.setMap(map));
+    if(route.viewport)map.fitBounds(route.viewport,{top:35,bottom:35,left:15,right:15});
+    msg.style.display='none';
+    lastRouteKey=key;
+    const mins=route.durationMillis?Math.round(route.durationMillis/60000):0;
+    $('customerStatus').innerHTML='<div class="status success">📏 सड़क की दूरी: '+currentDistanceKm.toFixed(2)+' km'+(mins?' • ⏱️ लगभग '+mins+' मिनट':'')+'</div>';
+  }catch(e){
+    if(seq!==routeSeq)return;
+    console.warn('Route:',e);
+    currentDistanceKm=0;$('distanceKm').value='';updateFarePreview();
+    msg.style.display='none';
+    $('customerStatus').innerHTML='<div class="status warning">Route नहीं मिला। सूची से सही जगह चुनें। (Google Cloud में “Routes API” चालू है या नहीं जाँचें।)</div>';
+  }
+}
+
+/* Driver के लिए Google Maps navigation links */
+function navLinks(b){
+  const out=[];
+  const okNum=v=>v!==null&&v!==undefined&&isFinite(Number(v));
+  if(okNum(b.pickupLat)&&okNum(b.pickupLng))out.push('<a class="nav-link" target="_blank" href="https://www.google.com/maps/dir/?api=1&amp;destination='+encodeURIComponent(b.pickupLat+','+b.pickupLng)+'&amp;travelmode=driving">🧭 Pickup तक</a>');
+  if(okNum(b.destLat)&&okNum(b.destLng))out.push('<a class="nav-link" target="_blank" href="https://www.google.com/maps/dir/?api=1&amp;destination='+encodeURIComponent(b.destLat+','+b.destLng)+'&amp;travelmode=driving">🏁 Destination तक</a>');
+  return out.length?'<div class="nav-links">'+out.join('')+'</div>':'';
+}
+
+// dropdown के बाहर टैप करने पर बंद
+document.addEventListener('click',e=>{
+  if(!e.target.closest||!e.target.closest('.search-wrap')){clearSuggestions('pickup');clearSuggestions('destination');}
+});
+
+function book(){
+  const toggle=document.getElementById('bookingToggle');
+  if(toggle&&!toggle.checked){alert('Booking अभी बंद है।');return;}
+  const mobile=document.getElementById('mobile').value.trim();
+  if(!/^\d{10}$/.test(mobile)){alert('10 अंकों का मोबाइल नंबर डालें।');return;}
+  const distance=parseFloat(document.getElementById('distanceKm').value);
+  const fare=calculateFare(document.getElementById('vehicle').value,localState.rideType,distance,document.getElementById('passengers').value);
+  if(!fare.ok){alert(fare.message||'Distance उपलब्ध नहीं है।');return;}
+  const booking={pickup:document.getElementById('pickup').value,destination:document.getElementById('destination').value,distanceKm:distance,vehicle:document.getElementById('vehicle').value,rideType:localState.rideType,passengers:parseInt(document.getElementById('passengers').value)||1,mobile,fare:fare.fare,status:'new',pickupLat:sel.pickup?sel.pickup.lat:null,pickupLng:sel.pickup?sel.pickup.lng:null,destLat:sel.destination?sel.destination.lat:null,destLng:sel.destination?sel.destination.lng:null,createdAt:new Date().toISOString()};
+  if(bookingsRef){bookingsRef.add(booking).then(ref=>{booking.id=ref.id;if(!allBookings.some(x=>x.id===ref.id))allBookings.unshift(booking);renderAll();}).catch(e=>{console.warn(e);allBookings.unshift(booking);renderAll();});}
+  else{allBookings.unshift(booking);renderAll();}
+  document.getElementById('customerStatus').innerHTML='<div class="status success">✅ Ride booked — ₹'+fare.fare+'<br><span class="small">Driver के Online होते ही booking दिखाई देगी।</span></div>';
+}
+function renderHistory(){const el=document.getElementById('history');if(!allBookings.length){el.textContent='कोई पिछली सवारी नहीं';return;}el.innerHTML=allBookings.slice(0,5).map(b=>'<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>₹'+escapeHtml(String(b.fare||0))+' • '+escapeHtml(String(b.distanceKm||0))+' km<br>'+escapeHtml(b.status||'new')+(b.driverName?'<br>🚗 Driver: '+escapeHtml(b.driverName):'')+'</div>').join('');}
+function toggleOnline(){
+  driverOnline=!driverOnline;
+  const btn=document.getElementById('onlineBtn');
+  btn.textContent=driverOnline?'🔴 Offline':'🟢 Online';
+  btn.className=driverOnline?'primary danger':'primary';
+  renderDriverRide();
+}
+function acceptRide(id){
+  const b=allBookings.find(x=>x.id===id); if(!b)return;
+  b.status='accepted';b.acceptedAt=new Date().toISOString();b.driverId=DRIVER_ID;b.driverName=DRIVER_NAME;b.driverVehicle=DRIVER_VEHICLE;
+  activeTripBookingId=b.id||id;
+  if(bookingsRef&&b.id)bookingsRef.doc(b.id).update({status:'accepted',acceptedAt:b.acceptedAt,driverId:DRIVER_ID,driverName:DRIVER_NAME,driverVehicle:DRIVER_VEHICLE}).catch(e=>console.warn('Accept:',e));
+  if(window.AndroidLocation&&AndroidLocation.startTripTracking){try{AndroidLocation.startTripTracking(String(activeTripBookingId));}catch(e){console.warn(e);}}
+  renderAll();
+}
+function completeRide(id){
+  const b=allBookings.find(x=>x.id===id); if(!b)return;
+  b.status='completed';b.completedAt=new Date().toISOString();
+  if(window.AndroidLocation&&AndroidLocation.stopTripTracking){try{AndroidLocation.stopTripTracking();}catch(e){}}
+  activeTripBookingId=null;
+  if(bookingsRef&&b.id)bookingsRef.doc(b.id).update({status:'completed',completedAt:b.completedAt}).catch(e=>console.warn('Complete:',e));
+  renderAll();
+}
+function rejectRide(id){
+  const b=allBookings.find(x=>x.id===id); if(!b)return;
+  b.status='rejected';b.rejectedAt=new Date().toISOString();
+  if(bookingsRef&&b.id)bookingsRef.doc(b.id).update({status:'rejected',rejectedAt:b.rejectedAt}).catch(e=>console.warn('Reject:',e));
+  renderAll();
+}
+function renderDriverRide(){
+  const el=document.getElementById('driverRide'),n=document.getElementById('newRideCount');
+  const pending=allBookings.filter(b=>b.status==='new');
+  const active=allBookings.find(b=>b.status==='accepted'&&b.driverId===DRIVER_ID);
+  n.textContent=driverOnline?pending.length:0;
+  document.getElementById('todayEarnings').textContent='₹'+(localState.earnings||0);
+  if(!driverOnline){el.innerHTML='<div class="status warning">🔴 Driver Offline है। Online करने पर नई booking दिखाई देगी।</div>';return;}
+  if(active){
+    el.innerHTML='<div class="history-item"><b>🚕 Active Ride</b><br>'+escapeHtml(active.pickup)+' → '+escapeHtml(active.destination)+'<br>📏 '+escapeHtml(String(active.distanceKm||''))+' km • 💰 ₹'+escapeHtml(String(active.fare||0))+'<div class="trip-location">👤 '+escapeHtml(String(active.passengers||1))+' passenger • 🚗 '+escapeHtml(DRIVER_NAME)+' • '+escapeHtml(DRIVER_VEHICLE)+'<br>🛰️ Ride के दौरान GPS location history record हो रही है।</div>'+navLinks(active)+'<div class="trip-actions"><button class="primary" onclick="completeRide(\''+escapeHtml(active.id||'')+'\')">✅ Ride Complete</button></div></div>';
+    return;
+  }
+  if(!pending.length){el.innerHTML='<div class="status success">🟢 Driver Online है। अभी कोई नई booking नहीं है।</div>';return;}
+  el.innerHTML=pending.slice(0,5).map(b=>{
+    const id=b.id||'';
+    return '<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>📏 '+escapeHtml(String(b.distanceKm||''))+' km • 💰 ₹'+escapeHtml(String(b.fare||0))+'<br>👤 '+escapeHtml(String(b.passengers||1))+' passenger • 🚕 '+escapeHtml(String(b.vehicle||''))+'<br>📱 '+escapeHtml(String(b.mobile||''))+'<div class="contact-buttons"><button class="secondary" onclick="acceptRide(\''+escapeHtml(id)+'\')">✅ Accept</button><button class="danger" onclick="rejectRide(\''+escapeHtml(id)+'\')">❌ Reject</button></div></div>';
+  }).join('');
+}
+function renderAdmin(){
+  document.getElementById('bookingCount').textContent=allBookings.length;
+  const revenue=allBookings.reduce((s,b)=>s+(Number(b.fare)||0),0);
+  const cp=Number(document.getElementById('commission').value)||0;
+  document.getElementById('adminRevenue').textContent='₹'+revenue;
+  document.getElementById('adminCommission').textContent='₹'+Math.round(revenue*cp/100);
+  const h=document.getElementById('adminHistory');
+  h.innerHTML=allBookings.length?allBookings.map(b=>'<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>₹'+escapeHtml(String(b.fare||0))+' • '+escapeHtml(String(b.distanceKm||0))+' km<br>Status: '+escapeHtml(b.status||'new')+(b.driverName?'<br>🚗 Driver: '+escapeHtml(b.driverName)+' • '+escapeHtml(b.driverVehicle||''):'')+'</div>').join(''):'कोई booking नहीं';
+  const th=document.getElementById('adminTripHistory');
+  const trips=allBookings.filter(b=>b.driverId||b.status==='completed'||b.status==='accepted');
+  th.innerHTML=trips.length?trips.slice(0,20).map(b=>'<div class="history-item"><b>'+escapeHtml(b.pickup)+' → '+escapeHtml(b.destination)+'</b><br>🚗 '+escapeHtml(b.driverName||'Driver record pending')+' • '+escapeHtml(b.driverVehicle||b.vehicle||'')+'<br>🕒 '+escapeHtml(b.acceptedAt||b.createdAt||'')+' → '+escapeHtml(b.completedAt||'Active')+'<br><span class="trip-location">GPS trail Firestore में booking के locationHistory subcollection में सुरक्षित किया जाएगा।</span></div>').join(''):'अभी कोई trip location history नहीं है।';
+}
+function renderAll(){renderHistory();renderDriverRide();renderAdmin();}
+window.onTripLocation=function(lat,lng,accuracy,ts){
+  const id=activeTripBookingId; if(!id||!bookingsRef)return;
+  bookingsRef.doc(id).collection('locationHistory').add({lat:Number(lat),lng:Number(lng),accuracy:Number(accuracy)||0,timestamp:ts||new Date().toISOString(),driverId:DRIVER_ID,driverName:DRIVER_NAME}).catch(e=>console.warn('Trip location:',e));
+};
+function escapeHtml(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+window.addEventListener('load',()=>{document.getElementById('shareBtn').classList.toggle('selected',localState.rideType==='Share');document.getElementById('directBtn').classList.toggle('selected',localState.rideType==='Direct');document.getElementById('commission').addEventListener('input',renderAdmin);loadGoogleMaps();updateFarePreview();renderAll();if(bookingsRef)bookingsRef.orderBy('createdAt','desc').limit(50).onSnapshot(s=>{allBookings=s.docs.map(d=>Object.assign({id:d.id},d.data()));renderAll();},e=>console.warn('Firestore listener:',e));});
+</script>
+</body>
+</html>
