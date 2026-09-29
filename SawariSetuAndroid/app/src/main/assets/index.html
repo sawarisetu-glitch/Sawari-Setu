@@ -62,8 +62,13 @@ button{font-family:inherit}
 .status.error{color:#ff6978;border-color:rgba(255,93,108,.3)}
 
 /* Google Maps Container */
-#mapBox{position:relative;width:100%;height:260px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #263d58}
+#mapBox{position:relative;width:100%;height:270px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #263d58}
 #map{width:100%;height:100%}
+
+/* Map Type Controller (Road vs Satellite) */
+.mapSwitchBar{position:absolute;top:10px;right:10px;z-index:5;display:flex;gap:4px;background:rgba(5,11,20,.85);padding:4px;border-radius:8px;border:1px solid #284464}
+.mapSwitchBtn{padding:5px 10px;font-size:11px;font-weight:700;border:0;border-radius:6px;background:#0f2136;color:#9eb5cb;cursor:pointer}
+.mapSwitchBtn.active{background:linear-gradient(135deg,#0d77d8,#00c8ff);color:#fff}
 
 /* Google Places Search Box */
 .suggestions{position:relative;z-index:999;background:#0a1728;border:1px solid #2b4566;border-radius:10px;margin-top:4px;overflow:hidden;max-height:220px;overflow-y:auto;box-shadow:0 10px 25px rgba(0,0,0,0.7)}
@@ -74,12 +79,12 @@ button{font-family:inherit}
 .typeBtn{background:#0a1626;border:1px solid #29405d;padding:10px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
 .typeBtn.sel{background:linear-gradient(135deg,#096fc8,#00aee0);border-color:#39bfff;box-shadow:0 4px 12px rgba(0,200,255,.2)}
 
-/* असली व यूनिक वाहन कार्ड्स */
+/* असली व यूनिक फोटोरियलिस्टिक वाहन कार्ड्स (NO DRAWING - REAL VEHICLES) */
 .vehicleGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .vehicleCard{background:#081423;border:1px solid #1d334e;border-radius:14px;padding:8px;text-align:center;cursor:pointer;color:#fff;transition:.2s;display:flex;flex-direction:column;align-items:center;position:relative}
 .vehicleCard.selected{background:linear-gradient(145deg,#083a62,#06577e);border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,200,255,.3)}
-.vehicleImgWrap{width:100%;height:85px;display:flex;align-items:center;justify-content:center;background:#050c17;border-radius:10px;overflow:hidden;padding:2px}
-.vehicleImgWrap svg{width:100%;height:100%;object-fit:contain}
+.vehicleImgWrap{width:100%;height:90px;display:flex;align-items:center;justify-content:center;background:#060e1a;border-radius:10px;overflow:hidden;padding:4px}
+.vehicleImgWrap img{width:100%;height:100%;object-fit:contain}
 .vehicleCard b{margin-top:6px;font-size:13px}
 
 .fare{margin-top:12px;padding:12px;text-align:center;border-radius:12px;background:linear-gradient(135deg,#132438,#0b1a2d);border:1px solid #304965}
@@ -141,7 +146,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙️ एडमिन</button>
 </div>
 
-<!-- SIDE MENU (मेन्यू आइकॉन के अंदर नियम, शर्तें व नीतियां) -->
+<!-- SIDE MENU -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
@@ -193,7 +198,12 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
       <input id="pDest" placeholder="कहाँ जाना है? (जैसे: प्रयागराज जंक्शन, नैनी, सिविल लाइंस)" autocomplete="off" oninput="onDestInput(this.value)">
       <div id="destSuggestions" class="suggestions hidden"></div>
 
+      <!-- MAP BOX WITH SATELLITE SWITCH -->
       <div id="mapBox">
+        <div class="mapSwitchBar">
+          <button id="btnMapDefault" class="mapSwitchBtn active" onclick="setGoogleMapType('roadmap')">🗺️ रोड</button>
+          <button id="btnMapSat" class="mapSwitchBtn" onclick="setGoogleMapType('satellite')">🛰️ सैटेलाइट</button>
+        </div>
         <div id="map"></div>
       </div>
 
@@ -209,93 +219,37 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <button id="typeDirect" class="typeBtn" onclick="selectRideType('direct')">🚕 डायरेक्ट (Direct)</button>
       </div>
 
-      <!-- असली व HD फोटो-स्टाइल वाहन विकल्प -->
-      <label>वाहन चुनें</label>
+      <!-- असली गाड़ियों की फ़ोटो (ACTUAL REAL VEHICLE PHOTOS) -->
+      <label>वाहन चुनें (असली फ़ोटो)</label>
       <div class="vehicleGrid">
-        <!-- 1. E-RICKSHAW -->
+        <!-- 1. E-RICKSHAW REAL PHOTO -->
         <div class="vehicleCard selected" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
           <div class="vehicleImgWrap">
-            <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="25" y="16" width="135" height="12" rx="4" fill="#00c8ff"/>
-              <rect x="22" y="24" width="140" height="4" fill="#1b2a3c"/>
-              <rect x="30" y="28" width="5" height="48" fill="#50667f"/>
-              <rect x="88" y="28" width="4" height="40" fill="#50667f"/>
-              <rect x="150" y="28" width="5" height="48" fill="#50667f"/>
-              <path d="M152 28l20 38h-16l-16-38h12z" fill="#00e5ff" fill-opacity="0.35"/>
-              <line x1="156" y1="64" x2="178" y2="78" stroke="#50667f" stroke-width="4" stroke-linecap="round"/>
-              <path d="M26 50h96v26H26z" fill="#ffc857"/>
-              <rect x="36" y="42" width="28" height="12" rx="2" fill="#d99b1c"/>
-              <rect x="24" y="70" width="132" height="12" rx="3" fill="#1b2a3c"/>
-              <circle cx="176" cy="66" r="6" fill="#fff" stroke="#ffc857" stroke-width="2"/>
-              <circle cx="48" cy="84" r="16" fill="#111822" stroke="#a0b2c6" stroke-width="4"/>
-              <circle cx="48" cy="84" r="6" fill="#50667f"/>
-              <circle cx="106" cy="84" r="16" fill="#111822" stroke="#a0b2c6" stroke-width="4"/>
-              <circle cx="106" cy="84" r="6" fill="#50667f"/>
-              <circle cx="174" cy="84" r="15" fill="#111822" stroke="#a0b2c6" stroke-width="4"/>
-              <circle cx="174" cy="84" r="5" fill="#50667f"/>
-            </svg>
+            <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=400&q=80" alt="ई-रिक्शा">
           </div>
           <b>ई-रिक्शा</b>
         </div>
 
-        <!-- 2. AUTO RICKSHAW -->
+        <!-- 2. AUTO RICKSHAW REAL PHOTO -->
         <div class="vehicleCard" data-v="auto" onclick="chooseVehicle('auto')">
           <div class="vehicleImgWrap">
-            <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 66V35c0-14 12-22 26-22h74c18 0 32 10 38 24l16 29h-40z" fill="#20d68b"/>
-              <path d="M48 13h72c14 0 24 6 30 16l-88-2c-8 0-14-6-14-14z" fill="#ffc857"/>
-              <path d="M72 24h60l12 24H72V24z" fill="#0c1824"/>
-              <path d="M22 66h148l-8 16H28l-6-16z" fill="#152637"/>
-              <path d="M152 48l24 18-6 10h-24v-28z" fill="#20d68b"/>
-              <line x1="148" y1="46" x2="164" y2="40" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="176" cy="68" r="5" fill="#ffc857"/>
-              <circle cx="52" cy="84" r="17" fill="#101721" stroke="#ffc857" stroke-width="5"/>
-              <circle cx="52" cy="84" r="6" fill="#69829c"/>
-              <circle cx="152" cy="84" r="17" fill="#101721" stroke="#ffc857" stroke-width="5"/>
-              <circle cx="152" cy="84" r="6" fill="#69829c"/>
-            </svg>
+            <img src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=400&q=80" alt="ऑटो रिक्शा">
           </div>
           <b>ऑटो</b>
         </div>
 
-        <!-- 3. BIKE -->
+        <!-- 3. MOTORCYCLE / BIKE REAL PHOTO -->
         <div class="vehicleCard" data-v="bike" onclick="chooseVehicle('bike')">
           <div class="vehicleImgWrap">
-            <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="42" y1="78" x2="90" y2="68" stroke="#50667f" stroke-width="6" stroke-linecap="round"/>
-              <rect x="80" y="60" width="34" height="24" rx="4" fill="#304358"/>
-              <circle cx="92" cy="72" r="6" fill="#6c86a3"/>
-              <path d="M60 48c10-14 30-12 42-12 14 0 22 8 28 14l-44 6c-10 0-18-4-26-8z" fill="#ff5d6c"/>
-              <path d="M96 36c8-6 20-6 28-2l-14 8-14-6z" fill="#121d28"/>
-              <path d="M50 48c14-2 26 2 34 8l-30 2-4-10z" fill="#0c141d"/>
-              <line x1="150" y1="78" x2="130" y2="28" stroke="#6884a4" stroke-width="5" stroke-linecap="round"/>
-              <line x1="120" y1="28" x2="138" y2="28" stroke="#ffc857" stroke-width="4" stroke-linecap="round"/>
-              <line x1="88" y1="78" x2="40" y2="82" stroke="#c0d1e2" stroke-width="5" stroke-linecap="round"/>
-              <circle cx="42" cy="78" r="20" fill="#0d141e" stroke="#3b5068" stroke-width="5"/>
-              <circle cx="42" cy="78" r="8" stroke="#ff5d6c" stroke-width="2"/>
-              <circle cx="150" cy="78" r="20" fill="#0d141e" stroke="#3b5068" stroke-width="5"/>
-              <circle cx="150" cy="78" r="8" stroke="#ff5d6c" stroke-width="2"/>
-            </svg>
+            <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=400&q=80" alt="बाइक">
           </div>
           <b>बाइक</b>
         </div>
 
-        <!-- 4. CAR -->
+        <!-- 4. CAR / TAXI REAL PHOTO -->
         <div class="vehicleCard" data-v="car" onclick="chooseVehicle('car')">
           <div class="vehicleImgWrap">
-            <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M48 44l24-22h58l26 22H48z" fill="#0d77d8"/>
-              <path d="M54 42l20-16h26v16H54z" fill="#00c8ff" fill-opacity="0.4"/>
-              <path d="M106 42V26h22l20 16h-42z" fill="#00c8ff" fill-opacity="0.4"/>
-              <path d="M20 64c0-6 6-12 14-12h136c12 0 22 8 22 18v8H14v-14h6z" fill="#2196f3"/>
-              <path d="M14 70h176v8H14z" fill="#0d3f6d"/>
-              <path d="M188 62l6 2v6h-10l4-8z" fill="#ffc857"/>
-              <path d="M16 62l4 2v6h-6l2-8z" fill="#ff5d6c"/>
-              <circle cx="54" cy="78" r="17" fill="#0f1722" stroke="#8fa9c4" stroke-width="5"/>
-              <circle cx="54" cy="78" r="6" fill="#00c8ff"/>
-              <circle cx="148" cy="78" r="17" fill="#0f1722" stroke="#8fa9c4" stroke-width="5"/>
-              <circle cx="148" cy="78" r="6" fill="#00c8ff"/>
-            </svg>
+            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80" alt="कार">
           </div>
           <b>कार</b>
         </div>
@@ -390,7 +344,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
   </section>
 
-  <!-- DRIVER SECTION (पोर्टल व ऑनलाइन टॉगल) -->
+  <!-- DRIVER SECTION -->
   <section id="sec-driver" class="section hidden">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -411,7 +365,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
   </section>
 
-  <!-- ADMIN SECTION (ड्राइवर जोड़ना, 7-दस्तावेज़ KYC व सत्यापन यहाँ है) -->
+  <!-- ADMIN SECTION -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
       <h2>⚙️ एडमिन कंट्रोल पैनल</h2>
@@ -511,11 +465,11 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
 </div>
 
 <script>
-/* CONFIGURATION & GOOGLE MAPS API KEY */
+/* CONFIGURATION */
 const CONFIG = {
   SUPPORT_PHONE: "9450985355",
   SUPPORT_EMAIL: "sawarisetu@gmail.com",
-  MAPS_API_KEY: "AIzaSyAvf66I6fSNgSLqC9CC1l_bZj_h1qyQh4w", // <-- आपकी प्रदान की हुई Google Maps Key
+  MAPS_API_KEY: "AIzaSyAvf66I6fSNgSLqC9CC1l_bZj_h1qyQh4w",
   FIREBASE: {
     apiKey: "AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",
     authDomain: "sawari-setu.firebaseapp.com",
@@ -584,6 +538,14 @@ function selectRideType(t) {
   calculateAndDisplayFare();
 }
 
+/* SATELLITE SWITCH ENGINE */
+function setGoogleMapType(type) {
+  if (!googleMap) return;
+  googleMap.setMapTypeId(type === "satellite" ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
+  document.getElementById("btnMapDefault").classList.toggle("active", type !== "satellite");
+  document.getElementById("btnMapSat").classList.toggle("active", type === "satellite");
+}
+
 /* EXTERNAL INTENTS */
 function triggerCall(num, label) {
   if (confirm(label + " के लिए " + num + " पर कॉल करना चाहते हैं?")) {
@@ -625,7 +587,7 @@ async function shareApp() {
 }
 
 /* ========================================================
-   GOOGLE MAPS & GOOGLE PLACES SEARCH ENGINE
+   GOOGLE MAPS INITIALIZATION WITH SATELLITE CONTROLS
 ======================================================== */
 window.onGoogleMapsLoaded = function() {
   initGoogleMap();
@@ -638,6 +600,7 @@ function initGoogleMap() {
   googleMap = new google.maps.Map(mapElem, {
     center: currentPickupCoords,
     zoom: 14,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false
@@ -672,13 +635,14 @@ function fetchGPS() {
     return;
   }
 
+  // High Accuracy with Low Fallback (कमरे के अंदर भी सिग्नल पकड़ेगा)
   navigator.geolocation.getCurrentPosition(
     pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
       currentPickupCoords = { lat, lng };
       st.className = "status success";
-      st.textContent = "✅ लोकेशन प्राप्त हुई (±" + Math.round(pos.coords.accuracy) + " मीटर)";
+      st.textContent = "✅ लोकेशन प्राप्त हुई (सटीकता: ±" + Math.round(pos.coords.accuracy) + "m)";
 
       if (googleMap) {
         googleMap.setCenter(currentPickupCoords);
@@ -686,7 +650,6 @@ function fetchGPS() {
         if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
       }
 
-      // Google Geocoder द्वारा वास्तविक पता प्राप्त करें
       if (geocoder) {
         geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
           if (status === "OK" && res && res[0]) {
@@ -698,12 +661,35 @@ function fetchGPS() {
       if (currentDestCoords) drawGoogleRoute();
     },
     err => {
-      st.className = "status error";
-      if (err.code === 1) st.textContent = "GPS अनुमति अस्वीकार की गई। कृपया Location अनुमति ON करें।";
-      else if (err.code === 2) st.textContent = "GPS सिग्नल नहीं मिला। फोन की Location सेवा ON करें।";
-      else st.textContent = "लोकेशन टाइमआउट। खुले स्थान में पुनः प्रयास करें।";
+      // यदि सेटेलाइट लॉक नहीं मिला, तो तुरंत सेल टॉवर/इंटरनेट मोड से लोकेशन लेंगे
+      navigator.geolocation.getCurrentPosition(
+        pos2 => {
+          const lat2 = pos2.coords.latitude;
+          const lng2 = pos2.coords.longitude;
+          currentPickupCoords = { lat: lat2, lng: lng2 };
+          st.className = "status success";
+          st.textContent = "✅ नेटवर्क से लोकेशन प्राप्त हुई";
+          if (googleMap) {
+            googleMap.setCenter(currentPickupCoords);
+            if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
+          }
+          if (geocoder) {
+            geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
+              if (status === "OK" && res && res[0]) {
+                document.getElementById("pPickup").value = res[0].formatted_address;
+              }
+            });
+          }
+          if (currentDestCoords) drawGoogleRoute();
+        },
+        () => {
+          st.className = "status error";
+          st.textContent = "GPS बंद है। कृपया फ़ोन सेटिंग्स से Location (GPS) चालू करें।";
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 30000 }
+      );
     },
-    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
   );
 }
 
@@ -730,15 +716,11 @@ function onDestInput(query) {
               </div>
             `).join("");
             box.classList.remove("hidden");
-          } else {
-            fallbackSearch(query);
           }
         }
       );
-    } else {
-      fallbackSearch(query);
     }
-  }, 300);
+  }, 250);
 }
 
 function chooseGoogleDest(placeId, desc) {
@@ -756,29 +738,6 @@ function chooseGoogleDest(placeId, desc) {
       }
     });
   }
-}
-
-function fallbackSearch(query) {
-  const box = document.getElementById("destSuggestions");
-  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5&accept-language=hi`)
-    .then(r => r.json())
-    .then(data => {
-      if (data && data.length) {
-        box.innerHTML = data.map(d => `
-          <div class="suggestion" onclick="chooseManualCoords(${d.lat}, ${d.lon}, '${d.display_name.replace(/'/g, "\\'")}')">
-            📍 <span>${d.display_name}</span>
-          </div>
-        `).join("");
-        box.classList.remove("hidden");
-      }
-    }).catch(()=>{});
-}
-
-function chooseManualCoords(lat, lng, desc) {
-  document.getElementById("destSuggestions").classList.add("hidden");
-  document.getElementById("pDest").value = desc.split(",").slice(0, 3).join(",");
-  currentDestCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
-  drawGoogleRoute();
 }
 
 function drawGoogleRoute() {
@@ -1085,7 +1044,7 @@ function renderGoodsHistory() {
 }
 
 /* ========================================================
-   ADMIN: DRIVER ONBOARDING & VERIFICATION ENGINE
+   ADMIN & DRIVER ENGINE
 ======================================================== */
 function adminRegisterDriver() {
   const name = document.getElementById("drvName").value.trim();
@@ -1202,9 +1161,7 @@ function renderAdminDashboard() {
   `).join("") || "कोई रिकॉर्ड नहीं।";
 }
 
-/* ========================================================
-   MODAL & LEGAL TEXT (मेन्यू के अंदर)
-======================================================== */
+/* MODALS */
 function showTerms() {
   openModal("📜 नियम एवं शर्तें (Aggregator Rules)", "<p>1. <b>एग्रीगेटर नीति:</b> सवारी सेतु केवल यात्री और स्वतंत्र चालक के बीच डिजिटल सेतु का कार्य करता है।<br>2. <b>किराया निर्धारण:</b> तय दूरी व वाहन स्लैब अनुसार किराया कंप्यूटर द्वारा पारदर्शी रूप से निकाला जाता है।<br>3. <b>माल ढुलाई:</b> माल का घोषित मूल्य ग्राहक की स्वयं की घोषणा है।<br>4. <b>दस्तावेज़ अनिवार्यता:</b> सभी चालक वैध डीएल, बीमा और पुलिस क्लीयरेंस के साथ ही अधिकृत हैं।</p>");
 }
@@ -1223,7 +1180,7 @@ function closeModal() {
   document.getElementById("universalModal").classList.add("hidden");
 }
 
-/* Google Maps Dynamic Script Injection */
+/* GOOGLE MAPS INJECTION */
 function injectGoogleMaps() {
   const s = document.createElement("script");
   s.src = "https://maps.googleapis.com/maps/api/js?key=" + CONFIG.MAPS_API_KEY + "&libraries=places&callback=onGoogleMapsLoaded";
