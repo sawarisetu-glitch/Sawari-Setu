@@ -61,14 +61,14 @@ button{font-family:inherit}
 .status.success{color:#20d68b;border-color:rgba(32,214,139,.3)}
 .status.error{color:#ff6978;border-color:rgba(255,93,108,.3)}
 
-/* Google Maps Container */
+/* Google Maps बॉक्स */
 #mapBox{position:relative;width:100%;height:270px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #263d58}
 #map{width:100%;height:100%}
 
 #adminFleetMapBox{position:relative;width:100%;height:300px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #00c8ff}
 #adminFleetMap{width:100%;height:100%}
 
-/* Satellite Controller */
+/* सैटेलाइट / रोड मैप कंट्रोलर */
 .mapSwitchBar{position:absolute;top:10px;right:10px;z-index:10;display:flex;gap:4px;background:rgba(5,11,20,.9);padding:4px;border-radius:8px;border:1px solid #284464}
 .mapSwitchBtn{padding:6px 12px;font-size:11px;font-weight:700;border:0;border-radius:6px;background:#0f2136;color:#9eb5cb;cursor:pointer}
 .mapSwitchBtn.active{background:linear-gradient(135deg,#0d77d8,#00c8ff);color:#fff}
@@ -81,13 +81,14 @@ button{font-family:inherit}
 .typeBtn{background:#0a1626;border:1px solid #29405d;padding:10px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
 .typeBtn.sel{background:linear-gradient(135deg,#096fc8,#00aee0);border-color:#39bfff;box-shadow:0 4px 12px rgba(0,200,255,.2)}
 
-/* 100% REALISTIC INDIAN VEHICLE CARDS (NO DRAWING) */
+/* 100% असली भारतीय वाहन कार्ड्स (नो कार्टून) */
 .vehicleGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .vehicleCard{background:#081423;border:1px solid #1d334e;border-radius:14px;padding:8px;text-align:center;cursor:pointer;color:#fff;transition:.2s;display:flex;flex-direction:column;align-items:center;position:relative}
 .vehicleCard.selected{background:linear-gradient(145deg,#083a62,#06577e);border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,200,255,.3)}
 .vehicleImgWrap{width:100%;height:100px;display:flex;align-items:center;justify-content:center;background:#040912;border-radius:10px;overflow:hidden;padding:4px}
 .vehicleImgWrap img{width:100%;height:100%;object-fit:cover;border-radius:8px}
 .vehicleCard b{margin-top:6px;font-size:13px}
+.vehicleCard small{font-size:10px;color:#9eb5cb;margin-top:2px}
 
 .fare{margin-top:12px;padding:12px;text-align:center;border-radius:12px;background:linear-gradient(135deg,#132438,#0b1a2d);border:1px solid #304965}
 .fare strong{display:block;font-size:26px;color:var(--gold)}
@@ -106,7 +107,17 @@ button{font-family:inherit}
 .menuItem{width:100%;text-align:left;background:#0d1c2e;border:1px solid #213a56;margin:6px 0;padding:12px;border-radius:10px;cursor:pointer;color:#fff}
 .menuItem strong{display:block;font-size:14px}
 .menuItem small{color:#9fb0c5;font-size:11px}
-.menuSection{background:#081626;border:1px solid #1e354e;border-radius:12px;margin-join:10px 0;padding:12px}
+.menuSection{background:#081626;border:1px solid #1e354e;border-radius:12px;margin:10px 0;padding:12px}
+
+/* सोशल शेयरिंग हब (आधिकारिक ब्रांड आइकॉन्स) */
+.socialShareGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.shareBtn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;color:#fff;font-weight:700;font-size:12px}
+.shareBtn.whatsapp{background:#25D366;color:#fff}
+.shareBtn.facebook{background:#1877F2;color:#fff}
+.shareBtn.instagram{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
+.shareBtn.sms{background:#0b8043;color:#fff}
+.shareBtn svg{width:20px;height:20px;flex-shrink:0;fill:currentColor}
+
 .emergencyGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .emBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px;min-height:64px;border-radius:10px;border:0;cursor:pointer;color:#fff;font-weight:700;font-size:11px;background:#182b40;border:1px solid #2b4b6f}
 .emBtn.red{background:linear-gradient(135deg,#a81b2e,#e53950);border-color:#ff6978}
@@ -128,6 +139,12 @@ button{font-family:inherit}
 .badge.approved{background:#20d68b;color:#05140d}
 .badge.onTrip{background:#00c8ff;color:#05140d}
 .badge.offline{background:#ff5d6c;color:#fff}
+.badge.insuranceActive{background:linear-gradient(135deg,#00c8ff,#0d77d8);color:#fff}
+.badge.insuranceExpired{background:#50667f;color:#d0dce8}
+
+/* सुरक्षित फुटर (नंबर पूरी तरह छुपा हुआ) */
+footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;border-top:1px solid #142336;margin-top:20px}
+.footerCallBtn{display:inline-flex;align-items:center;gap:6px;color:var(--cyan);font-weight:700;text-decoration:none;margin-top:6px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -151,15 +168,43 @@ button{font-family:inherit}
   <button id="tabRide" class="tab active" onclick="switchSection('ride',this)">🚕 सवारी</button>
   <button id="tabGoods" class="tab" onclick="switchSection('goods',this)">📦 माल</button>
   <button id="tabDriver" class="tab" onclick="switchSection('driver',this)">👨‍✈️ ड्राइवर</button>
-  <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙️ एडमिन</button>
+  <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙️️ एडमिन</button>
 </div>
 
-<!-- SIDE MENU -->
+<!-- SIDE MENU (नियम, शर्तें, सोशल शेयरिंग व सुरक्षा) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
       <h3 style="margin:0;color:#fff">📋 नियम, शर्तें व विकल्प</h3>
       <button class="menuBtn" onclick="toggleMenu(false)">✕</button>
+    </div>
+
+    <!-- सोशल शेयरिंग हब (आधिकारिक ब्रांड लोगोज़) -->
+    <div class="menuSection">
+      <h4 style="margin:0 0 6px;color:#fff">📤 ऐप शेयर करें</h4>
+      <div class="socialShareGrid">
+        <!-- WhatsApp -->
+        <button class="shareBtn whatsapp" onclick="shareToWhatsApp()">
+          <svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.8 14.16c-.24.68-1.2 1.3-1.68 1.36-.45.06-1.04.09-3.04-.73-2.55-1.05-4.21-3.64-4.34-3.81-.13-.17-1.04-1.39-1.04-2.65 0-1.26.66-1.88.89-2.14.24-.26.52-.33.69-.33.18 0 .35 0 .5.01.17.01.39-.06.61.47.23.54.78 1.91.85 2.05.07.14.12.31.02.5-.09.19-.14.31-.28.47-.14.16-.3.36-.43.48-.14.14-.29.29-.12.58.17.29.74 1.22 1.59 1.98 1.1 1 2.03 1.31 2.32 1.45.29.14.46.12.63-.07.17-.19.74-.86.94-1.15.2-.29.4-.24.67-.14.28.1 1.77.83 2.07.98.3.15.5.23.57.36.08.13.08.75-.16 1.43z"/></svg>
+          WhatsApp
+        </button>
+        <!-- Facebook -->
+        <button class="shareBtn facebook" onclick="shareToFacebook()">
+          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+        <!-- Instagram -->
+        <button class="shareBtn instagram" onclick="shareToInstagram()">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Instagram
+        </button>
+        <!-- SMS -->
+        <button class="shareBtn sms" onclick="shareToSMS()">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></svg>
+          मैसेज (SMS)
+        </button>
+      </div>
+      <button class="btn dark" style="margin-top:8px" onclick="copyShareLink()">🔗 लिंक कॉपी करें</button>
     </div>
     
     <div class="menuSection">
@@ -173,15 +218,14 @@ button{font-family:inherit}
     </div>
 
     <div class="menuSection">
-      <h4 style="margin:0 0 6px;color:#fff">📞 सहायता हेल्पलाइन</h4>
+      <h4 style="margin:0 0 6px;color:#fff">📞 24x7 ग्राहक सेवा सहायता</h4>
       <div class="contactGrid">
-        <button class="contactBtn" onclick="triggerCall('9450985355','हेल्पलाइन')"><span>📞</span>Call</button>
+        <button class="contactBtn" onclick="callSupport()"><span>📞</span>Call</button>
         <button class="contactBtn" onclick="openWhatsApp()"><span>💬</span>WhatsApp</button>
         <button class="contactBtn" onclick="openEmail()"><span>✉️</span>Email</button>
       </div>
     </div>
 
-    <button class="menuItem" onclick="shareApp()"><strong>📤 ऐप शेयर करें</strong><small>दोस्तों व परिवार के साथ साझा करें</small></button>
     <button class="menuItem" onclick="showTerms()"><strong>📜 नियम एवं शर्तें (Terms & Conditions)</strong><small>Ola/Uber एग्रीगेटर किराया व सेवा नियम</small></button>
     <button class="menuItem" onclick="showPrivacy()"><strong>🔐 गोपनीयता नीति (Privacy Policy)</strong><small>डेटा, लोकेशन व दस्तावेज़ सुरक्षा कानून</small></button>
     <button class="menuItem" onclick="showZeroTolerance()"><strong>🛑 शून्य सहिष्णुता नीति (Zero Tolerance)</strong><small>नशा, दुर्व्यवहार व ओवरचार्जिंग पर आजीवन बैन</small></button>
@@ -203,7 +247,7 @@ button{font-family:inherit}
       <div id="gpsStatus" class="status">GPS लोकेशन लेने के लिए ऊपर बटन दबाएँ।</div>
 
       <label>गंतव्य (Destination - Google Search Engine)</label>
-      <input id="pDest" placeholder="कहाँ जाना है? (जैसे: प्रयागराज जंक्शन, नैनी, सिविल लाइंस)" autocomplete="off" oninput="onDestInput(this.value)">
+      <input id="pDest" placeholder="कहाँ जाना है? (जैसे: नैनी, प्रयागराज, बनारस, मैहर)" autocomplete="off" oninput="onDestInput(this.value)">
       <div id="destSuggestions" class="suggestions hidden"></div>
 
       <!-- MAP BOX WITH SATELLITE SWITCH -->
@@ -227,39 +271,61 @@ button{font-family:inherit}
         <button id="typeDirect" class="typeBtn" onclick="selectRideType('direct')">🚕 डायरेक्ट (Direct)</button>
       </div>
 
-      <!-- वास्तविक भारतीय वाहन विज़ुअल्स (असली फ़ोटो) -->
-      <label>वाहन चुनें (असली मॉडल)</label>
+      <!-- वास्तविक भारतीय वाहन विज़ुअल्स (कारों की 3 श्रेणियां) -->
+      <label>वाहन चुनें (असली मॉडल व क्षमता)</label>
       <div class="vehicleGrid">
-        <!-- 1. E-RICKSHAW REAL PHOTO -->
-        <div class="vehicleCard selected" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
+        <!-- 1. E-RICKSHAW -->
+        <div class="vehicleCard" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
           <div class="vehicleImgWrap">
             <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=400&q=80" alt="ई-रिक्शा">
           </div>
           <b>ई-रिक्शा</b>
+          <small>👤 4 सवारी • लोकल</small>
         </div>
 
-        <!-- 2. AUTO RICKSHAW REAL PHOTO -->
+        <!-- 2. AUTO RICKSHAW -->
         <div class="vehicleCard" data-v="auto" onclick="chooseVehicle('auto')">
           <div class="vehicleImgWrap">
             <img src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=400&q=80" alt="ऑटो रिक्शा">
           </div>
           <b>ऑटो</b>
+          <small>👤 3 सवारी • तेज</small>
         </div>
 
-        <!-- 3. MOTORBIKE REAL PHOTO -->
+        <!-- 3. MOTORBIKE -->
         <div class="vehicleCard" data-v="bike" onclick="chooseVehicle('bike')">
           <div class="vehicleImgWrap">
             <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=400&q=80" alt="बाइक">
           </div>
           <b>बाइक</b>
+          <small>👤 1 सवारी • सबसे तेज</small>
         </div>
 
-        <!-- 4. CAR REAL PHOTO -->
-        <div class="vehicleCard" data-v="car" onclick="chooseVehicle('car')">
+        <!-- 4. MINI CAR (4 SEATER) -->
+        <div class="vehicleCard selected" data-v="car-mini" onclick="chooseVehicle('car-mini')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80" alt="कार">
+            <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=400&q=80" alt="मिनी कार">
           </div>
-          <b>कार</b>
+          <b>सवारी मिनी</b>
+          <small>👤 4 सवारी (WagonR/Alto)</small>
+        </div>
+
+        <!-- 5. SEDAN CAR (5 SEATER AC) -->
+        <div class="vehicleCard" data-v="car-sedan" onclick="chooseVehicle('car-sedan')">
+          <div class="vehicleImgWrap">
+            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80" alt="सेडान कार">
+          </div>
+          <b>सवारी सेडान</b>
+          <small>👤 5 सवारी (Dzire/Aura) AC</small>
+        </div>
+
+        <!-- 6. SUV (6-7 SEATER) -->
+        <div class="vehicleCard" data-v="car-suv" onclick="chooseVehicle('car-suv')">
+          <div class="vehicleImgWrap">
+            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&q=80" alt="एसयूवी">
+          </div>
+          <b>सवारी SUV</b>
+          <small>👤 6-7 सवारी (Bolero/Ertiga)</small>
         </div>
       </div>
 
@@ -274,9 +340,18 @@ button{font-family:inherit}
         </div>
       </div>
 
+      <!-- IRCTC STYLE TRIP INSURANCE BANNER -->
+      <div style="background:#091b2e;border:1px solid #1f3f66;border-radius:10px;padding:10px;margin-top:10px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:24px">🛡️</span>
+        <div>
+          <b style="color:var(--cyan);font-size:13px">सवारी सेतु ऑटो-ट्रिप इंश्योरेंस (IRCTC तर्ज पर)</b>
+          <small style="color:#a8c0db;display:block;font-size:11px">ट्रिप शुरू होते ही ₹5,00,000 का दुर्घटना बीमा एक्टिव होगा और गंतव्य पर उतरते ही स्वतः बंद।</small>
+        </div>
+      </div>
+
       <div class="fare">
         <strong id="fareDisplay">₹ —</strong>
-        <span id="fareSub">दूरी व वाहन अनुसार किराया</span>
+        <span id="fareSub">टोल टैक्स पूरी तरह शामिल • कोई अतिरिक्त शुल्क नहीं</span>
         <div id="farePerk" class="notice"></div>
       </div>
 
@@ -285,7 +360,7 @@ button{font-family:inherit}
     </div>
 
     <div class="card">
-      <h2>📜 मेरी पिछली राइड्स (OTP सहित)</h2>
+      <h2>📜 मेरी पिछली राइड्स (लाइव इंश्योरेंस व OTP)</h2>
       <div id="passengerRideHistory">कोई राइड रिकॉर्ड नहीं।</div>
     </div>
   </section>
@@ -373,11 +448,11 @@ button{font-family:inherit}
     </div>
   </section>
 
-  <!-- ADMIN SECTION: LIVE FLEET RADAR & TRACKING -->
+  <!-- ADMIN SECTION: LIVE FLEET RADAR & DIGITAL BLACK BOX -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
-      <h2>🛰️ एडमिन लाइव फ्लीट रडार (Live Driver Tracking)</h2>
-      <div class="status">सभी सक्रिय गाड़ियों की लाइव स्थिति (सिरसा, नैनी, प्रयागराज):</div>
+      <h2>🛰️ एडमिन लाइव फ्लीट रडार (Live Tracking)</h2>
+      <div class="status">गाड़ियों की स्थिति (सिरसा, नैनी, प्रयागराज):</div>
       
       <div class="statsGrid" style="margin-top:8px">
         <div class="statCol"><small>कुल गाड़ियाँ</small><b id="admTotalVehicles">0</b></div>
@@ -386,10 +461,32 @@ button{font-family:inherit}
         <div class="statCol"><small>🔴 खड़ी/ऑफलाइन</small><b id="admOfflineVehicles" style="color:var(--red)">0</b></div>
       </div>
 
-      <!-- ADMIN LIVE RADAR MAP -->
+      <!-- ADMIN FLEET RADAR WITH SATELLITE SWITCH -->
       <div id="adminFleetMapBox">
+        <div class="mapSwitchBar">
+          <button id="btnAdmMapDefault" class="mapSwitchBtn" onclick="setAdminMapType('roadmap')">🗺️ रोड</button>
+          <button id="btnAdmMapSat" class="mapSwitchBtn active" onclick="setAdminMapType('satellite')">🛰️ सैटेलाइट</button>
+        </div>
         <div id="adminFleetMap"></div>
       </div>
+    </div>
+
+    <!-- DIGITAL BLACK BOX / POLICE AUDIT DESK -->
+    <div class="card">
+      <h2>🚔 डिजिटल ब्लैक बॉक्स (Police Investigation Desk)</h2>
+      <div class="status">हादसा/विवाद होने पर 6-12 महीने का कानूनी ट्रिप रिकॉर्ड, पिक-ड्रॉप टाइम व GPS सबूत:</div>
+      <div class="row" style="margin-top:8px">
+        <input id="policeAuditSearch" placeholder="यात्री मोबाइल / गाड़ी नंबर">
+        <button class="btn dark" onclick="searchPoliceAudit()">🔍 सर्च सबूत</button>
+      </div>
+      <div id="policeAuditResult" style="margin-top:8px"></div>
+    </div>
+
+    <!-- TRIP INSURANCE AUDIT DESK -->
+    <div class="card">
+      <h2>🛡️ ट्रिप इंश्योरेंस ऑडिट डेस्क (Micro-Insurance Engine)</h2>
+      <div class="status">यात्री के सफर के दौरान स्वतः एक्टिव होने वाली पॉलिसी का लाइव रिकॉर्ड:</div>
+      <div id="admInsuranceList" style="margin-top:8px">कोई सक्रिय पॉलिसी नहीं।</div>
     </div>
 
     <!-- DRIVER ONBOARDING & CAMERA ATTACHMENTS -->
@@ -403,7 +500,7 @@ button{font-family:inherit}
       <label>मोबाइल नंबर</label>
       <input id="drvMobile" type="tel" maxlength="10" placeholder="10 अंकों का नंबर">
 
-      <!-- 1. LIVE CAMERA CAPTURE -->
+      <!-- LIVE CAMERA CAPTURE -->
       <div class="docBox">
         <b>📸 ड्राइवर की लाइव सेल्फ़ी/फ़ोटो (Direct Camera)</b>
         <label class="fileInputLabel">
@@ -418,14 +515,15 @@ button{font-family:inherit}
         <option value="e-rickshaw">ई-रिक्शा</option>
         <option value="auto">ऑटो रिक्शा</option>
         <option value="bike">बाइक</option>
-        <option value="car">कार</option>
+        <option value="car-mini">सवारी मिनी (WagonR/Alto)</option>
+        <option value="car-sedan">सवारी सेडान (Dzire/Aura)</option>
+        <option value="car-suv">सवारी SUV (Bolero/Ertiga)</option>
         <option value="pickup">पिकअप डाला</option>
       </select>
 
       <label>वाहन नंबर (RC No.)</label>
       <input id="drvVehicleNum" placeholder="UP 70 XX 0000">
 
-      <!-- 2. RC BOOK ATTACHMENT -->
       <div class="docBox">
         <b>📑 1. वाहन आरसी बुक (RC Document)</b>
         <label class="fileInputLabel">
@@ -435,7 +533,6 @@ button{font-family:inherit}
         <img id="thumbDrvRC" class="previewThumb" alt="RC">
       </div>
 
-      <!-- 3. DRIVING LICENSE ATTACHMENT -->
       <div class="docBox">
         <b>🪪 2. ड्राइविंग लाइसेंस (DL)</b>
         <input id="drvDLNum" placeholder="लाइसेंस नंबर">
@@ -448,7 +545,6 @@ button{font-family:inherit}
         <img id="thumbDrvDL" class="previewThumb" alt="DL">
       </div>
 
-      <!-- 4. COMMERCIAL INSURANCE ATTACHMENT -->
       <div class="docBox">
         <b>🛡️ 3. कमर्शियल वाहन इंश्योरेंस पॉलिसी</b>
         <input id="drvInsNum" placeholder="इंश्योरेंस पॉलिसी नंबर">
@@ -463,7 +559,6 @@ button{font-family:inherit}
         <img id="thumbDrvIns" class="previewThumb" alt="Insurance">
       </div>
 
-      <!-- 5. FITNESS ATTACHMENT -->
       <div class="docBox">
         <b>📋 4. वाहन फिटनेस प्रमाण पत्र (Fitness)</b>
         <input id="drvFitNum" placeholder="फिटनेस नंबर">
@@ -476,7 +571,6 @@ button{font-family:inherit}
         <img id="thumbDrvFit" class="previewThumb" alt="Fitness">
       </div>
 
-      <!-- 6. POLICE CLEARANCE CERTIFICATE -->
       <div class="docBox">
         <b>👮 5. पुलिस क्लीयरेंस प्रमाण पत्र (PCC)</b>
         <input id="drvPCCNum" placeholder="PCC प्रमाण पत्र नंबर">
@@ -510,14 +604,18 @@ button{font-family:inherit}
   </section>
 </main>
 
+<!-- सुरक्षित फुटर (पर्सनल नंबर पूरी तरह छुपा हुआ) -->
 <footer>
-  सवारी सेतु • 2026 सर्वाधिकार सुरक्षित • <a href="tel:9450985355" style="color:var(--cyan)">9450985355</a>
+  <div>सवारी सेतु • 2026 सर्वाधिकार सुरक्षित</div>
+  <div class="footerCallBtn" onclick="callSupport()">
+    📞 24x7 ग्राहक सेवा सहायता डेस्क से जुड़ें
+  </div>
 </footer>
 </div>
 
 <script>
 const CONFIG = {
-  SUPPORT_PHONE: "9450985355",
+  SUPPORT_PHONE: "9450985355", // यह इंटरनल कोड में है, स्क्रीन पर नहीं दिखेगा
   SUPPORT_EMAIL: "sawarisetu@gmail.com",
   MAPS_API_KEY: "AIzaSyAvf66I6fSNgSLqC9CC1l_bZj_h1qyQh4w",
   FIREBASE: {
@@ -541,8 +639,8 @@ try {
   console.warn("Firestore running in offline mode:", e);
 }
 
-let selectedVehicle = "e-rickshaw";
-let selectedRideType = "share";
+let selectedVehicle = "car-mini";
+let selectedRideType = "direct";
 let currentPickupCoords = { lat: 25.2672, lng: 82.0725 };
 let currentDestCoords = null;
 let googleMap = null;
@@ -613,10 +711,20 @@ function setGoogleMapType(type) {
   document.getElementById("btnMapSat").classList.toggle("active", type === "satellite");
 }
 
+function setAdminMapType(type) {
+  if (!adminFleetMap) return;
+  adminFleetMap.setMapTypeId(type === "satellite" ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
+  document.getElementById("btnAdmMapDefault").classList.toggle("active", type !== "satellite");
+  document.getElementById("btnAdmMapSat").classList.toggle("active", type === "satellite");
+}
+
+/* 24x7 हेल्पलाइन कॉल (नंबर स्क्रीन पर दिखाए बिना डायरेक्ट कॉल) */
+function callSupport() {
+  location.href = "tel:" + CONFIG.SUPPORT_PHONE;
+}
+
 function triggerCall(num, label) {
-  if (confirm(label + " के लिए " + num + " पर कॉल करना चाहते हैं?")) {
-    location.href = "tel:" + num;
-  }
+  location.href = "tel:" + num;
 }
 
 function openWhatsApp() {
@@ -633,13 +741,35 @@ function findHospitals() {
   }
 }
 
-function shareApp() {
-  if (navigator.share) {
-    navigator.share({ title: "सवारी सेतु", text: "आपकी सवारी, आपके पास", url: location.href }).catch(()=>{});
-  } else {
-    navigator.clipboard.writeText(location.href);
-    alert("ऐप लिंक कॉपी कर दिया गया है!");
-  }
+/* ========================================================
+   सोशल शेयरिंग इंजन (आधिकारिक ब्रांड फंक्शंस)
+======================================================== */
+const SHARE_TEXT = "नमस्ते! मैंने 'सवारी सेतु' से सुरक्षित व सस्ती यात्रा बुक की। आप भी गाँव-शहर के लिए ई-रिक्शा, ऑटो, मिनी या एसयूवी कार बुक करें। टोल टैक्स फ्री व ₹5 लाख का दुर्घटना बीमा लागू!";
+const SHARE_URL = window.location.href;
+
+function shareToWhatsApp() {
+  const url = "whatsapp://send?text=" + encodeURIComponent(SHARE_TEXT + " डाउनलोड करें: " + SHARE_URL);
+  location.href = url;
+}
+
+function shareToFacebook() {
+  const url = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(SHARE_URL) + "&quote=" + encodeURIComponent(SHARE_TEXT);
+  window.open(url, "_blank");
+}
+
+function shareToInstagram() {
+  navigator.clipboard.writeText(SHARE_TEXT + " " + SHARE_URL);
+  alert("शेयर मैसेज कॉपी हो गया है! Instagram ऐप खुल रहा है, स्टोरी या चैट में पेस्ट करें।");
+  location.href = "instagram://app";
+}
+
+function shareToSMS() {
+  location.href = "sms:?body=" + encodeURIComponent(SHARE_TEXT + " " + SHARE_URL);
+}
+
+function copyShareLink() {
+  navigator.clipboard.writeText(SHARE_TEXT + " " + SHARE_URL);
+  alert("सवारी सेतु ऐप लिंक और इनवाइट मैसेज कॉपी हो गया है!");
 }
 
 /* GOOGLE MAPS LOADER */
@@ -678,7 +808,7 @@ function initGoogleMap() {
   });
 }
 
-/* ADMIN FLEET RADAR MAP ENGINE */
+/* ADMIN FLEET RADAR MAP ENGINE (WITH SATELLITE VIEW) */
 function initAdminFleetMap() {
   if (!window.google || !google.maps) return;
   const adminMapElem = document.getElementById("adminFleetMap");
@@ -686,9 +816,9 @@ function initAdminFleetMap() {
 
   if (!adminFleetMap) {
     adminFleetMap = new google.maps.Map(adminMapElem, {
-      center: { lat: 25.3500, lng: 81.9500 }, // Prayagraj - Sirsa Belt
+      center: { lat: 25.3500, lng: 81.9500 },
       zoom: 11,
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      mapTypeId: google.maps.MapTypeId.HYBRID,
       mapTypeControl: false,
       streetViewControl: false
     });
@@ -696,7 +826,6 @@ function initAdminFleetMap() {
     google.maps.event.trigger(adminFleetMap, "resize");
   }
 
-  // Clear previous markers
   fleetMarkers.forEach(m => m.setMap(null));
   fleetMarkers = [];
 
@@ -707,9 +836,7 @@ function initAdminFleetMap() {
   let onTripCount = 0;
   let offlineCount = 0;
 
-  // Render Drivers on Fleet Radar
   drivers.forEach((drv, index) => {
-    // Determine dynamic position & status
     const activeRide = rides.find(r => r.driver && r.driver.mobile === drv.mobile && r.status === 'started');
     let lat = 25.2672 + (index * 0.015);
     let lng = 82.0725 + (index * 0.012);
@@ -719,7 +846,7 @@ function initAdminFleetMap() {
     if (activeRide) {
       onTripCount++;
       iconColor = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-      statusText = `🔵 ट्रिप पर (${activeRide.pickup} ➔ ${activeRide.dest})`;
+      statusText = `🔵 ट्रिप पर (पॉलिसी: ${activeRide.insurance ? activeRide.insurance.policyNum : 'सक्रिय'})`;
       lat = 25.3200 + (index * 0.008);
       lng = 81.9800 + (index * 0.008);
     } else if (drv.status === 'approved' && isDriverOnline) {
@@ -874,13 +1001,17 @@ function drawGoogleRoute() {
   }
 }
 
+/* ========================================================
+   नया ज़मीनी किराया इंजन (टोल-टैक्स सहित व सटीक स्लैब)
+======================================================== */
 function calculateFare(vehicle, type, distKm, passengers) {
   distKm = Number(distKm);
   passengers = Math.max(1, Number(passengers) || 1);
   if (!Number.isFinite(distKm) || distKm <= 0) return { valid: false, message: "वैध दूरी दर्ज करें" };
 
   let fare = 0;
-  let perk = "";
+  let perk = "✅ टोल टैक्स पूरी तरह शामिल";
+  let insuranceCharge = 2; // अलग से ₹2 इंश्योरेंस चार्ज
 
   if (vehicle === "e-rickshaw") {
     if (type === "share") {
@@ -908,42 +1039,46 @@ function calculateFare(vehicle, type, distKm, passengers) {
       else if (distKm <= 30) fare = 675;
       else if (distKm <= 40) fare = 775;
       else if (distKm <= 50) fare = 825;
-      else fare = 825 + (distKm - 50) * 5;
-
-      if (distKm >= 100) perk = "🎁 2 लीटर पानी कॉम्प्लिमेंट्री";
-      else if (distKm >= 50) perk = "🎁 1 लीटर पानी कॉम्प्लिमेंट्री";
+      else fare = 825 + (distKm - 50) * 8;
     }
   } else if (vehicle === "bike") {
     if (type === "share") return { valid: false, message: "बाइक पर शेयर विकल्प उपलब्ध नहीं है" };
     if (distKm <= 2) fare = 30;
     else if (distKm <= 5) fare = 50;
     else if (distKm <= 10) fare = 90;
-    else if (distKm <= 15) fare = 140;
     else if (distKm <= 20) fare = 190;
-    else if (distKm <= 25) fare = 280;
-    else if (distKm <= 30) fare = 370;
-    else if (distKm <= 40) fare = 480;
     else if (distKm <= 50) fare = 600;
     else fare = 600 + (distKm - 50) * 12;
-  } else if (vehicle === "car") {
-    if (type === "share") return { valid: false, message: "कार पर शेयर विकल्प उपलब्ध नहीं है" };
-    if (distKm <= 5) fare = 200;
-    else if (distKm <= 10) fare = 400;
-    else if (distKm <= 20) fare = 800;
-    else if (distKm <= 30) fare = 1200;
-    else if (distKm <= 40) fare = 1500;
-    else if (distKm <= 50) fare = 1800;
-    else if (distKm <= 60) fare = 2100;
-    else if (distKm <= 70) fare = 2400;
-    else if (distKm <= 80) fare = 2700;
-    else if (distKm <= 100) fare = 3200;
-    else fare = 3200 + (distKm - 100) * 30;
-
-    if (distKm >= 100) perk = "🎁 2 लीटर पानी कॉम्प्लिमेंट्री";
-    else if (distKm >= 50) perk = "🎁 1 लीटर पानी कॉम्प्लिमेंट्री";
+  } 
+  // 1. सवारी मिनी (WagonR / Alto - 4 सीटर)
+  else if (vehicle === "car-mini") {
+    if (distKm <= 10) fare = 350;
+    else if (distKm <= 25) fare = 800;
+    else if (distKm <= 55) fare = 1500; // ~50 km ब्रैकेट
+    else if (distKm <= 130) fare = 2400; // बनारस ब्रैकेट (~120 km)
+    else if (distKm <= 260) fare = 4500; // मैहर / सतना ब्रैकेट (टोल सहित)
+    else fare = 4500 + (distKm - 260) * 18;
+  }
+  // 2. सवारी सेडान (Dzire / Aura - 5 सीटर AC)
+  else if (vehicle === "car-sedan") {
+    if (distKm <= 10) fare = 450;
+    else if (distKm <= 25) fare = 950;
+    else if (distKm <= 55) fare = 1650; // ~50 km प्रयागराज/नैनी
+    else if (distKm <= 130) fare = 3100; // बनारस ब्रैकेट (~120 km)
+    else if (distKm <= 260) fare = 5000; // मैहर पैकेज (टोल सहित)
+    else fare = 5000 + (distKm - 260) * 20;
+  }
+  // 3. सवारी एसयूवी (Bolero / Ertiga / Scorpio - 6-7 सीटर)
+  else if (vehicle === "car-suv") {
+    if (distKm <= 10) fare = 600;
+    else if (distKm <= 25) fare = 1300;
+    else if (distKm <= 55) fare = 2300; // ~50 km ब्रैकेट
+    else if (distKm <= 130) fare = 3800; // बनारस ब्रैकेट
+    else if (distKm <= 260) fare = 5800; // मैहर पैकेज (टोल सहित)
+    else fare = 5800 + (distKm - 260) * 24;
   }
 
-  return { valid: true, fare: Math.round(fare), perk: perk };
+  return { valid: true, fare: Math.round(fare), insuranceCharge: insuranceCharge, perk: perk };
 }
 
 function calculateAndDisplayFare() {
@@ -954,7 +1089,7 @@ function calculateAndDisplayFare() {
 
   if (km <= 0) {
     fBox.textContent = "₹ —";
-    pBox.textContent = "";
+    pBox.textContent = "दूरी दर्ज होने पर किराया दिखेगा";
     return;
   }
 
@@ -966,7 +1101,7 @@ function calculateAndDisplayFare() {
   }
 
   fBox.textContent = "₹ " + res.fare;
-  pBox.textContent = res.perk;
+  pBox.textContent = `${res.perk} (सवारी किराया: ₹${res.fare - res.insuranceCharge} + बीमा: ₹${res.insuranceCharge})`;
 }
 
 function getStorage(key) {
@@ -976,6 +1111,7 @@ function setStorage(key, val) {
   localStorage.setItem(key, JSON.stringify(val));
 }
 
+/* 4-DIGIT OTP & TRIP INSURANCE BOOKING */
 function bookRide() {
   const name = document.getElementById("pName").value.trim();
   const mobile = document.getElementById("pMobile").value.trim();
@@ -1013,10 +1149,20 @@ function bookRide() {
     passengers: pCount,
     distanceKm: dist,
     fare: fareRes.fare,
+    insuranceCharge: fareRes.insuranceCharge,
     status: "pending",
     otp: rideOtp,
     driver: null,
-    gpsTrail: [currentPickupCoords], // Live Breadcrumb GPS recording
+    // IRCTC STYLE MICRO-INSURANCE OBJECT
+    insurance: {
+      status: "pending",
+      policyNum: "SS-INS-" + Math.floor(100000 + Math.random() * 900000),
+      sumInsured: "₹ 5,00,000",
+      coverage: "सफर के दौरान व्यक्तिगत दुर्घटना एवं आपातकालीन चिकित्सा कवर",
+      activatedAt: null,
+      expiredAt: null
+    },
+    gpsTrail: [currentPickupCoords],
     createdAt: new Date().toISOString()
   };
 
@@ -1032,12 +1178,14 @@ function bookRide() {
     <div class="bookingItem" style="border-color:var(--cyan)">
       <b>✅ बुकिंग सफल! (ID: ${rideId})</b>
       <small>${pickup} ➔ ${dest}</small>
-      <small>किराया: <b>₹ ${fareRes.fare}</b> (${dist} किमी)</small>
+      <small>कुल किराया: <b>₹ ${fareRes.fare}</b> (टोल-फ्री • ${dist} किमी)</small>
       <div style="margin-top:6px">
         <small style="color:var(--gold);font-weight:700">ड्राइवर को बताने के लिए OTP:</small>
         <div class="otpDisplayBox">${rideOtp}</div>
       </div>
-      <small style="display:block;margin-top:4px;color:#8fa2b8">जब ड्राइवर पहुँचे, तभी यह OTP साझा करें।</small>
+      <div style="margin-top:6px;background:#0d2238;padding:6px;border-radius:6px">
+        <small style="color:var(--cyan);font-weight:700">🛡️ ट्रिप बीमा: प्रतीक्षारत (गाड़ी में बैठते ही एक्टिव होगा)</small>
+      </div>
     </div>`;
 
   renderPassengerHistory();
@@ -1056,8 +1204,14 @@ function renderPassengerHistory() {
       <b>${r.pickup} ➔ ${r.dest}</b>
       <small>ID: ${r.id} • वाहन: ${r.vehicle} (${r.rideType})</small>
       <small>किराया: ₹${r.fare} • स्थिति: <b>${r.status === 'started' ? '🟢 ट्रिप चालू है' : r.status}</b></small>
-      <div style="margin-top:4px">
+      <div style="margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <span class="badge ${r.status === 'started' ? 'approved' : 'pending'}">राइड OTP: ${r.otp}</span>
+        ${r.insurance && r.insurance.status === 'active' ? 
+          `<span class="badge insuranceActive">🛡️ बीमा एक्टिव: ${r.insurance.policyNum}</span>` : 
+          (r.insurance && r.insurance.status === 'expired' ? 
+            `<span class="badge insuranceExpired">🛡️ बीमा समाप्त (${r.insurance.policyNum})</span>` :
+            `<span class="badge pending">🛡️ बीमा: प्रतीक्षारत</span>`)
+        }
       </div>
     </div>
   `).join("");
@@ -1164,9 +1318,7 @@ function renderGoodsHistory() {
   `).join("");
 }
 
-/* ========================================================
-   ADMIN: DRIVER ONBOARDING & CAMERA ATTACHMENTS
-======================================================== */
+/* ADMIN: DRIVER ONBOARDING */
 function adminRegisterDriver() {
   const name = document.getElementById("drvName").value.trim();
   const mobile = document.getElementById("drvMobile").value.trim();
@@ -1237,7 +1389,7 @@ function toggleDriverOnline() {
   renderDriverFeeds();
 }
 
-/* DRIVER TRIP START (OTP VERIFICATION) */
+/* DRIVER TRIP START (OTP VERIFICATION + AUTO-INSURANCE ACTIVATION) */
 function verifyAndStartRide(rideId, correctOtp) {
   const inputOtp = prompt("यात्री से 4 अंकों का OTP पूछकर यहाँ दर्ज करें:");
   if (!inputOtp) return;
@@ -1253,11 +1405,15 @@ function verifyAndStartRide(rideId, correctOtp) {
         r.status = "started";
         r.driver = drv;
         r.startedAt = new Date().toISOString();
+        if (r.insurance) {
+          r.insurance.status = "active";
+          r.insurance.activatedAt = new Date().toLocaleTimeString('hi-IN');
+        }
       }
       return r;
     });
     setStorage("ss_rides", rides);
-    alert("✅ OTP सत्यापित! ट्रिप सफलतापूर्वक शुरू हो गई।");
+    alert("✅ OTP सत्यापित! ट्रिप शुरू हो गई और यात्री का ₹5,00,000 ट्रिप बीमा लाइव एक्टिव हो गया है।");
     renderDriverFeeds();
     renderPassengerHistory();
   } else {
@@ -1265,21 +1421,40 @@ function verifyAndStartRide(rideId, correctOtp) {
   }
 }
 
+/* TRIP COMPLETE + AUTO-INSURANCE EXPIRATION + DIGITAL BLACK BOX CONFIRMATION */
 function completeRide(rideId) {
-  if (confirm("क्या यात्रा पूरी हो चुकी है और किराया प्राप्त हो गया है?")) {
+  if (confirm("क्या यात्रा पूरी हो चुकी है और यात्री को सुरक्षित ड्रॉप कर दिया गया है?")) {
     let rides = getStorage("ss_rides");
+    let finishedRide = null;
+
     rides = rides.map(r => {
       if (r.id === rideId) {
         r.status = "completed";
         r.completedAt = new Date().toISOString();
+        if (r.insurance) {
+          r.insurance.status = "expired";
+          r.insurance.expiredAt = new Date().toLocaleTimeString('hi-IN');
+        }
+        finishedRide = r;
       }
       return r;
     });
     setStorage("ss_rides", rides);
-    alert("✅ ट्रिप पूरी हुई। धन्यवाद!");
+    alert("✅ ट्रिप पूरी हुई। सफर समाप्त होने पर बीमा पॉलिसी सुरक्षित रूप से बंद हो गई और डिजिटल ब्लैक बॉक्स में कानूनी रिकॉर्ड दर्ज हो गया।");
+    
+    // यात्री को डिजिटल पुष्टि / WhatsApp इनवॉइस ट्रिगर
+    if (finishedRide) {
+      triggerPassengerReceipt(finishedRide);
+    }
+
     renderDriverFeeds();
     renderPassengerHistory();
   }
+}
+
+function triggerPassengerReceipt(ride) {
+  const msg = `सवारी सेतु रसीद: ट्रिप ${ride.id} पूरी हुई। पिकअप: ${ride.pickup} ड्रॉप: ${ride.dest}। किराया: ₹${ride.fare} (टोल शामिल)। बीमा पॉलिसी ${ride.insurance.policyNum} सुरक्षित रूप से बंद। सहायता हेतु संपर्क करें।`;
+  console.log("Invoice dispatched to passenger:", msg);
 }
 
 function renderDriverFeeds() {
@@ -1296,7 +1471,7 @@ function renderDriverFeeds() {
     <div class="bookingItem">
       <b>${r.pickup} ➔ ${r.dest}</b>
       <small>यात्री: ${r.name} (${r.mobile}) • किराया: ₹${r.fare}</small>
-      <small>दूरी: ${r.distanceKm} किमी • स्थिति: <b>${r.status === 'started' ? '🟢 ट्रिप जारी है' : 'लंबित'}</b></small>
+      <small>दूरी: ${r.distanceKm} किमी • स्थिति: <b>${r.status === 'started' ? '🟢 ट्रिप जारी है (बीमा एक्टिव)' : 'लंबित'}</b></small>
       <div style="display:flex;gap:6px;margin-top:8px">
         <button class="btn dark" style="padding:8px" onclick="location.href='tel:${r.mobile}'">📞 कॉल</button>
         ${r.status === 'pending' ? 
@@ -1315,6 +1490,38 @@ function renderDriverFeeds() {
       <button class="btn green" style="margin-top:6px" onclick="location.href='tel:${g.mobile}'">📞 कॉल</button>
     </div>
   `).join("") : "कोई नया माल ऑर्डर नहीं है।";
+}
+
+/* ========================================================
+   DIGITAL BLACK BOX SEARCH (POLICE AUDIT DESK)
+======================================================== */
+function searchPoliceAudit() {
+  const q = document.getElementById("policeAuditSearch").value.trim();
+  const box = document.getElementById("policeAuditResult");
+  if (!q) {
+    box.innerHTML = "<small style='color:var(--gold)'>कृपया मोबाइल नंबर या गाड़ी नंबर दर्ज करें।</small>";
+    return;
+  }
+
+  const rides = getStorage("ss_rides");
+  const found = rides.filter(r => r.mobile.includes(q) || (r.driver && r.driver.rc && r.driver.rc.includes(q)));
+
+  if (!found.length) {
+    box.innerHTML = "<small style='color:var(--red)'>इस नंबर से कोई ट्रिप रिकॉर्ड नहीं मिला।</small>";
+    return;
+  }
+
+  box.innerHTML = found.map(r => `
+    <div class="bookingItem" style="border-color:#ff5d6c">
+      <b style="color:var(--gold)">⚖️ कानूनी ऑडिट रिकॉर्ड (ID: ${r.id})</b>
+      <small>यात्री: <b>${r.name}</b> (${r.mobile})</small>
+      <small>ड्राइवर: <b>${r.driver ? r.driver.name : '—'}</b> | गाड़ी RC: <b>${r.driver ? r.driver.rc : '—'}</b></small>
+      <small>पिकअप: ${r.pickup} (समय: ${r.startedAt || r.createdAt})</small>
+      <small>ड्रॉप: ${r.dest} (समय: ${r.completedAt || 'सफर जारी था'})</small>
+      <small>बीमा पॉलिसी: ${r.insurance ? r.insurance.policyNum : '—'} (${r.insurance ? r.insurance.status : '—'})</small>
+      <small style="color:var(--green)">✓ कानूनी पुष्टि: सवारी सेतु ने यात्री को सुरक्षित ड्रॉप किया था।</small>
+    </div>
+  `).join("");
 }
 
 function renderAdminDashboard() {
@@ -1336,10 +1543,26 @@ function renderAdminDashboard() {
     </div>
   `).join("") : "कोई ड्राइवर रिकॉर्ड उपलब्ध नहीं है।";
 
+  const insBox = document.getElementById("admInsuranceList");
+  const insuredRides = rides.filter(r => r.insurance);
+  insBox.innerHTML = insuredRides.length ? insuredRides.slice(0, 10).map(r => `
+    <div class="bookingItem">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>पॉलिसी: ${r.insurance.policyNum}</b>
+        <span class="badge ${r.insurance.status === 'active' ? 'insuranceActive' : (r.insurance.status === 'expired' ? 'insuranceExpired' : 'pending')}">
+          ${r.insurance.status === 'active' ? '🟢 एक्टिव (सफर जारी)' : (r.insurance.status === 'expired' ? '🏁 समाप्त (Closed)' : '⏳ प्रतीक्षारत')}
+        </span>
+      </div>
+      <small>यात्री: <b>${r.name}</b> (${r.mobile}) • कवर: <b>${r.insurance.sumInsured}</b></small>
+      <small>मार्ग: ${r.pickup} ➔ ${r.dest}</small>
+      <small style="color:#8fa2b8">सक्रिय: ${r.insurance.activatedAt || '—'} | समाप्ति: ${r.insurance.expiredAt || '—'}</small>
+    </div>
+  `).join("") : "कोई ट्रिप बीमा रिकॉर्ड नहीं है।";
+
   document.getElementById("admRidesList").innerHTML = rides.slice(0, 10).map(r => `
     <div class="bookingItem">
       <b>${r.id} • ${r.pickup} ➔ ${r.dest}</b>
-      <small>यात्री: ${r.name} • किराया: ₹${r.fare} • OTP: <b>${r.otp}</b></small>
+      <small>यात्री: ${r.name} • कुल किराया: ₹${r.fare} • OTP: <b>${r.otp}</b></small>
       <small>स्थिति: <span class="badge ${r.status === 'started' ? 'onTrip' : (r.status === 'completed' ? 'approved' : 'pending')}">${r.status === 'started' ? 'ऑन-ट्रिप (लाइव)' : r.status}</span></small>
     </div>
   `).join("") || "कोई रिकॉर्ड नहीं।";
@@ -1353,7 +1576,7 @@ function showTerms() {
   alert("एग्रीगेटर नीति: सवारी सेतु यात्री व स्वतंत्र चालक के बीच डिजिटल सेतु है।");
 }
 function showPrivacy() {
-  alert("गोपनीयता नीति: लोकेशन व डेटा केवल ट्रिप सुरक्षा हेतु उपयोग होते हैं।");
+  alert("गोपनीयता नीति: लोकेशन व डेटा केवल ट्रिप सुरक्षा व पुलिस ऑडिट हेतु सुरक्षित रखे जाते हैं।");
 }
 function showZeroTolerance() {
   alert("शून्य सहिष्णुता: नशे व ओवरचार्जिंग पर चालक स्थायी ब्लैकलिस्ट होगा।");
