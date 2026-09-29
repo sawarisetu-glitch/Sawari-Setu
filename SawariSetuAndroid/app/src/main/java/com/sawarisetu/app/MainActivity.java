@@ -1,8 +1,11 @@
 package com.sawarisetu.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.webkit.GeolocationPermissions;
@@ -19,6 +22,9 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQ = 1001;
+    private static final int LOCATION_PERMISSION_REQ = 2001;
+    private GeolocationPermissions.Callback geoCallback;
+    private String geoOrigin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +42,30 @@ public class MainActivity extends Activity {
         ws.setAllowContentAccess(true);
         ws.setCacheMode(WebSettings.LOAD_DEFAULT);
 
+        // Native Android Location Permission maangna
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQ);
+            }
+        }
+
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        geoCallback = callback;
+                        geoOrigin = origin;
+                        requestPermissions(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        }, LOCATION_PERMISSION_REQ);
+                        return;
+                    }
+                }
                 callback.invoke(origin, true, false);
             }
 
@@ -54,7 +81,7 @@ public class MainActivity extends Activity {
                     return true;
                 } catch (Exception e) {
                     filePathCallback = null;
-                    Toast.makeText(MainActivity.this, "फ़ाइल पिकर उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "File picker unavailable", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -79,6 +106,22 @@ public class MainActivity extends Activity {
         webView.loadUrl("file:///android_asset/index.html");
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQ) {
+            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if (geoCallback != null && geoOrigin != null) {
+                geoCallback.invoke(geoOrigin, granted, false);
+                geoCallback = null;
+                geoOrigin = null;
+            }
+            if (granted && webView != null) {
+                webView.reload();
+            }
+        }
+    }
+
     private boolean handleExternalUrl(String url) {
         if (url == null) return false;
         if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:") || url.startsWith("geo:")) {
@@ -87,7 +130,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
                 return true;
             } catch (Exception e) {
-                Toast.makeText(this, "संबंधित ऐप उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "App not found", Toast.LENGTH_SHORT).show();
                 return true;
             }
         }
