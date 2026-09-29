@@ -14,6 +14,7 @@ html,body{margin:0;padding:0;background:#050b14;color:#eef5ff;font-family:system
 :root{--bg:#050b14;--card:#0b1728;--card2:#101f34;--line:#20334d;--blue:#2196f3;--cyan:#00c8ff;--gold:#ffc857;--green:#20d68b;--red:#ff5d6c;--muted:#9fb0c5}
 .app{width:100%;max-width:640px;margin:auto;min-height:100vh;background:radial-gradient(circle at 10% 0%,rgba(0,200,255,.08),transparent 25%),radial-gradient(circle at 90% 10%,rgba(255,200,87,.06),transparent 20%),var(--bg);display:flex;flex-direction:column}
 
+/* स्टेटस बार व नॉच सुरक्षा */
 header{
   padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
   padding-bottom: 14px;
@@ -77,12 +78,12 @@ button{font-family:inherit}
 .typeBtn{background:#0a1626;border:1px solid #29405d;padding:10px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
 .typeBtn.sel{background:linear-gradient(135deg,#096fc8,#00aee0);border-color:#39bfff;box-shadow:0 4px 12px rgba(0,200,255,.2)}
 
-/* Real Vehicles Card (NO CARTOON / NO DRAWING) */
+/* वास्तविक व प्रीमियम वाहन कार्ड्स */
 .vehicleGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .vehicleCard{background:#081423;border:1px solid #1d334e;border-radius:14px;padding:8px;text-align:center;cursor:pointer;color:#fff;transition:.2s;display:flex;flex-direction:column;align-items:center;position:relative}
 .vehicleCard.selected{background:linear-gradient(145deg,#083a62,#06577e);border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,200,255,.3)}
-.vehicleImgWrap{width:100%;height:95px;display:flex;align-items:center;justify-content:center;background:#040912;border-radius:10px;overflow:hidden;padding:2px}
-.vehicleImgWrap img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.vehicleImgWrap{width:100%;height:95px;display:flex;align-items:center;justify-content:center;background:#040912;border-radius:10px;overflow:hidden;padding:4px}
+.vehicleImgWrap svg{width:100%;height:100%}
 .vehicleCard b{margin-top:6px;font-size:13px}
 
 .fare{margin-top:12px;padding:12px;text-align:center;border-radius:12px;background:linear-gradient(135deg,#132438,#0b1a2d);border:1px solid #304965}
@@ -92,6 +93,10 @@ button{font-family:inherit}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
 
+/* OTP बैज डिस्प्ले */
+.otpDisplayBox{display:inline-block;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;padding:6px 14px;border-radius:8px;font-size:18px;font-weight:900;letter-spacing:4px;margin-top:6px}
+
+/* साइड मेन्यू */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:absolute;right:0;top:0;height:100%;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:calc(env(safe-area-inset-top, 0px) + 16px)}
@@ -113,7 +118,10 @@ button{font-family:inherit}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px}
 .modalCard{width:100%;max-width:520px;max-height:90vh;overflow-y:auto;background:#0b1728;border:1px solid #29405d;border-radius:16px;padding:16px}
 footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
-.docBox{border:1px solid #29405d;border-radius:12px;padding:12px;background:#081523;margin-top:8px}
+.docBox{border:1px solid #29405d;border-radius:12px;padding:12px;background:#081523;margin-top:10px}
+.docBox label{margin-top:6px}
+.fileInputLabel{display:inline-flex;align-items:center;gap:6px;background:#10243b;border:1px solid #294364;color:#00c8ff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;margin-top:6px}
+.previewThumb{width:60px;height:60px;border-radius:8px;object-fit:cover;margin-top:6px;border:1px solid #00c8ff;display:none}
 .badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700}
 .badge.pending{background:#ffc857;color:#0b1728}
 .badge.approved{background:#20d68b;color:#05140d}
@@ -143,7 +151,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙️ एडमिन</button>
 </div>
 
-<!-- SIDE MENU -->
+<!-- SIDE MENU (मेन्यू आइकॉन के अंदर नियम, शर्तें, कानून व नीतियां) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
@@ -216,37 +224,87 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <button id="typeDirect" class="typeBtn" onclick="selectRideType('direct')">🚕 डायरेक्ट (Direct)</button>
       </div>
 
-      <!-- REAL AUTHENTIC VEHICLE PHOTOS -->
-      <label>वाहन चुनें (असली फोटो)</label>
+      <!-- वास्तविक भारतीय वाहन विज़ुअल्स -->
+      <label>वाहन चुनें (असली मॉडल)</label>
       <div class="vehicleGrid">
-        <!-- 1. E-RICKSHAW REAL PHOTO -->
+        <!-- 1. E-RICKSHAW (REAL COVERED PASSENGER E-RICKSHAW) -->
         <div class="vehicleCard selected" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=400&q=80" alt="ई-रिक्शा" onerror="this.src='https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=400&q=80'">
+            <svg viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 18h95c6 0 10 3 14 8l15 22h-124v-30z" fill="#00c8ff"/>
+              <rect x="15" y="16" width="112" height="6" rx="2" fill="#ffc857"/>
+              <rect x="22" y="24" width="4" height="38" fill="#71869e"/>
+              <rect x="74" y="24" width="4" height="34" fill="#71869e"/>
+              <rect x="124" y="26" width="4" height="36" fill="#71869e"/>
+              <path d="M125 26l16 22h-18l-12-22h14z" fill="#d2f2ff" fill-opacity="0.5"/>
+              <path d="M18 42h78v22H18z" fill="#ffc857"/>
+              <rect x="16" y="58" width="115" height="10" rx="3" fill="#1b2838"/>
+              <circle cx="144" cy="56" r="4" fill="#fff" stroke="#ffc857" stroke-width="2"/>
+              <circle cx="36" cy="68" r="14" fill="#11161d" stroke="#8fa3b7" stroke-width="4"/>
+              <circle cx="36" cy="68" r="5" fill="#4d6175"/>
+              <circle cx="86" cy="68" r="14" fill="#11161d" stroke="#8fa3b7" stroke-width="4"/>
+              <circle cx="86" cy="68" r="5" fill="#4d6175"/>
+              <circle cx="138" cy="68" r="13" fill="#11161d" stroke="#8fa3b7" stroke-width="4"/>
+              <circle cx="138" cy="68" r="4" fill="#4d6175"/>
+            </svg>
           </div>
           <b>ई-रिक्शा</b>
         </div>
 
-        <!-- 2. AUTO RICKSHAW REAL PHOTO -->
+        <!-- 2. AUTO RICKSHAW (AUTHENTIC INDIAN CNG AUTO) -->
         <div class="vehicleCard" data-v="auto" onclick="chooseVehicle('auto')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=400&q=80" alt="ऑटो रिक्शा">
+            <svg viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 52V28c0-10 8-16 18-16h58c14 0 24 8 28 18l14 22h-32z" fill="#20d68b"/>
+              <path d="M36 12h56c10 0 18 4 22 12l-70-1c-6 0-10-4-10-10z" fill="#ffc857"/>
+              <path d="M54 20h46l10 18H54V20z" fill="#0b1723"/>
+              <path d="M16 52h116l-6 12H20l-4-12z" fill="#152637"/>
+              <path d="M116 38l18 14-4 8h-18v-22z" fill="#20d68b"/>
+              <circle cx="135" cy="54" r="4" fill="#ffc857"/>
+              <circle cx="38" cy="68" r="15" fill="#101721" stroke="#ffc857" stroke-width="4"/>
+              <circle cx="38" cy="68" r="5" fill="#69829c"/>
+              <circle cx="118" cy="68" r="15" fill="#101721" stroke="#ffc857" stroke-width="4"/>
+              <circle cx="118" cy="68" r="5" fill="#69829c"/>
+            </svg>
           </div>
           <b>ऑटो</b>
         </div>
 
-        <!-- 3. BIKE REAL PHOTO -->
+        <!-- 3. MOTORBIKE (REALISTIC COMMUTER BIKE) -->
         <div class="vehicleCard" data-v="bike" onclick="chooseVehicle('bike')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=400&q=80" alt="बाइक">
+            <svg viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="34" y1="62" x2="72" y2="54" stroke="#50667f" stroke-width="5" stroke-linecap="round"/>
+              <rect x="64" y="48" width="26" height="18" rx="3" fill="#304358"/>
+              <circle cx="74" cy="57" r="5" fill="#6c86a3"/>
+              <path d="M48 38c8-10 24-9 33-9 11 0 17 6 22 11l-35 5c-8 0-14-3-20-7z" fill="#ff5d6c"/>
+              <path d="M76 29c6-5 16-5 22-2l-11 6-11-4z" fill="#121d28"/>
+              <line x1="120" y1="62" x2="104" y2="24" stroke="#6884a4" stroke-width="4" stroke-linecap="round"/>
+              <line x1="96" y1="24" x2="110" y2="24" stroke="#ffc857" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="34" cy="62" r="16" fill="#0d141e" stroke="#3b5068" stroke-width="4"/>
+              <circle cx="34" cy="62" r="6" stroke="#ff5d6c" stroke-width="2"/>
+              <circle cx="120" cy="62" r="16" fill="#0d141e" stroke="#3b5068" stroke-width="4"/>
+              <circle cx="120" cy="62" r="6" stroke="#ff5d6c" stroke-width="2"/>
+            </svg>
           </div>
           <b>बाइक</b>
         </div>
 
-        <!-- 4. CAR REAL PHOTO -->
+        <!-- 4. CAR / TAXI (PASSENGER SEDAN) -->
         <div class="vehicleCard" data-v="car" onclick="chooseVehicle('car')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80" alt="कार">
+            <svg viewBox="0 0 160 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M38 36l18-18h46l20 18H38z" fill="#0d77d8"/>
+              <path d="M44 34l15-13h20v13H44z" fill="#00c8ff" fill-opacity="0.45"/>
+              <path d="M84 34V21h17l16 13H84z" fill="#00c8ff" fill-opacity="0.45"/>
+              <path d="M16 52c0-5 5-10 11-10h106c9 0 17 6 17 14v6H12v-11h4z" fill="#2196f3"/>
+              <path d="M12 56h138v6H12z" fill="#0d3f6d"/>
+              <path d="M148 50l4 2v5h-8l4-7z" fill="#ffc857"/>
+              <circle cx="42" cy="64" r="14" fill="#0f1722" stroke="#8fa9c4" stroke-width="4"/>
+              <circle cx="42" cy="64" r="5" fill="#00c8ff"/>
+              <circle cx="118" cy="64" r="14" fill="#0f1722" stroke="#8fa9c4" stroke-width="4"/>
+              <circle cx="118" cy="64" r="5" fill="#00c8ff"/>
+            </svg>
           </div>
           <b>कार</b>
         </div>
@@ -274,7 +332,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
 
     <div class="card">
-      <h2>📜 मेरी पिछली राइड्स</h2>
+      <h2>📜 मेरी पिछली राइड्स (OTP सहित)</h2>
       <div id="passengerRideHistory">कोई राइड रिकॉर्ड नहीं।</div>
     </div>
   </section>
@@ -341,7 +399,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
   </section>
 
-  <!-- DRIVER SECTION -->
+  <!-- DRIVER SECTION (OTP दर्ज करके ट्रिप शुरू करना) -->
   <section id="sec-driver" class="section hidden">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -352,7 +410,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
 
     <div class="card">
-      <h2>🚕 उपलब्ध सवारी रिक्वेस्ट्स</h2>
+      <h2>🚕 उपलब्ध सवारी रिक्वेस्ट्स (OTP सुरक्षा)</h2>
       <div id="driverPassengerList">ऑनलाइन होने पर बुकिंग्स दिखेंगी।</div>
     </div>
 
@@ -362,7 +420,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
   </section>
 
-  <!-- ADMIN SECTION -->
+  <!-- ADMIN SECTION (कैमरा, गैलरी अटैचमेंट्स व KYC) -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
       <h2>⚙️ एडमिन कंट्रोल पैनल</h2>
@@ -375,14 +433,24 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
     </div>
 
     <div class="card">
-      <h2>➕ नया ड्राइवर जोड़ें व KYC दस्तावेज़ दर्ज करें</h2>
-      <div class="status">ओला/उबर नियमों के अनुसार 7 अनिवार्य कानूनी दस्तावेज़ों का रिकॉर्ड:</div>
+      <h2>➕ नया ड्राइवर जोड़ें (कैमरा व दस्तावेज़ अटैचमेंट)</h2>
+      <div class="status">ओला/उबर नियमों अनुसार लाइव कैमरा से फ़ोटो व गैलरी से कागजात अपलोड करें:</div>
 
       <label>ड्राइवर का पूरा नाम</label>
-      <input id="drvName" placeholder="पूरा नाम">
+      <input id="drvName" placeholder="पूरा नाम दर्ज करें">
 
       <label>मोबाइल नंबर</label>
       <input id="drvMobile" type="tel" maxlength="10" placeholder="10 अंकों का नंबर">
+
+      <!-- 1. LIVE CAMERA DRIVER SELFIE -->
+      <div class="docBox">
+        <b>📸 ड्राइवर की लाइव फ़ोटो (Camera Mandatory)</b>
+        <label class="fileInputLabel">
+          📷 कैमरा खोलें व फ़ोटो खींचें
+          <input type="file" id="fileDrvPhoto" accept="image/*" capture="user" style="display:none" onchange="previewDoc(this, 'thumbDrvPhoto')">
+        </label>
+        <img id="thumbDrvPhoto" class="previewThumb" alt="ड्राइवर फ़ोटो">
+      </div>
 
       <label>वाहन श्रेणी</label>
       <select id="drvVehicleType">
@@ -390,41 +458,77 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <option value="auto">ऑटो रिक्शा</option>
         <option value="bike">बाइक</option>
         <option value="car">कार</option>
-        <option value="pickup">पिकअप</option>
+        <option value="pickup">पिकअप डाला</option>
       </select>
 
       <label>वाहन नंबर (RC No.)</label>
       <input id="drvVehicleNum" placeholder="UP 70 XX 0000">
 
+      <!-- 2. RC BOOK ATTACHMENT -->
       <div class="docBox">
-        <b>1. ड्राइविंग लाइसेंस (DL)</b>
+        <b>📑 1. वाहन आरसी बुक (RC Document)</b>
+        <label class="fileInputLabel">
+          📎 गैलरी / फ़ाइल से RC चुनें
+          <input type="file" id="fileDrvRC" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbDrvRC')">
+        </label>
+        <img id="thumbDrvRC" class="previewThumb" alt="RC">
+      </div>
+
+      <!-- 3. DRIVING LICENSE ATTACHMENT -->
+      <div class="docBox">
+        <b>🪪 2. ड्राइविंग लाइसेंस (DL)</b>
         <input id="drvDLNum" placeholder="लाइसेंस नंबर">
         <label>DL एक्सपायरी तिथि</label>
         <input id="drvDLExpiry" type="date">
+        <label class="fileInputLabel">
+          📎 DL फ़ोटो अटैच करें (Front/Back)
+          <input type="file" id="fileDrvDL" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbDrvDL')">
+        </label>
+        <img id="thumbDrvDL" class="previewThumb" alt="DL">
       </div>
 
+      <!-- 4. COMMERCIAL INSURANCE ATTACHMENT -->
       <div class="docBox">
-        <b>2. कमर्शियल वाहन इंश्योरेंस</b>
+        <b>🛡️ 3. कमर्शियल वाहन इंश्योरेंस पॉलिसी</b>
         <input id="drvInsNum" placeholder="इंश्योरेंस पॉलिसी नंबर">
+        <label>इंश्योरेंस कंपनी का नाम</label>
+        <input id="drvInsCompany" placeholder="जैसे: Tata AIG, HDFC Ergo, New India">
         <label>इंश्योरेंस एक्सपायरी तिथि</label>
         <input id="drvInsExpiry" type="date">
+        <label class="fileInputLabel">
+          📎 इंश्योरेंस पेपर / पॉलिसी अटैच करें
+          <input type="file" id="fileDrvIns" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbDrvIns')">
+        </label>
+        <img id="thumbDrvIns" class="previewThumb" alt="Insurance">
       </div>
 
+      <!-- 5. FITNESS ATTACHMENT -->
       <div class="docBox">
-        <b>3. फिटनेस प्रमाण पत्र (Fitness)</b>
+        <b>📋 4. वाहन फिटनेस प्रमाण पत्र (Fitness)</b>
         <input id="drvFitNum" placeholder="फिटनेस नंबर">
         <label>फिटनेस एक्सपायरी तिथि</label>
         <input id="drvFitExpiry" type="date">
+        <label class="fileInputLabel">
+          📎 फिटनेस प्रमाण पत्र अटैच करें
+          <input type="file" id="fileDrvFit" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbDrvFit')">
+        </label>
+        <img id="thumbDrvFit" class="previewThumb" alt="Fitness">
       </div>
 
+      <!-- 6. POLICE CLEARANCE CERTIFICATE -->
       <div class="docBox">
-        <b>4. पुलिस क्लीयरेंस प्रमाण पत्र (PCC)</b>
+        <b>👮 5. पुलिस क्लीयरेंस प्रमाण पत्र (PCC)</b>
         <input id="drvPCCNum" placeholder="PCC प्रमाण पत्र नंबर">
         <label>जारी होने की तिथि</label>
         <input id="drvPCCDate" type="date">
+        <label class="fileInputLabel">
+          📎 पुलिस वेरिफिकेशन रिपोर्ट अटैच करें
+          <input type="file" id="fileDrvPCC" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbDrvPCC')">
+        </label>
+        <img id="thumbDrvPCC" class="previewThumb" alt="PCC">
       </div>
 
-      <button class="btn gold" style="margin-top:12px" onclick="adminRegisterDriver()">💾 ड्राइवर रजिस्टर करें व Approve करें</button>
+      <button class="btn gold" style="margin-top:14px" onclick="adminRegisterDriver()">💾 ड्राइवर रजिस्टर करें व Approve करें</button>
       <div id="adminRegStatus" class="status"></div>
     </div>
 
@@ -500,6 +604,22 @@ let geocoder = null;
 let pickupMarker = null;
 let isDriverOnline = false;
 
+// अटैचमेंट बेस64 डेटा डिक्शनरी
+const uploadedDocs = {};
+
+function previewDoc(input, thumbId) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById(thumbId);
+      img.src = e.target.result;
+      img.style.display = "block";
+      uploadedDocs[thumbId] = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 function switchSection(sec, btn) {
   document.querySelectorAll(".section").forEach(s => s.classList.add("hidden"));
   const target = document.getElementById("sec-" + sec);
@@ -532,7 +652,6 @@ function selectRideType(t) {
   calculateAndDisplayFare();
 }
 
-/* SATELLITE SWITCH */
 function setGoogleMapType(type) {
   if (!googleMap) return;
   googleMap.setMapTypeId(type === "satellite" ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
@@ -591,7 +710,7 @@ function initGoogleMap() {
   googleMap = new google.maps.Map(mapElem, {
     center: currentPickupCoords,
     zoom: 14,
-    mapTypeId: google.maps.MapTypeId.HYBRID, // Satellite mode default
+    mapTypeId: google.maps.MapTypeId.HYBRID,
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false
@@ -653,7 +772,6 @@ function fetchGPS() {
   navigator.geolocation.getCurrentPosition(
     handleSuccess,
     () => {
-      // Fallback: Low accuracy network triangulation
       navigator.geolocation.getCurrentPosition(
         handleSuccess,
         () => {
@@ -838,6 +956,7 @@ function setStorage(key, val) {
   localStorage.setItem(key, JSON.stringify(val));
 }
 
+/* 4-DIGIT OTP RIDE BOOKING */
 function bookRide() {
   const name = document.getElementById("pName").value.trim();
   const mobile = document.getElementById("pMobile").value.trim();
@@ -861,7 +980,10 @@ function bookRide() {
     return;
   }
 
+  // Generate 4-Digit Security OTP
+  const rideOtp = Math.floor(1000 + Math.random() * 9000).toString();
   const rideId = "SS-R-" + Date.now().toString().slice(-6);
+
   const rideObj = {
     id: rideId,
     type: "ride",
@@ -872,6 +994,7 @@ function bookRide() {
     distanceKm: dist,
     fare: fareRes.fare,
     status: "pending",
+    otp: rideOtp, // Ride Start OTP
     driver: null,
     insurance: { status: "inactive" },
     createdAt: new Date().toISOString()
@@ -890,7 +1013,11 @@ function bookRide() {
       <b>✅ बुकिंग सफल! (ID: ${rideId})</b>
       <small>${pickup} ➔ ${dest}</small>
       <small>किराया: <b>₹ ${fareRes.fare}</b> (${dist} किमी)</small>
-      <small>स्थिति: चालक खोजा जा रहा है...</small>
+      <div style="margin-top:6px">
+        <small style="color:var(--gold);font-weight:700">ड्राइवर को बताने के लिए OTP:</small>
+        <div class="otpDisplayBox">${rideOtp}</div>
+      </div>
+      <small style="display:block;margin-top:4px;color:#8fa2b8">जब ड्राइवर पहुँचे, तभी यह OTP साझा करें।</small>
     </div>`;
 
   renderPassengerHistory();
@@ -908,7 +1035,10 @@ function renderPassengerHistory() {
     <div class="bookingItem">
       <b>${r.pickup} ➔ ${r.dest}</b>
       <small>ID: ${r.id} • वाहन: ${r.vehicle} (${r.rideType})</small>
-      <small>किराया: ₹${r.fare} • स्थिति: ${r.status}</small>
+      <small>किराया: ₹${r.fare} • स्थिति: <b>${r.status === 'started' ? 'चालू (On-Trip)' : r.status}</b></small>
+      <div style="margin-top:4px">
+        <span class="badge ${r.status === 'started' ? 'approved' : 'pending'}">राइड OTP: ${r.otp}</span>
+      </div>
     </div>
   `).join("");
 }
@@ -1014,7 +1144,9 @@ function renderGoodsHistory() {
   `).join("");
 }
 
-/* ADMIN & DRIVER WORKFLOW */
+/* ========================================================
+   ADMIN: DRIVER REGISTRATION & CAMERA/FILE ATTACHMENTS
+======================================================== */
 function adminRegisterDriver() {
   const name = document.getElementById("drvName").value.trim();
   const mobile = document.getElementById("drvMobile").value.trim();
@@ -1023,6 +1155,7 @@ function adminRegisterDriver() {
   const dl = document.getElementById("drvDLNum").value.trim();
   const dlExp = document.getElementById("drvDLExpiry").value;
   const ins = document.getElementById("drvInsNum").value.trim();
+  const insCompany = document.getElementById("drvInsCompany").value.trim();
   const insExp = document.getElementById("drvInsExpiry").value;
   const fit = document.getElementById("drvFitNum").value.trim();
   const fitExp = document.getElementById("drvFitExpiry").value;
@@ -1030,14 +1163,22 @@ function adminRegisterDriver() {
   const pccDate = document.getElementById("drvPCCDate").value;
 
   if (!name || mobile.length !== 10 || !rc || !dl || !dlExp || !ins || !insExp || !fit || !fitExp || !pcc) {
-    alert("ओला/उबर नियमों के अनुसार सभी 7 दस्तावेज़ व एक्सपायरी विवरण अनिवार्य हैं।");
+    alert("ओला/उबर नियमों के अनुसार सभी 7 विवरण व तिथियाँ अनिवार्य हैं।");
     return;
   }
 
   const driverData = {
     id: "DRV-" + mobile,
     name, mobile, vType, rc,
-    dl, dlExp, ins, insExp, fit, fitExp, pcc, pccDate,
+    dl, dlExp, ins, insCompany, insExp, fit, fitExp, pcc, pccDate,
+    attachments: {
+      photo: uploadedDocs['thumbDrvPhoto'] || null,
+      rcDoc: uploadedDocs['thumbDrvRC'] || null,
+      dlDoc: uploadedDocs['thumbDrvDL'] || null,
+      insDoc: uploadedDocs['thumbDrvIns'] || null,
+      fitDoc: uploadedDocs['thumbDrvFit'] || null,
+      pccDoc: uploadedDocs['thumbDrvPCC'] || null
+    },
     status: "approved",
     submittedAt: new Date().toISOString()
   };
@@ -1052,7 +1193,7 @@ function adminRegisterDriver() {
     db.collection("drivers").doc(driverData.id).set(driverData).catch(()=>{});
   }
 
-  document.getElementById("adminRegStatus").innerHTML = `<span class='success'>✅ ड्राइवर ${name} सफलतापूर्वक रजिस्टर व सत्यापित (Approved) हो गए!</span>`;
+  document.getElementById("adminRegStatus").innerHTML = `<span class='success'>✅ ड्राइवर ${name} (फ़ोटो व अटैचमेंट्स सहित) सफलतापूर्वक रजिस्टर व सत्यापित (Approved) हो गए!</span>`;
   renderAdminDashboard();
 }
 
@@ -1075,6 +1216,46 @@ function toggleDriverOnline() {
   renderDriverFeeds();
 }
 
+/* DRIVER OTP VERIFICATION & TRIP START */
+function verifyAndStartRide(rideId, correctOtp) {
+  const inputOtp = prompt("यात्री से 4 अंकों का OTP पूछकर यहाँ दर्ज करें:");
+  if (!inputOtp) return;
+
+  if (inputOtp.trim() === correctOtp.trim()) {
+    let rides = getStorage("ss_rides");
+    rides = rides.map(r => {
+      if (r.id === rideId) {
+        r.status = "started";
+        r.startedAt = new Date().toISOString();
+      }
+      return r;
+    });
+    setStorage("ss_rides", rides);
+    alert("✅ OTP सत्यापित! ट्रिप सफलतापूर्वक शुरू हो गई है।");
+    renderDriverFeeds();
+    renderPassengerHistory();
+  } else {
+    alert("❌ गलत OTP! जब तक सही OTP नहीं मिलेगा, राइड शुरू नहीं हो सकती।");
+  }
+}
+
+function completeRide(rideId) {
+  if (confirm("क्या यात्रा पूरी हो चुकी है और किराया प्राप्त हो गया है?")) {
+    let rides = getStorage("ss_rides");
+    rides = rides.map(r => {
+      if (r.id === rideId) {
+        r.status = "completed";
+        r.completedAt = new Date().toISOString();
+      }
+      return r;
+    });
+    setStorage("ss_rides", rides);
+    alert("✅ ट्रिप पूरी हुई। धन्यवाद!");
+    renderDriverFeeds();
+    renderPassengerHistory();
+  }
+}
+
 function renderDriverFeeds() {
   const pBox = document.getElementById("driverPassengerList");
   const gBox = document.getElementById("driverGoodsList");
@@ -1083,14 +1264,22 @@ function renderDriverFeeds() {
     gBox.textContent = "ड्राइवर ऑफलाइन है अथवा सत्यापन लंबित है।";
     return;
   }
-  const rides = getStorage("ss_rides").filter(r => r.status === "pending");
+
+  const rides = getStorage("ss_rides").filter(r => r.status === "pending" || r.status === "started");
   pBox.innerHTML = rides.length ? rides.map(r => `
     <div class="bookingItem">
       <b>${r.pickup} ➔ ${r.dest}</b>
-      <small>किराया: ₹${r.fare} • ${r.distanceKm} किमी</small>
-      <button class="btn green" style="margin-top:6px" onclick="location.href='tel:${r.mobile}'">📞 यात्री कॉल</button>
+      <small>यात्री: ${r.name} (${r.mobile}) • किराया: ₹${r.fare}</small>
+      <small>दूरी: ${r.distanceKm} किमी • स्थिति: <b>${r.status === 'started' ? '🟢 ट्रिप जारी है' : 'लंबित'}</b></small>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn dark" style="padding:8px" onclick="location.href='tel:${r.mobile}'">📞 यात्री कॉल</button>
+        ${r.status === 'pending' ? 
+          `<button class="btn gold" style="padding:8px" onclick="verifyAndStartRide('${r.id}','${r.otp}')">🔑 OTP डालकर शुरू करें</button>` :
+          `<button class="btn green" style="padding:8px" onclick="completeRide('${r.id}')">🏁 ट्रिप समाप्त करें</button>`
+        }
+      </div>
     </div>
-  `).join("") : "कोई नई सवारी नहीं है।";
+  `).join("") : "कोई सक्रिय सवारी नहीं है।";
 
   const goods = getStorage("ss_goods").filter(g => g.status === "pending");
   gBox.innerHTML = goods.length ? goods.map(g => `
@@ -1115,14 +1304,19 @@ function renderAdminDashboard() {
   const dBox = document.getElementById("admDriverApprovalList");
   dBox.innerHTML = drivers.length ? drivers.map(d => `
     <div class="bookingItem">
-      <b>${d.name} (${d.mobile}) • [${d.rc}]</b>
-      <small>DL: ${d.dl} (Exp: ${d.dlExp}) • बीमा: ${d.ins}</small>
-      <small>स्थिति: <span class="badge ${d.status}">${d.status === "approved" ? "सत्यापित (Approved)" : "लंबित"}</span></small>
+      <div style="display:flex;gap:10px;align-items:center">
+        ${d.attachments && d.attachments.photo ? `<img src="${d.attachments.photo}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid var(--cyan)">` : ''}
+        <div>
+          <b>${d.name} (${d.mobile}) • [${d.rc}]</b>
+          <small>DL: ${d.dl} • बीमा: ${d.insCompany || ''} (${d.ins})</small>
+          <small>स्थिति: <span class="badge ${d.status}">${d.status === "approved" ? "सत्यापित (Approved)" : "लंबित"}</span></small>
+        </div>
+      </div>
     </div>
   `).join("") : "कोई ड्राइवर रिकॉर्ड उपलब्ध नहीं है।";
 
   document.getElementById("admRidesList").innerHTML = rides.slice(0, 10).map(r => `
-    <div class="bookingItem"><b>${r.id} • ${r.pickup} ➔ ${r.dest}</b><small>₹${r.fare} • ${r.status}</small></div>
+    <div class="bookingItem"><b>${r.id} • ${r.pickup} ➔ ${r.dest}</b><small>₹${r.fare} • OTP: ${r.otp} • स्थिति: ${r.status}</small></div>
   `).join("") || "कोई रिकॉर्ड नहीं।";
 
   document.getElementById("admGoodsList").innerHTML = goods.slice(0, 10).map(g => `
@@ -1163,4 +1357,4 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 </body>
-              </html>
+</html>
