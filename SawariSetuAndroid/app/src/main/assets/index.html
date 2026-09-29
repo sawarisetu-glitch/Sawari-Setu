@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#050b14">
 <title>सवारी सेतु — आपकी सवारी, आपके पास</title>
-<!-- Guaranteed Free Real-Time Map & Routing Engine -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -64,9 +61,11 @@ button{font-family:inherit}
 .status.success{color:#20d68b;border-color:rgba(32,214,139,.3)}
 .status.error{color:#ff6978;border-color:rgba(255,93,108,.3)}
 
-/* मैप व ऑटोकम्प्लीट सर्च */
+/* Google Maps Container */
 #mapBox{position:relative;width:100%;height:260px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #263d58}
 #map{width:100%;height:100%}
+
+/* Google Places Search Box */
 .suggestions{position:relative;z-index:999;background:#0a1728;border:1px solid #2b4566;border-radius:10px;margin-top:4px;overflow:hidden;max-height:220px;overflow-y:auto;box-shadow:0 10px 25px rgba(0,0,0,0.7)}
 .suggestion{padding:12px 14px;border-bottom:1px solid #16263b;cursor:pointer;font-size:13px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
 .suggestion:active{background:#10253d}
@@ -75,7 +74,7 @@ button{font-family:inherit}
 .typeBtn{background:#0a1626;border:1px solid #29405d;padding:10px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
 .typeBtn.sel{background:linear-gradient(135deg,#096fc8,#00aee0);border-color:#39bfff;box-shadow:0 4px 12px rgba(0,200,255,.2)}
 
-/* असली, यूनिक व HD वाहन कार्ड्स */
+/* असली व यूनिक वाहन कार्ड्स */
 .vehicleGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .vehicleCard{background:#081423;border:1px solid #1d334e;border-radius:14px;padding:8px;text-align:center;cursor:pointer;color:#fff;transition:.2s;display:flex;flex-direction:column;align-items:center;position:relative}
 .vehicleCard.selected{background:linear-gradient(145deg,#083a62,#06577e);border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,200,255,.3)}
@@ -90,7 +89,7 @@ button{font-family:inherit}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
 
-/* साइड मेन्यू (नियम व कानून) */
+/* साइड मेन्यू */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:absolute;right:0;top:0;height:100%;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:calc(env(safe-area-inset-top, 0px) + 16px)}
@@ -142,7 +141,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙️ एडमिन</button>
 </div>
 
-<!-- SIDE MENU (मेन्यू आइकॉन के अंदर नियम, शर्तें, कानून व नीतियां) -->
+<!-- SIDE MENU (मेन्यू आइकॉन के अंदर नियम, शर्तें व नीतियां) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
@@ -190,8 +189,8 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
       <button class="btn locationBtn" onclick="fetchGPS()">📍 मेरी वर्तमान लोकेशन प्राप्त करें</button>
       <div id="gpsStatus" class="status">GPS लोकेशन लेने के लिए ऊपर बटन दबाएँ।</div>
 
-      <label>गंतव्य (Destination)</label>
-      <input id="pDest" placeholder="कहाँ जाना है? (जैसे: प्रयागराज जंक्शन, नैनी)" autocomplete="off" oninput="onDestInput(this.value)">
+      <label>गंतव्य (Destination - Google Search Engine)</label>
+      <input id="pDest" placeholder="कहाँ जाना है? (जैसे: प्रयागराज जंक्शन, नैनी, सिविल लाइंस)" autocomplete="off" oninput="onDestInput(this.value)">
       <div id="destSuggestions" class="suggestions hidden"></div>
 
       <div id="mapBox">
@@ -199,7 +198,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
       </div>
 
       <div class="row" style="margin-top:10px">
-        <div><label>सड़क दूरी</label><input id="pDistDisplay" readonly placeholder="—"></div>
+        <div><label>सड़क दूरी (Google Maps)</label><input id="pDistDisplay" readonly placeholder="—"></div>
         <div><label>अनुमानित समय</label><input id="pTimeDisplay" readonly placeholder="—"></div>
       </div>
       <input id="pDistKm" type="hidden">
@@ -210,10 +209,10 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <button id="typeDirect" class="typeBtn" onclick="selectRideType('direct')">🚕 डायरेक्ट (Direct)</button>
       </div>
 
-      <!-- असली, यूनिक व HD फोटो-स्टाइल वाहन विकल्प -->
+      <!-- असली व HD फोटो-स्टाइल वाहन विकल्प -->
       <label>वाहन चुनें</label>
       <div class="vehicleGrid">
-        <!-- 1. E-RICKSHAW (REALISTIC INDIAN COVERED PASSENGER E-RICKSHAW) -->
+        <!-- 1. E-RICKSHAW -->
         <div class="vehicleCard selected" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
           <div class="vehicleImgWrap">
             <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -239,7 +238,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
           <b>ई-रिक्शा</b>
         </div>
 
-        <!-- 2. AUTO RICKSHAW (AUTHENTIC INDIAN CNG/PETROL AUTO) -->
+        <!-- 2. AUTO RICKSHAW -->
         <div class="vehicleCard" data-v="auto" onclick="chooseVehicle('auto')">
           <div class="vehicleImgWrap">
             <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -259,7 +258,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
           <b>ऑटो</b>
         </div>
 
-        <!-- 3. BIKE (REALISTIC COMMUTER / SPORTS MOTORBIKE) -->
+        <!-- 3. BIKE -->
         <div class="vehicleCard" data-v="bike" onclick="chooseVehicle('bike')">
           <div class="vehicleImgWrap">
             <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -281,7 +280,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
           <b>बाइक</b>
         </div>
 
-        <!-- 4. CAR / TAXI (CLEAN MODERN PASSENGER SEDAN) -->
+        <!-- 4. CAR -->
         <div class="vehicleCard" data-v="car" onclick="chooseVehicle('car')">
           <div class="vehicleImgWrap">
             <svg viewBox="0 0 200 110" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -346,7 +345,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <div><label>गंतव्य (Destination)</label><input id="gDest" placeholder="कहाँ पहुँचाना है?"></div>
       </div>
 
-      <button class="btn dark" style="margin-top:8px" onclick="calcGoodsRouteAuto()">🛣️ दूरी व भाड़ा ऑटो-कैलकुलेट करें</button>
+      <button class="btn dark" style="margin-top:8px" onclick="calcGoodsRouteAuto()">🛣️ Google Maps द्वारा दूरी जांचें</button>
       <div id="goodsRouteStatus" class="status">पिकअप व गंतव्य डालकर दूरी जांचें।</div>
 
       <div class="row">
@@ -424,7 +423,6 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
       </div>
     </div>
 
-    <!-- OLA/UBER स्तर का नया ड्राइवर जोड़ने व KYC का फॉर्म -->
     <div class="card">
       <h2>➕ नया ड्राइवर जोड़ें व KYC दस्तावेज़ दर्ज करें</h2>
       <div class="status">ओला/उबर नियमों के अनुसार 7 अनिवार्य कानूनी दस्तावेज़ों का रिकॉर्ड:</div>
@@ -513,10 +511,11 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
 </div>
 
 <script>
-/* CONFIGURATION & FIREBASE */
+/* CONFIGURATION & GOOGLE MAPS API KEY */
 const CONFIG = {
   SUPPORT_PHONE: "9450985355",
   SUPPORT_EMAIL: "sawarisetu@gmail.com",
+  MAPS_API_KEY: "AIzaSyAvf66I6fSNgSLqC9CC1l_bZj_h1qyQh4w", // <-- आपकी प्रदान की हुई Google Maps Key
   FIREBASE: {
     apiKey: "AIzaSyDT89G4QK_cmppJK5S3xu70AVbz7V7AqXs",
     authDomain: "sawari-setu.firebaseapp.com",
@@ -543,10 +542,13 @@ let selectedVehicle = "e-rickshaw";
 let selectedRideType = "share";
 let currentPickupCoords = { lat: 25.2672, lng: 82.0725 };
 let currentDestCoords = null;
-let leafletMap = null;
+let googleMap = null;
+let directionsService = null;
+let directionsRenderer = null;
+let autocompleteService = null;
+let placesService = null;
+let geocoder = null;
 let pickupMarker = null;
-let destMarker = null;
-let routeLine = null;
 let isDriverOnline = false;
 
 /* UI NAVIGATION */
@@ -558,8 +560,8 @@ function switchSection(sec, btn) {
   if (btn) btn.classList.add("active");
   if (sec === "driver") renderDriverFeeds();
   if (sec === "admin") renderAdminDashboard();
-  if (sec === "ride" && leafletMap) {
-    setTimeout(() => { leafletMap.invalidateSize(); }, 200);
+  if (sec === "ride" && googleMap && window.google) {
+    setTimeout(() => { google.maps.event.trigger(googleMap, "resize"); }, 200);
   }
 }
 
@@ -623,24 +625,40 @@ async function shareApp() {
 }
 
 /* ========================================================
-   RELIABLE MAP & GPS ENGINE (LEAFLET + NOMINATIM + OSRM)
+   GOOGLE MAPS & GOOGLE PLACES SEARCH ENGINE
 ======================================================== */
-function initMapEngine() {
-  const container = document.getElementById("map");
-  if (!container || leafletMap) return;
+window.onGoogleMapsLoaded = function() {
+  initGoogleMap();
+};
 
-  leafletMap = L.map("map", {
-    zoomControl: true,
-    attributionControl: false
-  }).setView([currentPickupCoords.lat, currentPickupCoords.lng], 14);
+function initGoogleMap() {
+  if (!window.google || !google.maps) return;
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19
-  }).addTo(leafletMap);
+  const mapElem = document.getElementById("map");
+  googleMap = new google.maps.Map(mapElem, {
+    center: currentPickupCoords,
+    zoom: 14,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false
+  });
 
-  pickupMarker = L.marker([currentPickupCoords.lat, currentPickupCoords.lng], {
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    map: googleMap,
+    suppressMarkers: false,
+    polylineOptions: { strokeColor: "#00c8ff", strokeWeight: 5 }
+  });
+
+  autocompleteService = new google.maps.places.AutocompleteService();
+  placesService = new google.maps.places.PlacesService(googleMap);
+  geocoder = new google.maps.Geocoder();
+
+  pickupMarker = new google.maps.Marker({
+    position: currentPickupCoords,
+    map: googleMap,
     title: "पिकअप स्थान"
-  }).addTo(leafletMap);
+  });
 }
 
 function fetchGPS() {
@@ -662,21 +680,22 @@ function fetchGPS() {
       st.className = "status success";
       st.textContent = "✅ लोकेशन प्राप्त हुई (±" + Math.round(pos.coords.accuracy) + " मीटर)";
 
-      if (leafletMap) {
-        leafletMap.setView([lat, lng], 16);
-        if (pickupMarker) pickupMarker.setLatLng([lat, lng]);
-        else pickupMarker = L.marker([lat, lng]).addTo(leafletMap);
+      if (googleMap) {
+        googleMap.setCenter(currentPickupCoords);
+        googleMap.setZoom(16);
+        if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
       }
 
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=hi`)
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.display_name) {
-            document.getElementById("pPickup").value = data.display_name.split(",").slice(0, 3).join(",");
+      // Google Geocoder द्वारा वास्तविक पता प्राप्त करें
+      if (geocoder) {
+        geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
+          if (status === "OK" && res && res[0]) {
+            document.getElementById("pPickup").value = res[0].formatted_address;
           }
-        }).catch(()=>{});
+        });
+      }
 
-      if (currentDestCoords) drawRouteOSRM();
+      if (currentDestCoords) drawGoogleRoute();
     },
     err => {
       st.className = "status error";
@@ -700,66 +719,88 @@ function onDestInput(query) {
   }
 
   destSearchTimer = setTimeout(() => {
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5&accept-language=hi`)
-      .then(res => res.json())
-      .then(results => {
-        if (!results || !results.length) {
-          box.innerHTML = `<div class="suggestion">कोई स्थान नहीं मिला। पूरा नाम लिखें।</div>`;
-          box.classList.remove("hidden");
-          return;
+    if (autocompleteService) {
+      autocompleteService.getPlacePredictions(
+        { input: query, componentRestrictions: { country: "in" } },
+        (preds, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && preds && preds.length) {
+            box.innerHTML = preds.map(p => `
+              <div class="suggestion" onclick="chooseGoogleDest('${p.place_id}', '${p.description.replace(/'/g, "\\'")}')">
+                📍 <span>${p.description}</span>
+              </div>
+            `).join("");
+            box.classList.remove("hidden");
+          } else {
+            fallbackSearch(query);
+          }
         }
-        box.innerHTML = results.map(r => `
-          <div class="suggestion" onclick="selectDestination(${r.lat}, ${r.lon}, '${r.display_name.replace(/'/g, "\\'")}')">
-            📍 <span>${r.display_name}</span>
+      );
+    } else {
+      fallbackSearch(query);
+    }
+  }, 300);
+}
+
+function chooseGoogleDest(placeId, desc) {
+  document.getElementById("destSuggestions").classList.add("hidden");
+  document.getElementById("pDest").value = desc;
+
+  if (placesService) {
+    placesService.getDetails({ placeId: placeId, fields: ["geometry"] }, (place, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry) {
+        currentDestCoords = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        };
+        drawGoogleRoute();
+      }
+    });
+  }
+}
+
+function fallbackSearch(query) {
+  const box = document.getElementById("destSuggestions");
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5&accept-language=hi`)
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.length) {
+        box.innerHTML = data.map(d => `
+          <div class="suggestion" onclick="chooseManualCoords(${d.lat}, ${d.lon}, '${d.display_name.replace(/'/g, "\\'")}')">
+            📍 <span>${d.display_name}</span>
           </div>
         `).join("");
         box.classList.remove("hidden");
-      }).catch(() => {
-        box.classList.add("hidden");
-      });
-  }, 350);
+      }
+    }).catch(()=>{});
 }
 
-function selectDestination(lat, lng, desc) {
+function chooseManualCoords(lat, lng, desc) {
   document.getElementById("destSuggestions").classList.add("hidden");
   document.getElementById("pDest").value = desc.split(",").slice(0, 3).join(",");
   currentDestCoords = { lat: parseFloat(lat), lng: parseFloat(lng) };
-
-  if (leafletMap) {
-    if (destMarker) destMarker.setLatLng([lat, lng]);
-    else destMarker = L.marker([lat, lng]).addTo(leafletMap);
-  }
-
-  drawRouteOSRM();
+  drawGoogleRoute();
 }
 
-function drawRouteOSRM() {
+function drawGoogleRoute() {
   if (!currentPickupCoords || !currentDestCoords) return;
 
-  const url = `https://router.project-osrm.org/route/v1/driving/${currentPickupCoords.lng},${currentPickupCoords.lat};${currentDestCoords.lng},${currentDestCoords.lat}?overview=full&geometries=geojson`;
-
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if (data && data.routes && data.routes.length) {
-        const route = data.routes[0];
-        const km = (route.distance / 1000).toFixed(2);
-        const mins = Math.round(route.duration / 60);
-
+  if (directionsService && directionsRenderer) {
+    directionsService.route({
+      origin: currentPickupCoords,
+      destination: currentDestCoords,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, (res, status) => {
+      if (status === "OK" && res && res.routes && res.routes[0]) {
+        directionsRenderer.setDirections(res);
+        const leg = res.routes[0].legs[0];
+        const km = (leg.distance.value / 1000).toFixed(2);
         document.getElementById("pDistKm").value = km;
         document.getElementById("pDistDisplay").value = km + " किमी";
-        document.getElementById("pTimeDisplay").value = mins + " मिनट";
-
-        const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
-        if (routeLine && leafletMap) leafletMap.removeLayer(routeLine);
-        routeLine = L.polyline(coords, { color: "#00c8ff", weight: 5 }).addTo(leafletMap);
-        leafletMap.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
-
+        document.getElementById("pTimeDisplay").value = leg.duration.text;
         calculateAndDisplayFare();
       }
-    }).catch(e => {
-      console.warn("Routing fallback:", e);
     });
+  }
 }
 
 /* ========================================================
@@ -955,34 +996,30 @@ function calcGoodsRouteAuto() {
     return;
   }
 
-  st.textContent = "दूरी की गणना हो रही है...";
-  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(p)}&limit=1`)
-    .then(r=>r.json())
-    .then(pRes => {
-      if(!pRes.length) throw new Error();
-      return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d)}&limit=1`)
-        .then(r=>r.json())
-        .then(dRes => {
-          if(!dRes.length) throw new Error();
-          return fetch(`https://router.project-osrm.org/route/v1/driving/${pRes[0].lon},${pRes[0].lat};${dRes[0].lon},${dRes[0].lat}?overview=false`);
-        });
-    })
-    .then(r=>r.json())
-    .then(data => {
-      const km = (data.routes[0].distance / 1000).toFixed(2);
-      document.getElementById("gDistance").value = km;
-      const rateMap = { "e-rickshaw": 15, "auto": 18, "pickup": 25, "mini-truck": 35, "truck": 50 };
-      let base = Number(km) * (rateMap[v] || 20);
-      if (load === "loading" || load === "unloading") base += 50;
-      if (load === "both") base += 100;
-      const finalFare = Math.max(50, Math.round(base));
-      document.getElementById("gCalculatedFare").value = finalFare;
-      st.className = "status success";
-      st.textContent = `दूरी: ${km} किमी • भाड़ा: ₹${finalFare}`;
-    }).catch(() => {
-      st.className = "status error";
-      st.textContent = "दूरी की स्वतः गणना नहीं हो सकी, कृपया मैन्युअल भरें।";
+  st.textContent = "Google Maps द्वारा दूरी की गणना हो रही है...";
+  if (directionsService) {
+    directionsService.route({
+      origin: p,
+      destination: d,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, (res, status) => {
+      if (status === "OK" && res && res.routes && res.routes[0]) {
+        const km = (res.routes[0].legs[0].distance.value / 1000).toFixed(2);
+        document.getElementById("gDistance").value = km;
+        const rateMap = { "e-rickshaw": 15, "auto": 18, "pickup": 25, "mini-truck": 35, "truck": 50 };
+        let base = Number(km) * (rateMap[v] || 20);
+        if (load === "loading" || load === "unloading") base += 50;
+        if (load === "both") base += 100;
+        const finalFare = Math.max(50, Math.round(base));
+        document.getElementById("gCalculatedFare").value = finalFare;
+        st.className = "status success";
+        st.textContent = `दूरी: ${km} किमी • भाड़ा: ₹${finalFare}`;
+      } else {
+        st.className = "status error";
+        st.textContent = "Google Maps द्वारा मार्ग नहीं मिला, कृपया मैनुअल भरें।";
+      }
     });
+  }
 }
 
 function bookGoodsOrder() {
@@ -1186,8 +1223,17 @@ function closeModal() {
   document.getElementById("universalModal").classList.add("hidden");
 }
 
+/* Google Maps Dynamic Script Injection */
+function injectGoogleMaps() {
+  const s = document.createElement("script");
+  s.src = "https://maps.googleapis.com/maps/api/js?key=" + CONFIG.MAPS_API_KEY + "&libraries=places&callback=onGoogleMapsLoaded";
+  s.async = true;
+  s.defer = true;
+  document.head.appendChild(s);
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-  initMapEngine();
+  injectGoogleMaps();
   renderPassengerHistory();
   renderGoodsHistory();
 });
