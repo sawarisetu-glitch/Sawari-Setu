@@ -1,10 +1,10 @@
 package com.sawarisetu.app;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
-    private static final int FILE_CHOOSER_REQUEST_CODE = 1001;
+    private static final int FILE_CHOOSER_REQ = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,16 +27,15 @@ public class MainActivity extends Activity {
         webView = new WebView(this);
         setContentView(webView);
 
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setDatabaseEnabled(true);
-        settings.setGeolocationEnabled(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        WebSettings ws = webView.getSettings();
+        ws.setJavaScriptEnabled(true);
+        ws.setDomStorageEnabled(true);
+        ws.setDatabaseEnabled(true);
+        ws.setGeolocationEnabled(true);
+        ws.setAllowFileAccess(true);
+        ws.setAllowContentAccess(true);
+        ws.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        // GPS Permission & Camera/File Chooser Bridge
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -44,55 +43,51 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-                if (MainActivity.this.filePathCallback != null) {
-                    MainActivity.this.filePathCallback.onReceiveValue(null);
+            public boolean onShowFileChooser(WebView wv, ValueCallback<Uri[]> cb, FileChooserParams params) {
+                if (filePathCallback != null) {
+                    filePathCallback.onReceiveValue(null);
                 }
-                MainActivity.this.filePathCallback = filePathCallback;
-
-                Intent intent = fileChooserParams.createIntent();
+                filePathCallback = cb;
                 try {
-                    startActivityForResult(intent, FILE_CHOOSER_REQUEST_CODE);
-                } catch (ActivityNotFoundException e) {
-                    MainActivity.this.filePathCallback = null;
+                    Intent i = params.createIntent();
+                    startActivityForResult(i, FILE_CHOOSER_REQ);
+                    return true;
+                } catch (Exception e) {
+                    filePathCallback = null;
                     Toast.makeText(MainActivity.this, "फ़ाइल पिकर उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                return true;
             }
         });
 
-        // External App Intents (Phone Dialer, WhatsApp, Email, Maps)
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (request == null || request.getUrl() == null) return false;
-                return handleExternalAppLaunch(request.getUrl().toString());
+                if (request != null && request.getUrl() != null) {
+                    return handleExternalUrl(request.getUrl().toString());
+                }
+                return false;
             }
 
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return handleExternalAppLaunch(url);
+                return handleExternalUrl(url);
             }
         });
 
-        // Production Single Canonical Asset Load
         webView.loadUrl("file:///android_asset/index.html");
     }
 
-    private boolean handleExternalAppLaunch(String url) {
+    private boolean handleExternalUrl(String url) {
+        if (url == null) return false;
         if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:") || url.startsWith("geo:")) {
             try {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
                 return true;
             } catch (Exception e) {
-                if (url.startsWith("whatsapp:")) {
-                    Toast.makeText(this, "डिवाइस में WhatsApp उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "संबंधित ऐप उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(this, "संबंधित ऐप उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
                 return true;
             }
         }
@@ -101,7 +96,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+        if (requestCode == FILE_CHOOSER_REQ) {
             if (filePathCallback != null) {
                 Uri[] results = null;
                 if (resultCode == RESULT_OK && data != null) {
@@ -125,11 +120,11 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && webView != null && webView.canGoBack()) {
             webView.goBack();
-        } else {
-            super.onBackPressed();
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
 }
