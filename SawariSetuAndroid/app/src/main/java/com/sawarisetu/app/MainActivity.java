@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
@@ -16,13 +18,20 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
 
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
+    private Uri cameraImageUri = null;
     private static final int FILE_CHOOSER_REQ = 1001;
-    private static final int LOCATION_PERMISSION_REQ = 2001;
+    private static final int PERMISSION_REQ = 2001;
     private GeolocationPermissions.Callback geoCallback;
     private String geoOrigin;
 
@@ -42,30 +51,19 @@ public class MainActivity extends Activity {
         ws.setAllowContentAccess(true);
         ws.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        // Native Android Location Permission maangna
+        // Location व Camera Permissions maangna
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                }, LOCATION_PERMISSION_REQ);
-            }
+            String[] permissions = {
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.CAMERA
+            };
+            requestPermissions(permissions, PERMISSION_REQ);
         }
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        geoCallback = callback;
-                        geoOrigin = origin;
-                        requestPermissions(new String[]{
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION
-                        }, LOCATION_PERMISSION_REQ);
-                        return;
-                    }
-                }
                 callback.invoke(origin, true, false);
             }
 
@@ -75,13 +73,43 @@ public class MainActivity extends Activity {
                     filePathCallback.onReceiveValue(null);
                 }
                 filePathCallback = cb;
+
+                // Intent for Direct Camera Capture
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File photoFile = null;
                 try {
-                    Intent i = params.createIntent();
-                    startActivityForResult(i, FILE_CHOOSER_REQ);
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+                    File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                    photoFile = File.createTempFile("PHOTO_" + timeStamp + "_", ".jpg", storageDir);
+                    cameraImageUri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".provider", photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+                } catch (Exception ex) {
+                    cameraImageUri = null;
+                }
+
+                // Intent for Gallery / File selection
+                Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                contentSelectionIntent.setType("image/*");
+
+                Intent[] intentArray;
+                if (takePictureIntent != null && cameraImageUri != null) {
+                    intentArray = new Intent[]{takePictureIntent};
+                } else {
+                    intentArray = new Intent[0];
+                }
+
+                Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+                chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+                chooserIntent.putExtra(Intent.EXTRA_TITLE, "कैमरा से फोटो लें या फ़ाइल चुनें");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+
+                try {
+                    startActivityForResult(chooserIntent, FILE_CHOOSER_REQ);
                     return true;
                 } catch (Exception e) {
                     filePathCallback = null;
-                    Toast.makeText(MainActivity.this, "File picker unavailable", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "कैमरा या फाइल पिकर उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -91,15 +119,18 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (request != null && request.getUrl() != null) {
-                    return handleExternalUrl(request.getUrl().toString());
+                    String url = request.getUrl().toString();
+                    if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:") || url.startsWith("geo:")) {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                            return true;
+                        } catch (Exception e) {
+                            return true;
+                        }
+                    }
                 }
                 return false;
-            }
-
-            @SuppressWarnings("deprecation")
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return handleExternalUrl(url);
             }
         });
 
@@ -107,56 +138,25 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQ) {
-            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            if (geoCallback != null && geoOrigin != null) {
-                geoCallback.invoke(geoOrigin, granted, false);
-                geoCallback = null;
-                geoOrigin = null;
-            }
-            if (granted && webView != null) {
-                webView.reload();
-            }
-        }
-    }
-
-    private boolean handleExternalUrl(String url) {
-        if (url == null) return false;
-        if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:") || url.startsWith("geo:")) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-                return true;
-            } catch (Exception e) {
-                Toast.makeText(this, "App not found", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_CHOOSER_REQ) {
-            if (filePathCallback != null) {
-                Uri[] results = null;
-                if (resultCode == RESULT_OK && data != null) {
+            if (filePathCallback == null) return;
+            Uri[] results = null;
+
+            if (resultCode == RESULT_OK) {
+                if (data == null || data.getData() == null) {
+                    if (cameraImageUri != null) {
+                        results = new Uri[]{cameraImageUri};
+                    }
+                } else {
                     String dataString = data.getDataString();
                     if (dataString != null) {
                         results = new Uri[]{Uri.parse(dataString)};
-                    } else if (data.getClipData() != null) {
-                        int count = data.getClipData().getItemCount();
-                        results = new Uri[count];
-                        for (int i = 0; i < count; i++) {
-                            results[i] = data.getClipData().getItemAt(i).getUri();
-                        }
                     }
                 }
-                filePathCallback.onReceiveValue(results);
-                filePathCallback = null;
             }
+            filePathCallback.onReceiveValue(results);
+            filePathCallback = null;
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
