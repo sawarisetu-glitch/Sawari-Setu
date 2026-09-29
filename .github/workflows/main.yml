@@ -19,22 +19,17 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Install Gradle & Build APK
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.5'
+
+    - name: Build APK
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y gradle
-        
-        # प्रोजेक्ट डायरेक्टरी ढूंढना
-        PROJECT_DIR=$(dirname $(find . -name "build.gradle" | head -n 1))
-        cd "$PROJECT_DIR"
-        
-        # अगर gradlew न हो तो नया wrapper तैयार करना
-        if [ ! -f "gradlew" ]; then
-          gradle wrapper
-        fi
-        
-        chmod +x gradlew
-        ./gradlew assembleDebug --stacktrace
+        PROJ=$(dirname $(find . -name "build.gradle" -not -path "*/app/*" | head -n 1))
+        echo "Building project inside: $PROJ"
+        cd "$PROJ"
+        gradle assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
