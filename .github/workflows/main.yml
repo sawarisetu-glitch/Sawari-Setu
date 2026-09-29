@@ -19,21 +19,25 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Find gradlew and Build APK
+    - name: Install Gradle & Build APK
       run: |
-        GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-        if [ -z "$GRADLEW_PATH" ]; then
-          echo "ERROR: gradlew file not found anywhere!"
-          exit 1
+        sudo apt-get update -qq
+        sudo apt-get install -y gradle
+        
+        # प्रोजेक्ट डायरेक्टरी ढूंढना
+        PROJECT_DIR=$(dirname $(find . -name "build.gradle" | head -n 1))
+        cd "$PROJECT_DIR"
+        
+        # अगर gradlew न हो तो नया wrapper तैयार करना
+        if [ ! -f "gradlew" ]; then
+          gradle wrapper
         fi
-        DIR=$(dirname "$GRADLEW_PATH")
-        echo "Found gradlew in: $DIR"
-        cd "$DIR"
+        
         chmod +x gradlew
-        ./gradlew assembleDebug
+        ./gradlew assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: SawariSetu-Debug-APK
-        path: "**/app/build/outputs/apk/debug/*.apk"
+        path: "**/build/outputs/apk/debug/*.apk"
