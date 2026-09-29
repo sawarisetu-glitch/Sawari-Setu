@@ -1,6 +1,7 @@
 package com.sawarisetu.app;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,21 +14,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
-    private static final int FILE_CHOOSER_RESULT_CODE = 1001;
+    private static final int FILE_CHOOSER_REQUEST_CODE = 1001;
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // WebView इनिशियलाइज़ेशन
         webView = new WebView(this);
         setContentView(webView);
 
@@ -38,24 +34,12 @@ public class MainActivity extends AppCompatActivity {
         settings.setGeolocationEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        // आधुनिक बैक-प्रेस हैंडलर (बिल्ड एरर से बचने के लिए)
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (webView != null && webView.canGoBack()) {
-                    webView.goBack();
-                } else {
-                    finish();
-                }
-            }
-        });
-
-        // GPS और File/Camera हैंडलर
+        // GPS Permission & Camera/File Chooser Bridge
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                // WebView के अंदर GPS की अनुमति पास करना
                 callback.invoke(origin, true, false);
             }
 
@@ -68,44 +52,47 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = fileChooserParams.createIntent();
                 try {
-                    startActivityForResult(intent, FILE_CHOOSER_RESULT_CODE);
-                } catch (Exception e) {
+                    startActivityForResult(intent, FILE_CHOOSER_REQUEST_CODE);
+                } catch (ActivityNotFoundException e) {
                     MainActivity.this.filePathCallback = null;
-                    Toast.makeText(MainActivity.this, "फ़ाइल पिकर नहीं खुला", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "फ़ाइल पिकर उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 return true;
             }
         });
 
-        // लिंक व ऐप हैंडलिंग (कॉल, व्हाट्सएप, मेल)
+        // External App Intents (Phone Dialer, WhatsApp, Email, Maps)
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (request == null || request.getUrl() == null) return false;
-                String url = request.getUrl().toString();
-                return handleUrlIntents(url);
+                return handleExternalAppLaunch(request.getUrl().toString());
             }
 
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return handleUrlIntents(url);
+                return handleExternalAppLaunch(url);
             }
         });
 
-        // HTML फ़ाइल लोड करें
+        // Production Single Canonical Asset Load
         webView.loadUrl("file:///android_asset/index.html");
     }
 
-    private boolean handleUrlIntents(String url) {
+    private boolean handleExternalAppLaunch(String url) {
         if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:") || url.startsWith("geo:")) {
             try {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
                 return true;
             } catch (Exception e) {
-                Toast.makeText(this, "संबंधित ऐप डिवाइस में मौजूद नहीं है", Toast.LENGTH_SHORT).show();
+                if (url.startsWith("whatsapp:")) {
+                    Toast.makeText(this, "डिवाइस में WhatsApp उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "संबंधित ऐप उपलब्ध नहीं है", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         }
@@ -114,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILE_CHOOSER_RESULT_CODE) {
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
             if (filePathCallback != null) {
                 Uri[] results = null;
                 if (resultCode == RESULT_OK && data != null) {
@@ -134,6 +121,15 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
 }
