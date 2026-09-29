@@ -19,16 +19,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      working-directory: SawariSetuAndroid
-
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
-      working-directory: SawariSetuAndroid
+    - name: Find gradlew and Build APK
+      run: |
+        GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "ERROR: gradlew file not found anywhere!"
+          exit 1
+        fi
+        DIR=$(dirname "$GRADLEW_PATH")
+        echo "Found gradlew in: $DIR"
+        cd "$DIR"
+        chmod +x gradlew
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: SawariSetu-Debug-APK
-        path: SawariSetuAndroid/app/build/outputs/apk/debug/*.apk
+        path: "**/app/build/outputs/apk/debug/*.apk"
