@@ -10,7 +10,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,9 +22,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        webView = findViewById(R.id.webView);
+        // डायनामिक लेआउट बाइंडिंग (ताकि R फाइल पैकेज एरर न दे)
+        int layoutId = getResources().getIdentifier("activity_main", "layout", getPackageName());
+        if (layoutId != 0) {
+            setContentView(layoutId);
+        }
+
+        int webViewId = getResources().getIdentifier("webView", "id", getPackageName());
+        if (webViewId != 0) {
+            webView = findViewById(webViewId);
+        }
+
+        // यदि XML से WebView न मिले तो सीधे कोड से अटैच करें
+        if (webView == null) {
+            webView = new WebView(this);
+            setContentView(webView);
+        }
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -38,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
-        // कस्टम URL स्कीम्स (WhatsApp, Instagram, SMS, Call) हैंडलर
+        // कस्टम स्कीम्स (WhatsApp, Instagram, SMS, Phone Call)
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -61,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // कैमरा व फ़ाइल अपलोड हैंडलर
+        // कैमरा व डॉक्यूमेंट अपलोड
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
@@ -87,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FILE_CHOOSER_RESULT_CODE) {
             if (uploadMessage == null) return;
@@ -98,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()) {
+        if (webView != null && webView.canGoBack()) {
             webView.goBack();
         } else {
             super.onBackPressed();
