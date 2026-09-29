@@ -29,6 +29,11 @@ jobs:
         PROJ=$(dirname $(find . -name "build.gradle" -not -path "*/app/*" | head -n 1))
         echo "Building project inside: $PROJ"
         cd "$PROJ"
+        
+        # AndroidX फ़ीचर चालू करना
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
+        
         gradle assembleDebug --stacktrace
 
     - name: Upload APK
