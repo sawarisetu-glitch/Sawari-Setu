@@ -14,7 +14,6 @@ html,body{margin:0;padding:0;background:#050b14;color:#eef5ff;font-family:system
 :root{--bg:#050b14;--card:#0b1728;--card2:#101f34;--line:#20334d;--blue:#2196f3;--cyan:#00c8ff;--gold:#ffc857;--green:#20d68b;--red:#ff5d6c;--muted:#9fb0c5}
 .app{width:100%;max-width:640px;margin:auto;min-height:100vh;background:radial-gradient(circle at 10% 0%,rgba(0,200,255,.08),transparent 25%),radial-gradient(circle at 90% 10%,rgba(255,200,87,.06),transparent 20%),var(--bg);display:flex;flex-direction:column}
 
-/* स्टेटस बार, टाइम व बैटरी ओवरलैप से सुरक्षा */
 header{
   padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
   padding-bottom: 14px;
@@ -65,12 +64,11 @@ button{font-family:inherit}
 #mapBox{position:relative;width:100%;height:270px;margin-top:10px;border-radius:14px;overflow:hidden;background:#08111d;border:1px solid #263d58}
 #map{width:100%;height:100%}
 
-/* Map Type Controller (Road vs Satellite) */
-.mapSwitchBar{position:absolute;top:10px;right:10px;z-index:5;display:flex;gap:4px;background:rgba(5,11,20,.85);padding:4px;border-radius:8px;border:1px solid #284464}
-.mapSwitchBtn{padding:5px 10px;font-size:11px;font-weight:700;border:0;border-radius:6px;background:#0f2136;color:#9eb5cb;cursor:pointer}
+/* Satellite Controller */
+.mapSwitchBar{position:absolute;top:10px;right:10px;z-index:10;display:flex;gap:4px;background:rgba(5,11,20,.9);padding:4px;border-radius:8px;border:1px solid #284464}
+.mapSwitchBtn{padding:6px 12px;font-size:11px;font-weight:700;border:0;border-radius:6px;background:#0f2136;color:#9eb5cb;cursor:pointer}
 .mapSwitchBtn.active{background:linear-gradient(135deg,#0d77d8,#00c8ff);color:#fff}
 
-/* Google Places Search Box */
 .suggestions{position:relative;z-index:999;background:#0a1728;border:1px solid #2b4566;border-radius:10px;margin-top:4px;overflow:hidden;max-height:220px;overflow-y:auto;box-shadow:0 10px 25px rgba(0,0,0,0.7)}
 .suggestion{padding:12px 14px;border-bottom:1px solid #16263b;cursor:pointer;font-size:13px;line-height:1.4;display:flex;align-items:flex-start;gap:8px}
 .suggestion:active{background:#10253d}
@@ -79,12 +77,12 @@ button{font-family:inherit}
 .typeBtn{background:#0a1626;border:1px solid #29405d;padding:10px;border-radius:10px;color:#fff;font-weight:700;cursor:pointer}
 .typeBtn.sel{background:linear-gradient(135deg,#096fc8,#00aee0);border-color:#39bfff;box-shadow:0 4px 12px rgba(0,200,255,.2)}
 
-/* असली व यूनिक फोटोरियलिस्टिक वाहन कार्ड्स (NO DRAWING - REAL VEHICLES) */
+/* Real Vehicles Card (NO CARTOON / NO DRAWING) */
 .vehicleGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .vehicleCard{background:#081423;border:1px solid #1d334e;border-radius:14px;padding:8px;text-align:center;cursor:pointer;color:#fff;transition:.2s;display:flex;flex-direction:column;align-items:center;position:relative}
 .vehicleCard.selected{background:linear-gradient(145deg,#083a62,#06577e);border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,200,255,.3)}
-.vehicleImgWrap{width:100%;height:90px;display:flex;align-items:center;justify-content:center;background:#060e1a;border-radius:10px;overflow:hidden;padding:4px}
-.vehicleImgWrap img{width:100%;height:100%;object-fit:contain}
+.vehicleImgWrap{width:100%;height:95px;display:flex;align-items:center;justify-content:center;background:#040912;border-radius:10px;overflow:hidden;padding:2px}
+.vehicleImgWrap img{width:100%;height:100%;object-fit:cover;border-radius:8px}
 .vehicleCard b{margin-top:6px;font-size:13px}
 
 .fare{margin-top:12px;padding:12px;text-align:center;border-radius:12px;background:linear-gradient(135deg,#132438,#0b1a2d);border:1px solid #304965}
@@ -94,7 +92,6 @@ button{font-family:inherit}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
 
-/* साइड मेन्यू */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:absolute;right:0;top:0;height:100%;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:calc(env(safe-area-inset-top, 0px) + 16px)}
@@ -201,8 +198,8 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
       <!-- MAP BOX WITH SATELLITE SWITCH -->
       <div id="mapBox">
         <div class="mapSwitchBar">
-          <button id="btnMapDefault" class="mapSwitchBtn active" onclick="setGoogleMapType('roadmap')">🗺️ रोड</button>
-          <button id="btnMapSat" class="mapSwitchBtn" onclick="setGoogleMapType('satellite')">🛰️ सैटेलाइट</button>
+          <button id="btnMapDefault" class="mapSwitchBtn" onclick="setGoogleMapType('roadmap')">🗺️ रोड</button>
+          <button id="btnMapSat" class="mapSwitchBtn active" onclick="setGoogleMapType('satellite')">🛰️ सैटेलाइट</button>
         </div>
         <div id="map"></div>
       </div>
@@ -219,13 +216,13 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
         <button id="typeDirect" class="typeBtn" onclick="selectRideType('direct')">🚕 डायरेक्ट (Direct)</button>
       </div>
 
-      <!-- असली गाड़ियों की फ़ोटो (ACTUAL REAL VEHICLE PHOTOS) -->
-      <label>वाहन चुनें (असली फ़ोटो)</label>
+      <!-- REAL AUTHENTIC VEHICLE PHOTOS -->
+      <label>वाहन चुनें (असली फोटो)</label>
       <div class="vehicleGrid">
         <!-- 1. E-RICKSHAW REAL PHOTO -->
         <div class="vehicleCard selected" data-v="e-rickshaw" onclick="chooseVehicle('e-rickshaw')">
           <div class="vehicleImgWrap">
-            <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=400&q=80" alt="ई-रिक्शा">
+            <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=400&q=80" alt="ई-रिक्शा" onerror="this.src='https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=400&q=80'">
           </div>
           <b>ई-रिक्शा</b>
         </div>
@@ -238,7 +235,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
           <b>ऑटो</b>
         </div>
 
-        <!-- 3. MOTORCYCLE / BIKE REAL PHOTO -->
+        <!-- 3. BIKE REAL PHOTO -->
         <div class="vehicleCard" data-v="bike" onclick="chooseVehicle('bike')">
           <div class="vehicleImgWrap">
             <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=400&q=80" alt="बाइक">
@@ -246,7 +243,7 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
           <b>बाइक</b>
         </div>
 
-        <!-- 4. CAR / TAXI REAL PHOTO -->
+        <!-- 4. CAR REAL PHOTO -->
         <div class="vehicleCard" data-v="car" onclick="chooseVehicle('car')">
           <div class="vehicleImgWrap">
             <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80" alt="कार">
@@ -465,7 +462,6 @@ footer{text-align:center;padding:20px 16px 30px;color:#6b8099;font-size:11px}
 </div>
 
 <script>
-/* CONFIGURATION */
 const CONFIG = {
   SUPPORT_PHONE: "9450985355",
   SUPPORT_EMAIL: "sawarisetu@gmail.com",
@@ -491,7 +487,6 @@ try {
   console.warn("Firestore running in offline mode:", e);
 }
 
-/* GLOBAL STATE */
 let selectedVehicle = "e-rickshaw";
 let selectedRideType = "share";
 let currentPickupCoords = { lat: 25.2672, lng: 82.0725 };
@@ -505,7 +500,6 @@ let geocoder = null;
 let pickupMarker = null;
 let isDriverOnline = false;
 
-/* UI NAVIGATION */
 function switchSection(sec, btn) {
   document.querySelectorAll(".section").forEach(s => s.classList.add("hidden"));
   const target = document.getElementById("sec-" + sec);
@@ -538,7 +532,7 @@ function selectRideType(t) {
   calculateAndDisplayFare();
 }
 
-/* SATELLITE SWITCH ENGINE */
+/* SATELLITE SWITCH */
 function setGoogleMapType(type) {
   if (!googleMap) return;
   googleMap.setMapTypeId(type === "satellite" ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
@@ -546,7 +540,6 @@ function setGoogleMapType(type) {
   document.getElementById("btnMapSat").classList.toggle("active", type === "satellite");
 }
 
-/* EXTERNAL INTENTS */
 function triggerCall(num, label) {
   if (confirm(label + " के लिए " + num + " पर कॉल करना चाहते हैं?")) {
     location.href = "tel:" + num;
@@ -586,9 +579,7 @@ async function shareApp() {
   alert("ऐप लिंक कॉपी कर दिया गया है!");
 }
 
-/* ========================================================
-   GOOGLE MAPS INITIALIZATION WITH SATELLITE CONTROLS
-======================================================== */
+/* GOOGLE MAPS LOADER */
 window.onGoogleMapsLoaded = function() {
   initGoogleMap();
 };
@@ -600,7 +591,7 @@ function initGoogleMap() {
   googleMap = new google.maps.Map(mapElem, {
     center: currentPickupCoords,
     zoom: 14,
-    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    mapTypeId: google.maps.MapTypeId.HYBRID, // Satellite mode default
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false
@@ -635,58 +626,41 @@ function fetchGPS() {
     return;
   }
 
-  // High Accuracy with Low Fallback (कमरे के अंदर भी सिग्नल पकड़ेगा)
+  const handleSuccess = (pos) => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    currentPickupCoords = { lat, lng };
+    st.className = "status success";
+    st.textContent = "✅ लोकेशन प्राप्त हुई (±" + Math.round(pos.coords.accuracy || 10) + "m)";
+
+    if (googleMap) {
+      googleMap.setCenter(currentPickupCoords);
+      googleMap.setZoom(16);
+      if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
+    }
+
+    if (geocoder) {
+      geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
+        if (status === "OK" && res && res[0]) {
+          document.getElementById("pPickup").value = res[0].formatted_address;
+        }
+      });
+    }
+
+    if (currentDestCoords) drawGoogleRoute();
+  };
+
   navigator.geolocation.getCurrentPosition(
-    pos => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      currentPickupCoords = { lat, lng };
-      st.className = "status success";
-      st.textContent = "✅ लोकेशन प्राप्त हुई (सटीकता: ±" + Math.round(pos.coords.accuracy) + "m)";
-
-      if (googleMap) {
-        googleMap.setCenter(currentPickupCoords);
-        googleMap.setZoom(16);
-        if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
-      }
-
-      if (geocoder) {
-        geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
-          if (status === "OK" && res && res[0]) {
-            document.getElementById("pPickup").value = res[0].formatted_address;
-          }
-        });
-      }
-
-      if (currentDestCoords) drawGoogleRoute();
-    },
-    err => {
-      // यदि सेटेलाइट लॉक नहीं मिला, तो तुरंत सेल टॉवर/इंटरनेट मोड से लोकेशन लेंगे
+    handleSuccess,
+    () => {
+      // Fallback: Low accuracy network triangulation
       navigator.geolocation.getCurrentPosition(
-        pos2 => {
-          const lat2 = pos2.coords.latitude;
-          const lng2 = pos2.coords.longitude;
-          currentPickupCoords = { lat: lat2, lng: lng2 };
-          st.className = "status success";
-          st.textContent = "✅ नेटवर्क से लोकेशन प्राप्त हुई";
-          if (googleMap) {
-            googleMap.setCenter(currentPickupCoords);
-            if (pickupMarker) pickupMarker.setPosition(currentPickupCoords);
-          }
-          if (geocoder) {
-            geocoder.geocode({ location: currentPickupCoords }, (res, status) => {
-              if (status === "OK" && res && res[0]) {
-                document.getElementById("pPickup").value = res[0].formatted_address;
-              }
-            });
-          }
-          if (currentDestCoords) drawGoogleRoute();
-        },
+        handleSuccess,
         () => {
           st.className = "status error";
-          st.textContent = "GPS बंद है। कृपया फ़ोन सेटिंग्स से Location (GPS) चालू करें।";
+          st.textContent = "कृपया सेटिंग्स में जाकर सवारी सेतु ऐप को Location Permission Allow करें।";
         },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 30000 }
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
       );
     },
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
@@ -762,9 +736,6 @@ function drawGoogleRoute() {
   }
 }
 
-/* ========================================================
-   FARES, BOOKING & STORAGE
-======================================================== */
 function calculateFare(vehicle, type, distKm, passengers) {
   distKm = Number(distKm);
   passengers = Math.max(1, Number(passengers) || 1);
@@ -975,7 +946,7 @@ function calcGoodsRouteAuto() {
         st.textContent = `दूरी: ${km} किमी • भाड़ा: ₹${finalFare}`;
       } else {
         st.className = "status error";
-        st.textContent = "Google Maps द्वारा मार्ग नहीं मिला, कृपया मैनुअल भरें।";
+        st.textContent = "मार्ग नहीं मिल सका।";
       }
     });
   }
@@ -1043,9 +1014,7 @@ function renderGoodsHistory() {
   `).join("");
 }
 
-/* ========================================================
-   ADMIN & DRIVER ENGINE
-======================================================== */
+/* ADMIN & DRIVER WORKFLOW */
 function adminRegisterDriver() {
   const name = document.getElementById("drvName").value.trim();
   const mobile = document.getElementById("drvMobile").value.trim();
@@ -1161,15 +1130,14 @@ function renderAdminDashboard() {
   `).join("") || "कोई रिकॉर्ड नहीं।";
 }
 
-/* MODALS */
 function showTerms() {
-  openModal("📜 नियम एवं शर्तें (Aggregator Rules)", "<p>1. <b>एग्रीगेटर नीति:</b> सवारी सेतु केवल यात्री और स्वतंत्र चालक के बीच डिजिटल सेतु का कार्य करता है।<br>2. <b>किराया निर्धारण:</b> तय दूरी व वाहन स्लैब अनुसार किराया कंप्यूटर द्वारा पारदर्शी रूप से निकाला जाता है।<br>3. <b>माल ढुलाई:</b> माल का घोषित मूल्य ग्राहक की स्वयं की घोषणा है।<br>4. <b>दस्तावेज़ अनिवार्यता:</b> सभी चालक वैध डीएल, बीमा और पुलिस क्लीयरेंस के साथ ही अधिकृत हैं।</p>");
+  openModal("📜 नियम एवं शर्तें (Aggregator Rules)", "<p>1. <b>एग्रीगेटर नीति:</b> सवारी सेतु केवल यात्री और स्वतंत्र चालक के बीच डिजिटल सेतु का कार्य करता है।<br>2. <b>किराया निर्धारण:</b> तय दूरी व वाहन स्लैब अनुसार किराया पारदर्शी रूप से निकलता है।<br>3. <b>दस्तावेज़:</b> सभी चालक वैध DL, बीमा और पुलिस वेरिफिकेशन के साथ ही अधिकृत हैं।</p>");
 }
 function showPrivacy() {
-  openModal("🔐 गोपनीयता नीति (Privacy Policy)", "<p>1. लोकेशन का उपयोग केवल पिकअप और लाइव रूटिंग के लिए किया जाता है।<br>2. चालक व वाहन के संवेदनशील दस्तावेज़ केवल एडमिन वेरिफिकेशन व कानूनी अनुपालन हेतु सुरक्षित रखे जाते हैं।<br>3. डेटा किसी तीसरे पक्ष को साझा नहीं किया जाता।</p>");
+  openModal("🔐 गोपनीयता नीति (Privacy Policy)", "<p>1. लोकेशन का उपयोग केवल पिकअप और लाइव रूटिंग के लिए किया जाता है।<br>2. डेटा किसी तीसरे पक्ष को साझा नहीं किया जाता।</p>");
 }
 function showZeroTolerance() {
-  openModal("🛑 शून्य सहिष्णुता नीति (Zero Tolerance)", "<p>1. <b>नशा व दुर्व्यवहार:</b> नशे की हालत में गाड़ी चलाने पर तत्काल प्रभाव से आईडी स्थायी ब्लॉक कर दी जाएगी।<br>2. <b>अतिरिक्त किराया:</b> ऐप में दर्ज किराए से अधिक राशि मांगना सख्त मना है।<br>3. <b>सुरक्षा:</b> यात्री की सुरक्षा सर्वोच्च प्राथमिकता है। किसी भी विवाद पर कानूनी जांच तक खाता निलंबित रहेगा।</p>");
+  openModal("🛑 शून्य सहिष्णुता नीति (Zero Tolerance)", "<p>1. <b>नशा व दुर्व्यवहार:</b> नशे में गाड़ी चलाने पर तत्काल प्रभाव से आईडी स्थायी ब्लॉक होगी।<br>2. <b>ओवरचार्जिंग:</b> ऐप से अधिक किराया मांगना सख्त मना है।</p>");
 }
 function openModal(heading, html) {
   document.getElementById("modalHeading").textContent = heading;
@@ -1180,7 +1148,6 @@ function closeModal() {
   document.getElementById("universalModal").classList.add("hidden");
 }
 
-/* GOOGLE MAPS INJECTION */
 function injectGoogleMaps() {
   const s = document.createElement("script");
   s.src = "https://maps.googleapis.com/maps/api/js?key=" + CONFIG.MAPS_API_KEY + "&libraries=places&callback=onGoogleMapsLoaded";
@@ -1196,4 +1163,4 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 </body>
-</html>
+              </html>
