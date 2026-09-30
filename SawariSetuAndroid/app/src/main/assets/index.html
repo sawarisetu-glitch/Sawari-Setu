@@ -65,11 +65,9 @@ button{font-family:inherit}
 .vehicleCard small{font-size:10px;color:#9eb5cb;margin-top:2px}
 .fare{margin-top:12px;padding:12px;text-align:center;border-radius:12px;background:linear-gradient(135deg,#132438,#0b1a2d);border:1px solid #304965}
 .fare strong{display:block;font-size:26px;color:var(--gold)}
-.notice{color:var(--gold);font-size:11px;margin-top:4px}
 .bookingItem{padding:12px;border:1px solid #263d57;border-radius:12px;margin-top:8px;background:#081523}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
-.otpDisplayBox{display:inline-block;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;padding:6px 14px;border-radius:8px;font-size:18px;font-weight:900;letter-spacing:4px;margin-top:6px}
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:absolute;right:0;top:0;height:100%;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:calc(env(safe-area-inset-top,0px) + 16px)}
@@ -87,13 +85,10 @@ button{font-family:inherit}
 .docBox{border:1px solid #29405d;border-radius:12px;padding:12px;background:#081523;margin-top:10px}
 .fileInputLabel{display:inline-flex;align-items:center;gap:6px;background:#10243b;border:1px solid #294364;color:#00c8ff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;margin-top:6px}
 .previewThumb{width:64px;height:64px;border-radius:8px;object-fit:cover;margin-top:6px;border:1px solid #00c8ff;display:none}
-.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700}
-.badge.pending{background:#ffc857;color:#0b1728}
-.badge.approved{background:#20d68b;color:#05140d}
-.badge.onTrip{background:#00c8ff;color:#05140d}
-.badge.offline{background:#ff5d6c;color:#fff}
 footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;border-top:1px solid #142336;margin-top:20px}
-.footerCallBtn{display:inline-flex;align-items:center;gap:6px;color:var(--cyan);font-weight:700;text-decoration:none;margin-top:6px;cursor:pointer}
+.emergencyGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.emgBtn{background:#1a1012;border:1px solid #ff5d6c;color:#ff5d6c;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;text-align:center}
+.emgBtn.blue{border-color:#2196f3;color:#2196f3;background:#0a1522}
 </style>
 </head>
 <body>
@@ -121,14 +116,15 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙ एडमिन</button>
 </div>
 
-<!-- SIDE MENU -->
+<!-- SIDE MENU (Emergency, Support & Policies) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
-      <h3 style="margin:0;color:#fff">📋 नियम, शर्तें व विकल्प</h3>
+      <h3 style="margin:0;color:#fff">📋 नियम, आपातकाल व विकल्प</h3>
       <button class="menuBtn" onclick="toggleMenu(false)">✕</button>
     </div>
 
+    <!-- 1. App Share -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:#fff">📤 ऐप शेयर करें</h4>
       <div class="socialShareGrid">
@@ -140,8 +136,29 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <button class="btn dark" style="margin-top:8px" onclick="copyShareLink()">🔗 लिंक कॉपी करें</button>
     </div>
 
-    <button class="menuItem" onclick="showTerms()"><strong>📜 नियम एवं शर्तें (Terms & Conditions)</strong><small>30 दिन डेटा नीति व एग्रीगेटर नियम</small></button>
-    <button class="menuItem" onclick="showPrivacy()"><strong>🔐 गोपनीयता नीति (Privacy Policy)</strong><small>ड्राइवर प्राइवेसी व फोन नंबर सुरक्षा</small></button>
+    <!-- 2. Emergency Help -->
+    <div class="menuSection">
+      <h4 style="margin:0 0 6px;color:#ff5d6c">🚨 आपातकालीन सहायता (Emergency)</h4>
+      <div class="emergencyGrid">
+        <button class="emgBtn" onclick="triggerEmergency('police')">🚨 पुलिस (112)</button>
+        <button class="emgBtn" onclick="triggerEmergency('ambulance')">🚑 एम्बुलेंस (108)</button>
+        <button class="emgBtn blue" onclick="triggerEmergency('fire')">🚒 फायर (101)</button>
+        <button class="emgBtn blue" onclick="findNearbyHospital()">🏥 नजदीकी अस्पताल</button>
+      </div>
+    </div>
+
+    <!-- 3. Customer Support -->
+    <div class="menuSection">
+      <h4 style="margin:0 0 6px;color:var(--cyan)">📞 24×7 ग्राहक सेवा सहायता</h4>
+      <div class="row">
+        <button class="btn green" onclick="location.href='tel:9450985355'">📞 कॉल करें</button>
+        <button class="btn" style="background:#25D366" onclick="openSupportWhatsApp()">💬 WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- 4. Legal Policies -->
+    <button class="menuItem" onclick="showTerms()"><strong>📜 नियम एवं शर्तें (Terms & Conditions)</strong><small>30-दिन डेटा नीति व एग्रीगेटर नियम</small></button>
+    <button class="menuItem" onclick="showPrivacy()"><strong>🔐 गोपनीयता नीति (Privacy Policy)</strong><small>ड्राइवर प्राइवेसी व डेटा सुरक्षा</small></button>
     <button class="menuItem" onclick="showZeroTolerance()"><strong>🛑 शून्य सहिष्णुता नीति (Zero Tolerance)</strong><small>नशा व दुर्व्यवहार पर आजीवन बैन</small></button>
   </aside>
 </div>
@@ -210,7 +227,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
 
       <div class="fare">
         <strong id="fareDisplay">₹ —</strong>
-        <span id="fareSub">टोल टैक्स पूरी तरह शामिल</span>
+        <span>टोल टैक्स पूरी तरह शामिल</span>
       </div>
 
       <button class="btn gold big" style="margin-top:12px" onclick="bookRide()">🚕 राइड बुक करें</button>
@@ -223,10 +240,10 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- GOODS SECTION WITH DIGITAL PROOF & INVOICE UPLOAD -->
+  <!-- GOODS SECTION WITH DIGITAL PROOF & INVOICE -->
   <section id="sec-goods" class="section hidden">
     <div class="card">
-      <h2>📦 माल ट्रांसपोर्ट बुक करें (डिजिटल प्रूफ व इनवॉइस)</h2>
+      <h2>📦 माल ट्रांसपोर्ट बुक करें (डिजिटल POD व इनवॉइस)</h2>
       <label>भेजने वाले का नाम</label><input id="gName" placeholder="पूरा नाम">
       <label>मोबाइल नंबर</label><input id="gMobile" type="tel" maxlength="10" placeholder="10 अंकों का मोबाइल">
       
@@ -242,7 +259,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
         <div><label>वजन (kg)</label><input id="gWeight" type="number" placeholder="वजन"></div>
       </div>
 
-      <!-- डिजिटल प्रूफ / इनवॉइस अपलोड -->
+      <!-- Digital Proof / Invoice Upload -->
       <div class="docBox">
         <b>📄 माल का इनवॉइस / दुकान बिल या सामान की फोटो (Digital Proof)</b>
         <label class="fileInputLabel">
@@ -274,19 +291,19 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <div id="goodsBookingResult"></div>
     </div>
     <div class="card">
-      <h2>📜 मेरी माल बुकिंग्स</h2>
+      <h2>📜 मेरी माल बुकिंग्स व POD</h2>
       <div id="goodsHistoryList">कोई माल बुकिंग नहीं।</div>
     </div>
   </section>
 
-  <!-- DRIVER SECTION WITH ONLINE/OFFLINE TOGGLE & PRIVACY -->
+  <!-- DRIVER SECTION WITH ONLINE/OFFLINE & PRIVACY -->
   <section id="sec-driver" class="section hidden">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <h2>👨‍✈️ ड्राइवर पार्टनर पोर्टल (प्राइवेसी कंट्रोल)</h2>
         <button id="driverToggleBtn" class="btn red" style="width:auto;padding:8px 14px" onclick="toggleDriverOnline()">🔴 ऑफलाइन</button>
       </div>
-      <div id="driverOnlineStatus" class="status">ऑनलाइन होने पर ही राइड्स दिखेंगी। जब तक आप ट्रिप स्वीकार नहीं करते, ग्राहक को आपकी पर्सनल डिटेल नहीं दिखेगी।</div>
+      <div id="driverOnlineStatus" class="status">ऑनलाइन होने पर ही राइड्स दिखेंगी। जब तक आप ट्रिप स्वीकार नहीं करते, ग्राहक का नंबर गोपनीय रहेगा।</div>
     </div>
     <div class="card">
       <h2>🚕 उपलब्ध सवारी रिक्वेस्ट्स (OTP सुरक्षा)</h2>
@@ -298,11 +315,11 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- PROMOTIONAL HUB & MASTER QR SYSTEM -->
+  <!-- PROMOTIONAL HUB & MASTER QR -->
   <section id="sec-promo" class="section hidden">
     <div class="card">
-      <h2>📢 प्रमोशनल हब व मास्टर क्यूआर कोड (Marketing System)</h2>
-      <div class="status">गाँव-शहर में प्रचार के लिए रेडीमेड पोस्टर्स, कैप्शंस और डायरेक्ट डाउनलोड क्यूआर कोड:</div>
+      <h2>📢 प्रमोशनल हब व मास्टर क्यूआर कोड (Marketing Hub)</h2>
+      <div class="status">गाँव और शहर में प्रचार के लिए रेडीमेड पोस्टर्स, कैप्शंस और डायरेक्ट डाउनलोड क्यूआर कोड:</div>
 
       <div class="docBox" style="text-align:center">
         <b>📲 सवारी सेतु मास्टर डाउनलोड क्यूआर कोड</b>
@@ -320,7 +337,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- ADMIN SECTION WITH POLICE VERIFICATION & 30-DAY COMPLIANCE -->
+  <!-- ADMIN SECTION WITH POLICE VERIFICATION & EXPIRY ALERTS -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
       <h2>🚔 पुलिस वेरिफिकेशन व 30-दिन डेटा अनुपालन (Admin Desk)</h2>
@@ -333,10 +350,11 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
 
     <div class="card">
-      <h2>➕ नया ड्राइवर जोड़ें (पुलिस वेरिफिकेशन सर्टिफिकेट सहित)</h2>
+      <h2>➕ नया ड्राइवर जोड़ें (पुलिस वेरिफिकेशन व एक्सपायरी अलर्ट)</h2>
       <label>ड्राइवर का पूरा नाम</label><input id="drvName" placeholder="नाम दर्ज करें">
       <label>मोबाइल नंबर</label><input id="drvMobile" type="tel" maxlength="10" placeholder="10 अंकों का नंबर">
       <label>वाहन नंबर (RC)</label><input id="drvVehicleNum" placeholder="UP 70 XX 0000">
+      <label>डॉक्यूमेंट एक्सपायरी तिथि</label><input id="drvExpiryDate" type="date">
 
       <div class="docBox">
         <b>👮 पुलिस वेरिफिकेशन प्रमाण पत्र (Police Clearance Certificate - PCC)</b>
@@ -352,8 +370,8 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
 
     <div class="card">
-      <h2>👨‍✈️ ड्राइवर सत्यापन सूची</h2>
-      <div id="admDriverApprovalList">कोई लंबित सत्यापन नहीं।</div>
+      <h2>👨‍✈️ ड्राइवर सत्यापन व एक्सपायरी स्टेटस</h2>
+      <div id="admDriverApprovalList">कोई ड्राइवर रजिस्टर्ड नहीं।</div>
     </div>
   </section>
 </main>
@@ -406,6 +424,35 @@ function switchSection(sec, btn) {
 
 function toggleMenu(show) {
   document.getElementById("mainMenuOverlay").classList.toggle("open", show);
+}
+
+// Emergency & Support functions
+function triggerEmergency(type) {
+  if (type === 'police') {
+    if (confirm("क्या आप पुलिस (112) को कॉल करना चाहते हैं?")) { location.href = "tel:112"; }
+  } else if (type === 'ambulance') {
+    if (confirm("क्या आप एम्बुलेंस (108) को कॉल करना चाहते हैं?")) { location.href = "tel:108"; }
+  } else if (type === 'fire') {
+    if (confirm("क्या आप फायर ब्रिगेड (101) को कॉल करना चाहते हैं?")) { location.href = "tel:101"; }
+  }
+}
+
+function findNearbyHospital() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      window.open(`https://www.google.com/maps/search/hospitals/@${lat},${lng},14z`, '_blank');
+    }, () => {
+      window.open("https://www.google.com/maps/search/hospitals/", '_blank');
+    });
+  } else {
+    window.open("https://www.google.com/maps/search/hospitals/", '_blank');
+  }
+}
+
+function openSupportWhatsApp() {
+  location.href = "whatsapp://send?phone=919450985355&text=नमस्ते,%20मुझे%20सवारी%20सेतु%20ऐप%20के%20संबंध%20में%20सहायता%20चाहिए।";
 }
 
 let selectedVehicle = "car-mini";
@@ -565,7 +612,7 @@ function calcGoodsRouteAuto() {
 function bookGoodsOrder() {
   const name = document.getElementById("gName").value.trim();
   const mobile = document.getElementById("gMobile").value.trim();
-  if (!name || mobile.length !== 10) { alert("नाम और मोबाइल भरें।"); return; }
+  if (!name || mobile.length !== 10) { alert("नाम और मोबाइल भरें। चयन करें।"); return; }
   const goodsObj = {
     id: "SS-G-" + Date.now().toString().slice(-6),
     name, mobile,
@@ -578,7 +625,7 @@ function bookGoodsOrder() {
   const list = getStorage("ss_goods");
   list.unshift(goodsObj);
   setStorage("ss_goods", list);
-  document.getElementById("goodsBookingResult").innerHTML = `<div class="bookingItem"><b>✅ माल बुकिंग सफल (डिजिटल प्रूफ सहित)</b></div>`;
+  document.getElementById("goodsBookingResult").innerHTML = `<div class="bookingItem"><b>📦 माल बुकिंग सफल (डिजिटल POD व इनवॉइस सहित)</b></div>`;
 }
 
 function toggleDriverOnline() {
@@ -612,34 +659,58 @@ function acceptRideByDriver(id) {
 function adminRegisterDriver() {
   const name = document.getElementById("drvName").value.trim();
   const mobile = document.getElementById("drvMobile").value.trim();
+  const expiry = document.getElementById("drvExpiryDate").value;
   if (!name || mobile.length !== 10) { alert("नाम और मोबाइल भरें।"); return; }
   const drv = {
-    name, mobile,
+    name, mobile, expiry,
     pcc: uploadedDocs['thumbDrvPCC'] || null,
     status: "approved"
   };
   let drivers = getStorage("ss_drivers");
   drivers.unshift(drv);
   setStorage("ss_drivers", drivers);
-  document.getElementById("adminRegStatus").innerHTML = "<span class='success'>✅ ड्राइवर पुलिस वेरिफिकेशन सहित रजिस्टर्ड!</span>";
+  document.getElementById("adminRegStatus").innerHTML = "<span class='success'>✅ ड्राइवर पुलिस वेरिफिकेशन व एक्सपायरी डेटा सहित रजिस्टर्ड!</span>";
+  renderAdminDashboard();
 }
 
 function renderAdminDashboard() {
   const drivers = getStorage("ss_drivers");
-  document.getElementById("admDriverApprovalList").innerHTML = drivers.length ? drivers.map(d => `
-    <div class="bookingItem"><b>${d.name} (${d.mobile})</b><small>पुलिस वेरिफिकेशन: ${d.pcc ? '✅ संलग्न' : '❌ लंबित'}</small></div>`).join("") : "कोई ड्राइवर नहीं।";
+  const today = new Date();
+  document.getElementById("admDriverApprovalList").innerHTML = drivers.length ? drivers.map(d => {
+    let expStatus = "सक्रिय";
+    let badgeClass = "badge approved";
+    if (d.expiry) {
+      const expDate = new Date(d.expiry);
+      const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) { expStatus = "एक्सपायर हो चुका है! (सस्पेंड)"; badgeClass = "badge pending"; }
+      else if (diffDays <= 15) { expStatus = `⚠️ ${diffDays} दिन में एक्सपायर होगा`; badgeClass = "badge pending"; }
+    }
+    return `
+      <div class="bookingItem">
+        <b>${d.name} (${d.mobile})</b>
+        <small>पुलिस वेरिफिकेशन (PCC): ${d.pcc ? '✅ संलग्न' : '❌ लंबित'}</small>
+        <small class="${badgeClass}" style="margin-top:4px">डॉक्यूमेंट स्टेटस: ${expStatus}</small>
+      </div>`;
+  }).join("") : "कोई ड्राइवर नहीं।";
 }
 
 function searchPoliceAudit() {
   const q = document.getElementById("policeAuditSearch").value.trim();
   const box = document.getElementById("policeAuditResult");
   const rides = getStorage("ss_rides").filter(r => r.mobile.includes(q));
-  box.innerHTML = rides.length ? rides.map(r => `<div class="bookingItem"><b>कानूनी रिकॉर्ड:</b> ${r.name} (${r.mobile}) - 30-दिन डेटा अनुपालन सक्रिय</div>`).join("") : "कोई रिकॉर्ड नहीं मिला।";
+  box.innerHTML = rides.length ? rides.map(r => `<div class="bookingItem"><b>कानूनी ऑडिट रिकॉर्ड:</b> ${r.name} (${r.mobile}) - 30-दिन डेटा नीति सक्रिय</div>`).join("") : "कोई रिकॉर्ड नहीं मिला।";
 }
 
-function showTerms() { alert("सवारी सेतु: 30-दिन डेटा नीति व एग्रीगेटर नियम लागू।"); }
-function showPrivacy() { alert("प्राइवेसी नीति: ड्राइवर और यात्री की व्यक्तिगत जानकारी तब तक सुरक्षित है जब तक ट्रिप स्वीकार नहीं होती।"); }
-function showZeroTolerance() { alert("शून्य सहिष्णुता: दुर्व्यवहार पर आजीवन बैन।"); }
+// Legal Policies Popups
+function showTerms() { 
+  alert("📜 सवारी सेतु नियम एवं शर्तें (Terms & Conditions):\n\n1. सवारी सेतु एग्रीगेटर प्लेटफॉर्म है।\n2. 30-दिन डेटा नीति: सुरक्षा और ऑडिट के लिए ट्रिप डेटा 30 दिन तक सुरक्षित रखकर ऑटो-डिलीट होता है।\n3. शिकायत 15 दिन के भीतर दर्ज करनी होगी।"); 
+}
+function showPrivacy() { 
+  alert("🔐 गोपनीयता नीति (Privacy Policy):\n\n1. ड्राइवर प्राइवेसी: ट्रिप स्वीकार होने तक यात्री और ड्राइवर के नंबर गोपनीय रहते हैं।\n2. डेटा की सुरक्षा और एन्क्रिप्शन का पूर्ण पालन किया जाता है।"); 
+}
+function showZeroTolerance() { 
+  alert("🛑 शून्य सहिष्णुता नीति (Zero Tolerance):\n\n1. नशा, बदसलूकी या ओवरचार्जिंग पर आजीवन बैन (Lifetime Ban) लगाया जाता है।"); 
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   const s = document.createElement("script");
