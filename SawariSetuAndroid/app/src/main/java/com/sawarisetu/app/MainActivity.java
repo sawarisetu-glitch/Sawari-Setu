@@ -1,6 +1,7 @@
 package com.sawarisetu.app;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,13 +12,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private WebView webView;
     private ValueCallback<Uri[]> uploadMessage;
@@ -28,12 +29,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // लोकेशन परमिशन की जाँच
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        // लोकेशन परमिशन की जाँच (Android 6.0 और ऊपर के लिए)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            }
         }
 
-        // WebView इनिशियलाइज करना
+        // WebView सीधे स्क्रीन पर सेट करना
         webView = new WebView(this);
         setContentView(webView);
 
@@ -96,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // जाँच के लिए सीधे गूगल लोड करें ताकि ऐप के खुलने का पता चल सके
-        webView.loadUrl("https://www.google.com");
+        // लोकल एसेट फ़ाइल लोड करना
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override
