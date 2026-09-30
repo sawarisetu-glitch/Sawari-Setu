@@ -68,9 +68,12 @@ button{font-family:inherit}
 .bookingItem{padding:12px;border:1px solid #263d57;border-radius:12px;margin-top:8px;background:#081523}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
+
+/* FIXED SIDE MENU & EMERGENCY OVERLAP BUG */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
-.sideMenu{position:absolute;right:0;top:0;height:100%;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:calc(env(safe-area-inset-top,0px) + 16px)}
+.sideMenu{position:fixed;right:0;top:0;height:100vh;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:max(env(safe-area-inset-top,0px), 25px);z-index:2100}
+
 .menuHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .menuItem{width:100%;text-align:left;background:#0d1c2e;border:1px solid #213a56;margin:6px 0;padding:12px;border-radius:10px;cursor:pointer;color:#fff}
 .menuItem strong{display:block;font-size:14px}
@@ -116,7 +119,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙ एडमिन</button>
 </div>
 
-<!-- SIDE MENU (Emergency, Support & Policies) -->
+<!-- SIDE MENU -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
@@ -124,7 +127,6 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <button class="menuBtn" onclick="toggleMenu(false)">✕</button>
     </div>
 
-    <!-- 1. App Share -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:#fff">📤 ऐप शेयर करें</h4>
       <div class="socialShareGrid">
@@ -136,7 +138,6 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <button class="btn dark" style="margin-top:8px" onclick="copyShareLink()">🔗 लिंक कॉपी करें</button>
     </div>
 
-    <!-- 2. Emergency Help -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:#ff5d6c">🚨 आपातकालीन सहायता (Emergency)</h4>
       <div class="emergencyGrid">
@@ -147,7 +148,6 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       </div>
     </div>
 
-    <!-- 3. Customer Support -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:var(--cyan)">📞 24×7 ग्राहक सेवा सहायता</h4>
       <div class="row">
@@ -156,7 +156,6 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       </div>
     </div>
 
-    <!-- 4. Legal Policies -->
     <button class="menuItem" onclick="showTerms()"><strong>📜 नियम एवं शर्तें (Terms & Conditions)</strong><small>30-दिन डेटा नीति व एग्रीगेटर नियम</small></button>
     <button class="menuItem" onclick="showPrivacy()"><strong>🔐 गोपनीयता नीति (Privacy Policy)</strong><small>ड्राइवर प्राइवेसी व डेटा सुरक्षा</small></button>
     <button class="menuItem" onclick="showZeroTolerance()"><strong>🛑 शून्य सहिष्णुता नीति (Zero Tolerance)</strong><small>नशा व दुर्व्यवहार पर आजीवन बैन</small></button>
@@ -240,7 +239,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- GOODS SECTION WITH DIGITAL PROOF & INVOICE -->
+  <!-- GOODS SECTION -->
   <section id="sec-goods" class="section hidden">
     <div class="card">
       <h2>📦 माल ट्रांसपोर्ट बुक करें (डिजिटल POD व इनवॉइस)</h2>
@@ -259,7 +258,6 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
         <div><label>वजन (kg)</label><input id="gWeight" type="number" placeholder="वजन"></div>
       </div>
 
-      <!-- Digital Proof / Invoice Upload -->
       <div class="docBox">
         <b>📄 माल का इनवॉइस / दुकान बिल या सामान की फोटो (Digital Proof)</b>
         <label class="fileInputLabel">
@@ -296,7 +294,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- DRIVER SECTION WITH ONLINE/OFFLINE & PRIVACY -->
+  <!-- DRIVER SECTION -->
   <section id="sec-driver" class="section hidden">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -315,7 +313,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- PROMOTIONAL HUB & MASTER QR -->
+  <!-- PROMO SECTION -->
   <section id="sec-promo" class="section hidden">
     <div class="card">
       <h2>📢 प्रमोशनल हब व मास्टर क्यूआर कोड (Marketing Hub)</h2>
@@ -337,7 +335,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- ADMIN SECTION WITH POLICE VERIFICATION & EXPIRY ALERTS -->
+  <!-- ADMIN SECTION -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
       <h2>🚔 पुलिस वेरिफिकेशन व 30-दिन डेटा अनुपालन (Admin Desk)</h2>
@@ -426,7 +424,6 @@ function toggleMenu(show) {
   document.getElementById("mainMenuOverlay").classList.toggle("open", show);
 }
 
-// Emergency & Support functions
 function triggerEmergency(type) {
   if (type === 'police') {
     if (confirm("क्या आप पुलिस (112) को कॉल करना चाहते हैं?")) { location.href = "tel:112"; }
@@ -478,7 +475,7 @@ function setGoogleMapType(type) {
 }
 
 const APP_DOWNLOAD_LINK = "https://sawarisetu.com";
-const SHARE_TEXT = "नमस्ते! 'सवारी सेतु' से सुरक्षित व सस्ती यात्रा बुक करें। ई-रिक्शा, ऑटो, मिनी या एसयूवी कार बुक करें।\n\n📲 ऐप डाउनलोड करें: " + APP_DOWNLOAD_LINK;
+const SHARE_TEXT = "नमस्ते! 'सवारी सेतु' से सुरक्षित व सस्ती यात्रा बुक करें। ई-रिक्शा, ऑटो, मिनी या एसयूवी कार बुक करें。\n\n📲 ऐप डाउनलोड करें: " + APP_DOWNLOAD_LINK;
 
 function shareToWhatsApp() { location.href = "whatsapp://send?text=" + encodeURIComponent(SHARE_TEXT); }
 function shareToFacebook() { window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(APP_DOWNLOAD_LINK), "_blank"); }
@@ -612,7 +609,7 @@ function calcGoodsRouteAuto() {
 function bookGoodsOrder() {
   const name = document.getElementById("gName").value.trim();
   const mobile = document.getElementById("gMobile").value.trim();
-  if (!name || mobile.length !== 10) { alert("नाम और मोबाइल भरें। चयन करें।"); return; }
+  if (!name || mobile.length !== 10) { alert("नाम और मोबाइल भरें।"); return; }
   const goodsObj = {
     id: "SS-G-" + Date.now().toString().slice(-6),
     name, mobile,
@@ -701,7 +698,6 @@ function searchPoliceAudit() {
   box.innerHTML = rides.length ? rides.map(r => `<div class="bookingItem"><b>कानूनी ऑडिट रिकॉर्ड:</b> ${r.name} (${r.mobile}) - 30-दिन डेटा नीति सक्रिय</div>`).join("") : "कोई रिकॉर्ड नहीं मिला।";
 }
 
-// Legal Policies Popups
 function showTerms() { 
   alert("📜 सवारी सेतु नियम एवं शर्तें (Terms & Conditions):\n\n1. सवारी सेतु एग्रीगेटर प्लेटफॉर्म है।\n2. 30-दिन डेटा नीति: सुरक्षा और ऑडिट के लिए ट्रिप डेटा 30 दिन तक सुरक्षित रखकर ऑटो-डिलीट होता है।\n3. शिकायत 15 दिन के भीतर दर्ज करनी होगी।"); 
 }
