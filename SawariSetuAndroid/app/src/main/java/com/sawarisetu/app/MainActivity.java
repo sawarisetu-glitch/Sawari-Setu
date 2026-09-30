@@ -27,27 +27,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // लोकेशन और जीपीएस परमिशन की जाँच और माँगना ताकि ऐप क्रैश न हो
+        // लोकेशन परमिशन की जाँच
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         }
 
-        // डायनामिक लेआउट बाइंडिंग (ताकि R फाइल पैकेज एरर न दे)
-        int layoutId = getResources().getIdentifier("activity_main", "layout", getPackageName());
-        if (layoutId != 0) {
-            setContentView(layoutId);
-        }
-
-        int webViewId = getResources().getIdentifier("webView", "id", getPackageName());
-        if (webViewId != 0) {
-            webView = findViewById(webViewId);
-        }
-
-        // यदि XML से WebView न मिले तो सीधे कोड से अटैच करें
-        if (webView == null) {
-            webView = new WebView(this);
-            setContentView(webView);
-        }
+        // WebView इनिशियलाइज करना
+        webView = new WebView(this);
+        setContentView(webView);
 
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -60,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
-        // कस्टम स्कीम्स (WhatsApp, Instagram, SMS, Phone Call)
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -75,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         return true;
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "संबंधित ऐप डिवाइस में उपलब्ध नहीं है।", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "संबंधित ऐप उपलब्ध नहीं है।", Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 }
@@ -83,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // कैमरा व डॉक्यूमेंट अपलोड
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
@@ -105,7 +90,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        webView.loadUrl("file:///android_asset/index.html");
+        // पहले लोकल एसेट लोड करने की कोशिश करें, अगर न हो तो गूगल लोड करें ताकि ऐप क्रैश न हो
+        try {
+            webView.loadUrl("file:///android_asset/index.html");
+        } catch (Exception e) {
+            webView.loadUrl("https://www.google.com");
+        }
     }
 
     @Override
