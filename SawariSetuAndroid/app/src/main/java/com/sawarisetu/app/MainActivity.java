@@ -90,15 +90,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            // वेबव्यू के अंदर जीपीएस लोकेशन की अनुमति को ऑटो-अप्रूव करना ताकि क्रैश न हो
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
                 callback.invoke(origin, true, false);
             }
         });
 
-        // लोकल एसेट लोड करना
-        webView.loadUrl("file:///android_asset/index.html");
+        // जाँच के लिए सीधे गूगल लोड करें ताकि ऐप के खुलने का पता चल सके
+        webView.loadUrl("https://www.google.com");
     }
 
     @Override
