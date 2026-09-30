@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -88,14 +89,16 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             }
+
+            // वेबव्यू के अंदर जीपीएस लोकेशन की अनुमति को ऑटो-अप्रूव करना ताकि क्रैश न हो
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+            }
         });
 
-        // पहले लोकल एसेट लोड करने की कोशिश करें, अगर न हो तो गूगल लोड करें ताकि ऐप क्रैश न हो
-        try {
-            webView.loadUrl("file:///android_asset/index.html");
-        } catch (Exception e) {
-            webView.loadUrl("https://www.google.com");
-        }
+        // लोकल एसेट लोड करना
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override
