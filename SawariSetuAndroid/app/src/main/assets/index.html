@@ -69,6 +69,7 @@ button{font-family:inherit}
 .bookingItem b{color:#fff;font-size:14px}
 .bookingItem small{color:#9fb0c5;display:block;margin-top:4px;font-size:12px;line-height:1.4}
 
+/* FIXED OVERLAY & MENU BOUNDARIES */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:2000;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:fixed;right:0;top:0;height:100vh;width:min(90vw,360px);background:#071321;border-left:1px solid #294361;box-shadow:-12px 0 35px rgba(0,0,0,.5);overflow-y:auto;padding:16px;padding-top:max(env(safe-area-inset-top,0px), 25px);z-index:2100}
@@ -118,7 +119,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
   <button id="tabAdmin" class="tab" onclick="switchSection('admin',this)">⚙ एडमिन</button>
 </div>
 
-<!-- SIDE MENU -->
+<!-- SIDE MENU WITH EMERGENCY & POLICIES -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="toggleMenu(false)">
   <aside class="sideMenu" onclick="event.stopPropagation()">
     <div class="menuHead">
@@ -126,6 +127,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <button class="menuBtn" onclick="toggleMenu(false)">✕</button>
     </div>
 
+    <!-- 1. App Share -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:#fff">📤 ऐप शेयर करें</h4>
       <div class="socialShareGrid">
@@ -137,6 +139,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       <button class="btn dark" style="margin-top:8px" onclick="copyShareLink()">🔗 लिंक कॉपी करें</button>
     </div>
 
+    <!-- 2. Emergency Support -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:#ff5d6c">🚨 आपातकालीन सहायता (Emergency)</h4>
       <div class="emergencyGrid">
@@ -147,6 +150,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       </div>
     </div>
 
+    <!-- 3. Customer Support -->
     <div class="menuSection">
       <h4 style="margin:0 0 6px;color:var(--cyan)">📞 24×7 ग्राहक सेवा सहायता</h4>
       <div class="row">
@@ -238,7 +242,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- GOODS SECTION -->
+  <!-- GOODS SECTION WITH DIGITAL POD -->
   <section id="sec-goods" class="section hidden">
     <div class="card">
       <h2>📦 माल ट्रांसपोर्ट बुक करें (डिजिटल POD व इनवॉइस)</h2>
@@ -258,7 +262,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
       </div>
 
       <div class="docBox">
-        <b>📄 माल का इनवॉइस / दुकान बिल या सामान की फोटो (Digital Proof)</b>
+        <b>📄 माल का इनवॉइस / दुकान बिल या सामान की फोटो (Digital POD Proof)</b>
         <label class="fileInputLabel">
           📷 फोटो खींचें या बिल अपलोड करें
           <input type="file" id="fileGoodsProof" accept="image/*,.pdf" style="display:none" onchange="previewDoc(this, 'thumbGoodsProof')">
@@ -293,7 +297,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- DRIVER SECTION -->
+  <!-- DRIVER SECTION WITH PRIVACY & ONLINE/OFFLINE -->
   <section id="sec-driver" class="section hidden">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between">
@@ -312,7 +316,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- PROMO SECTION -->
+  <!-- PROMO HUB -->
   <section id="sec-promo" class="section hidden">
     <div class="card">
       <h2>📢 प्रमोशनल हब व मास्टर क्यूआर कोड (Marketing Hub)</h2>
@@ -334,7 +338,7 @@ footer{text-align:center;padding:24px 16px 34px;color:#6b8099;font-size:12px;bor
     </div>
   </section>
 
-  <!-- ADMIN SECTION -->
+  <!-- ADMIN SECTION WITH POLICE VERIFICATION & EXPIRY ALERTS -->
   <section id="sec-admin" class="section hidden">
     <div class="card">
       <h2>🚔 पुलिस वेरिफिकेशन व 30-दिन डेटा अनुपालन (Admin Desk)</h2>
