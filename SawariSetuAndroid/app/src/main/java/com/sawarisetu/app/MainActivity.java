@@ -1,6 +1,3 @@
-ठीक है। नीचे आपकी मौजूदा MainActivity.java का पूरा corrected version है। इसमें index.html को बदलने की जरूरत नहीं है।
-मुख्य सुधार: Call, WhatsApp, Email, GPS permission और WebView geolocation को native Android तरीके से संभाला गया है।
-Writing
 package com.sawarisetu.app;
 
 import android.Manifest;
@@ -604,9 +601,3 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 }
-एक जरूरी चीज़ और
-इस Java file को लगाने के बाद Manifest में GPS permission मौजूद होना जरूरी है। AndroidManifest.xml में कम-से-कम ये permissions होनी चाहिए:
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.INTERNET" />
-अभी APK build मत करें। पहले मुझे आपका AndroidManifest.xml पूरा code भेज दें। मैं उसे भी इसी master structure के हिसाब से जाँच लूँगा। उसके बाद हम क्रम से Manifest → Java → Assets → Build → Install → Call/WhatsApp/Email/GPS test करेंगे।
