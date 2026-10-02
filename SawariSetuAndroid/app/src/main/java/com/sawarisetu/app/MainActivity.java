@@ -23,16 +23,23 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> uploadMessage;
     private static final int FILE_CHOOSER_RESULT_CODE = 1001;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
+    
+    private String mGeolocationOrigin;
+    private GeolocationPermissions.Callback mGeolocationCallback;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // लोकेशन परमिशन की जाँच (Android 6.0 और ऊपर के लिए)
+        // रनटाइम पर GPS लोकेशन परमिशन की जाँच (Android 6.0 और ऊपर के लिए)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION, 
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                }, LOCATION_PERMISSION_REQUEST_CODE);
             }
         }
 
@@ -51,29 +58,36 @@ public class MainActivity extends Activity {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
+        // 📞 💬 ✉️ बाहरी इंटेंट्स (Call, WhatsApp, Email, Geo) की सटीक नेटिव हैंडलिंग
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url == null) return false;
+
+                // यदि लिंक कॉल, व्हाट्सएप, एसएमएस, ईमेल या जिओ का है तो नेटिव ऐप खोलें
                 if (url.startsWith("tel:") || 
                     url.startsWith("sms:") || 
+                    url.startsWith("smsto:") ||
                     url.startsWith("whatsapp:") || 
-                    url.startsWith("instagram:") || 
+                    url.startsWith("https://wa.me/") || 
                     url.startsWith("mailto:") || 
-                    url.startsWith("geo:") ||
-                    url.startsWith("https://wa.me/")) {
+                    url.startsWith("geo:")) {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(intent);
                         return true;
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "संबंधित ऐप उपलब्ध नहीं है।", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "संबंधित ऐप (WhatsApp/Dialer/Email) उपलब्ध नहीं है।", Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 }
+                
+                // बाकी सामान्य लिंक्स WebView के अंदर ही लोड होंगे
                 return false;
             }
         });
 
+        // 📍 Geolocation और File Chooser (WebView Chrome Client)
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
@@ -96,11 +110,20 @@ public class MainActivity extends Activity {
 
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                callback.invoke(origin, true, false);
+                mGeolocationOrigin = origin;
+                mGeolocationCallback = callback;
+                
+                // पुनः सुनिश्चित करें कि परमिशन ग्रांटेड है या नहीं
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    callback.invoke(origin, true, false);
+                } else {
+                    // यदि परमिशन नहीं है तो अनुमति दें
+                    callback.invoke(origin, true, false);
+                }
             }
         });
 
-        // लोकल एसेट फ़ाइल लोड करना
+        // मास्टर बेसलाइन लोकल एसेट फ़ाइल लोड करना
         webView.loadUrl("file:///android_asset/index.html");
     }
 
