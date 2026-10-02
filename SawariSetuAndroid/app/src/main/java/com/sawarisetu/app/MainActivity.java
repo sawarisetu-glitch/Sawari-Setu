@@ -59,7 +59,8 @@ public class MainActivity extends Activity {
                     url.startsWith("whatsapp:") || 
                     url.startsWith("instagram:") || 
                     url.startsWith("mailto:") || 
-                    url.startsWith("geo:")) {
+                    url.startsWith("geo:") ||
+                    url.startsWith("https://wa.me/")) {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(intent);
