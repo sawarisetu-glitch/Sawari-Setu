@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
-<title>सवारी सेतु — Pan-India Commercial Transport Platform</title>
+<title>सवारी सेतु — Commercial Transport Platform</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#050b14;color:#eef5ff;font-family:Arial,"Noto Sans Devanagari",sans-serif;width:100%;min-height:100vh;overflow-x:hidden}
@@ -143,7 +143,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 </div>
 </header>
 
-<!-- ☰ हैमबर्गर मेनू (एआई, ड्राइवर रजिस्ट्रेशन, पुलिस वेरिफिकेशन और कंपनी के कानूनी बचाव नियम) -->
+<!-- ☰ हैमबर्गर मेनू (एआई, पोस्टर जनरेटर, ड्राइवर रजिस्ट्रेशन, पुलिस वेरिफिकेशन और कानूनी नियम) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="closeMainMenu(event)">
 <aside class="sideMenu" onclick="event.stopPropagation()">
 <div class="menuHead"><h2>☰ सवारी सेतु मेनू</h2><button class="menuClose" onclick="closeMainMenu()">✕</button></div>
@@ -253,7 +253,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 </div>
 </div>
 
-<div class="check" style="margin-top:12px"><input type="checkbox" checked disabled><span>🛡️ सवारी सुरक्षा मानक सक्रिय</span></div>
+<div class="check" style="margin-top:12px"><input type="checkbox" checked disabled><span>🛡️️ सवारी सुरक्षा मानक सक्रिय</span></div>
 <button class="btn gold big" onclick="safeBookRide()">🚖 राइड बुक करें (OTP & Cloud)</button>
 <div id="rStatus" class="status"></div>
 </div>
@@ -717,7 +717,7 @@ async function safeBookRide(){
     } else {
       statusEl.textContent = "✅ राइड लोकल मोड में दर्ज हुई। OTP: " + generatedOtp;
     }
-  } catch(e) { statusEl.textContent = "⚠️️ सिंक त्रुटि: " + e.message; }
+  } catch(e) { statusEl.textContent = "⚠ सिंक त्रुटि: " + e.message; }
 }
 
 async function safeBookGoods(){
@@ -771,72 +771,4 @@ function acceptBooking(id, otp){
   activeRideOtp = otp;
   let msgEl = document.getElementById("otpStatusMsg");
   msgEl.className = "status success";
-  msgEl.textContent = "✅ बुकिंग स्वीकार! ग्राहक से 4-अंकों का OTP लेकर दर्ज करें।";
-}
-
-function rejectBooking(id){
-  let msgEl = document.getElementById("otpStatusMsg");
-  msgEl.className = "status error";
-  msgEl.textContent = "❌ बुकिंग अस्वीकार कर दी गई है।";
-}
-
-function verifyAndStartRide(){
-  let enteredOtp = document.getElementById("verifyOtpInput").value.trim();
-  let msgEl = document.getElementById("otpStatusMsg");
-  if(!enteredOtp) { alert("कृपया OTP दर्ज करें। समय पर वेरीफाई करें।"); return; }
-  if(enteredOtp === activeRideOtp || enteredOtp === "4821") {
-    msgEl.className = "status success";
-    msgEl.textContent = "🎉 OTP सत्यापित! राइड शुरू हो गई है।";
-    let historyBox = document.getElementById("driverHistoryContainer");
-    historyBox.innerHTML = `<div style="background:#071221;padding:7px;border-radius:6px;border:1px solid #20d68b;color:#20d68b">✅ पूर्ण राइड: OTP मिलान सफल (${enteredOtp})</div>` + historyBox.innerHTML;
-  } else {
-    msgEl.className = "status error";
-    msgEl.textContent = "❌ गलत OTP! सही पिन दर्ज करें।";
-  }
-}
-
-function triggerNativeAction(url, label){
-  if(url.startsWith('tel:')){
-    if(confirm("सुरक्षा कॉल: क्या आप "+label+" पर कॉल करना चाहते हैं?")) { window.location.href = url; }
-  } else { window.open(url, '_blank'); }
-}
-
-function fetchCurrentLocation(elementId){
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      let lat = pos.coords.latitude;
-      let lng = pos.coords.longitude;
-      if(geocoder) {
-        geocoder.geocode({ location: { lat: lat, lng: lng } }, (results, status) => {
-          if (status === "OK" && results[0]) {
-            document.getElementById(elementId).value = results[0].formatted_address;
-          } else {
-            document.getElementById(elementId).value = "Lat: " + lat.toFixed(4) + ", Lng: " + lng.toFixed(4);
-          }
-        });
-      }
-      let curLatLng = { lat: lat, lng: lng };
-      if(rideMap) rideMap.setCenter(curLatLng);
-      if(driverMap) driverMap.setCenter(curLatLng);
-      if(goodsMap) goodsMap.setCenter(curLatLng);
-    }, err=>{ alert("लोकेशन प्राप्त करने में असमर्थ। कृपया GPS ऑन करें।"); });
-  } else { alert("आपका ब्राउज़र जियोलोकेशन सपोर्ट नहीं करता।"); }
-}
-
-function askAiChat(){
-  let inp=document.getElementById("aiUserInput"),val=inp.value.trim();
-  if(!val)return;
-  let box=document.getElementById("aiChatBox");
-  box.innerHTML += `<div class="chatMsg user">${val}</div>`;
-  let reply="समझ गया! आपकी मांग के अनुसार जानकारी प्रोसेस हो रही है।";
-  if(val.includes("कानपुर")||val.includes("कहाँ")||val.includes("location"))
-    reply="📍 वाहन और रूट की लाइव स्थिति अपडेट कर दी गई है।";
-  box.innerHTML += `<div class="chatMsg bot">${reply}</div>`;
-  inp.value="";
-  box.scrollTop=box.scrollHeight;
-}
-
-window.addEventListener("load",()=>{calculateGoodsEstimate()});
-</script>
-</body>
-</html>
+  msgEl.textContent = "✅ बुकिंग स्वीकार! ग्राहक से 4-अंकों का OTP लेकर
