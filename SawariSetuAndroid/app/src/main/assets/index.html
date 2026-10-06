@@ -12,11 +12,14 @@ html,body{margin:0;padding:0;background:#050b14;color:#eef5ff;font-family:Arial,
 
 .app{width:100%;min-height:100vh;background:radial-gradient(circle at 20% 0%,rgba(0,200,255,.12),transparent 30%),radial-gradient(circle at 90% 10%,rgba(255,200,87,.10),transparent 25%),var(--bg);display:flex;flex-direction:column}
 
+/* टॉप हेडर - स्टेटस बार के नीचे सुरक्षित */
 header{padding: max(12px, env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:50;background:rgba(5,11,20,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);width:100%}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:42px;height:42px;border-radius:12px;object-fit:cover;background:#12243a;border:1px solid #294361}
 .brand h1{margin:0;font-size:18px;color:#fff}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:10px}
 
+/* बॉटम नेविगेशन टैब (सबसे नीचे) */
 .tabs{position:fixed;bottom:0;left:0;width:100%;background:rgba(5,11,20,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:8px;z-index:100;backdrop-filter:blur(12px)}
 .tab{background:#0b1625;border:1px solid var(--line);color:#b9c8da;font-weight:700;border-radius:10px;padding:8px 2px;text-align:center;cursor:pointer;font-size:11px}
 .tab.active{background:linear-gradient(135deg,#0d77d8,#13b8e7);color:#fff;border-color:#39bfff}
@@ -45,7 +48,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 .status.success{color:#20d68b}
 .status.error{color:#ff6978}
 
+/* मैप बॉक्स (हर सेक्शन में लाइव मैप) */
 .map-box{width:100%;height:220px;margin-top:10px;border-radius:12px;overflow:hidden;background:#08111d;border:1px solid #263d58}
+
 .fare{margin-top:12px;padding:14px;text-align:center;border-radius:14px;background:linear-gradient(135deg,#172b43,#0b1a2d);border:1px solid #304965}
 .fare strong{display:block;font-size:24px;color:var(--gold)}
 
@@ -60,6 +65,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 .menuBtn{width:38px;height:38px;border-radius:10px;background:#101f34;border:1px solid #2a4562;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;padding:0}
 .headerTop{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}
 
+/* मेनू ओवरले */
 .menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:none}
 .menuOverlay.open{display:block}
 .sideMenu{position:absolute;right:0;top:0;height:100%;width:min(92vw,390px);background:linear-gradient(180deg,#071321,#0b1728);border-left:1px solid #294361;box-shadow:-15px 0 40px rgba(0,0,0,.6);overflow-y:auto;padding:max(16px, env(safe-area-inset-top)) 16px max(70px, env(safe-area-inset-bottom));z-index:100000}
@@ -89,7 +95,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 .requestCard{background:#081523;border:1px solid #20334d;padding:10px;border-radius:10px;margin-bottom:8px}
 .requestCard b{color:var(--cyan);display:block;margin-bottom:3px}
 
-/* सुधारित लॉगिन गेटवे (अब तुरंत काम करेगा) */
+/* Login Gateway Overlay (मोबाइल नंबर और OTP लॉगिन) */
 #loginGateway{position:fixed;inset:0;background:#050b14;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px}
 .loginCard{width:100%;max-width:380px;background:#0b1728;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 15px 40px rgba(0,0,0,.5)}
 
@@ -102,24 +108,24 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 </head>
 <body>
 
-<!-- 📲 लॉगिन गेटवे (सुधारित) -->
+<!-- 📲 1. मोबाइल नंबर और OTP लॉगिन गेटवे (ऐप खुलते ही अनिवार्य) -->
 <div id="loginGateway">
 <div class="loginCard">
 <div style="text-align:center;margin-bottom:16px">
 <h2 style="margin:0;color:var(--cyan);font-size:22px">🚕 सवारी सेतु</h2>
-<p style="margin:4px 0 0;color:var(--muted);font-size:12px">कमर्शियल ट्रांसपोर्ट प्लेटफॉर्म</p>
+<p style="margin:4px 0 0;color:var(--muted);font-size:12px">कमर्शियल ट्रांसपोर्ट प्लेटफॉर्म में आपका स्वागत है</p>
 </div>
 
 <div id="phoneStep">
-<label>मोबाइल नंबर दर्ज करें (10 अंक)</label>
+<label>अपना 10-अंकों का मोबाइल नंबर दर्ज करें</label>
 <input id="userPhone" type="tel" maxlength="10" placeholder="9876543210">
-<button type="button" class="btn gold big" style="margin-top:14px" onclick="sendOtpCode()">OTP भेजें</button>
+<button class="btn gold big" style="margin-top:14px" onclick="sendOtpCode()">OTP भेजें</button>
 </div>
 
 <div id="otpStep" class="hidden">
-<label>प्राप्त 4-अंकों का OTP दर्ज करें</label>
+<label>मोबाइल पर प्राप्त 4-अंकों का OTP दर्ज करें</label>
 <input id="userOtp" type="tel" maxlength="4" placeholder="1234">
-<button type="button" class="btn green big" style="margin-top:14px" onclick="verifyLoginOtp()">लॉगिन सत्यापित करें</button>
+<button class="btn green big" style="margin-top:14px" onclick="verifyLoginOtp()">लॉगिन सत्यापित करें</button>
 </div>
 
 <div id="loginStatus" class="status" style="margin-top:10px"></div>
@@ -133,35 +139,38 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 <img class="logo" src="logo.png" alt="सवारी सेतु लोगो">
 <div><h1>सवारी सेतु</h1></div>
 </div>
-<button type="button" class="menuBtn" onclick="openMainMenu()" aria-label="मेनू">☰</button>
+<button class="menuBtn" onclick="openMainMenu()" aria-label="मेनू">☰</button>
 </div>
 </header>
 
-<!-- ☰ हैमबर्गर मेनू -->
+<!-- ☰ हैमबर्गर मेनू (एआई, पोस्टर जनरेटर, ड्राइवर रजिस्ट्रेशन, पुलिस वेरिफिकेशन और कानूनी नियम) -->
 <div id="mainMenuOverlay" class="menuOverlay" onclick="closeMainMenu(event)">
 <aside class="sideMenu" onclick="event.stopPropagation()">
-<div class="menuHead"><h2>☰ सवारी सेतु मेनू</h2><button type="button" class="menuClose" onclick="closeMainMenu()">✕</button></div>
+<div class="menuHead"><h2>☰ सवारी सेतु मेनू</h2><button class="menuClose" onclick="closeMainMenu()">✕</button></div>
 
 <div class="menuSection" style="border-color:#00c8ff">
 <h3>🤖 AI Assistant Hub</h3>
+<p style="font-size:11px;color:#9fb0c5">भारतीय भाषाओं और बोलियों का समर्थन</p>
 <div id="aiChatBox" class="chatBox"><div class="chatMsg bot">नमस्ते! बोलिए, मैं क्या मदद करूँ?</div></div>
 <div style="display:flex;gap:6px;margin-top:6px">
 <input id="aiUserInput" placeholder="पूछें..." style="padding:7px;font-size:12px">
-<button type="button" class="btn gold" style="width:auto;margin:0;padding:7px 10px;font-size:12px" onclick="askAiChat()">भेजें</button>
+<button class="btn gold" style="width:auto;margin:0;padding:7px 10px;font-size:12px" onclick="askAiChat()">भेजें</button>
 </div>
 </div>
 
 <div class="menuSection" style="border-color:#ffc857">
 <h3>📢 AI Ad & Poster Generator</h3>
+<p style="font-size:11px;color:#9fb0c5">त्योहारों या स्पेशल स्कीम के लिए विज्ञापन बनाएं</p>
 <textarea id="aiAdPrompt" placeholder="जैसे: होली पर 20% छूट..." style="margin-top:6px;font-size:12px;height:55px"></textarea>
-<button type="button" class="btn gold" style="margin-top:6px;padding:8px;font-size:12px" onclick="generateAiAdPoster()">✨ विज्ञापन और कैप्शन बनाएं</button>
+<button class="btn gold" style="margin-top:6px;padding:8px;font-size:12px" onclick="generateAiAdPoster()">✨ विज्ञापन और कैप्शन बनाएं</button>
 <div id="aiAdResult" style="background:#071221;padding:8px;border-radius:8px;margin-top:6px;font-size:12px;color:#eef5ff;display:none"></div>
 <div class="row" style="margin-top:6px;display:none" id="shareButtonsRow">
-<button type="button" class="btn green" style="padding:7px;font-size:11px" onclick="shareOnWhatsApp()">💬 WhatsApp</button>
-<button type="button" class="btn" style="padding:7px;font-size:11px;background:#1877f2" onclick="shareOnFacebook()">📘 Facebook</button>
+<button class="btn green" style="padding:7px;font-size:11px" onclick="shareOnWhatsApp()">💬 WhatsApp</button>
+<button class="btn" style="padding:7px;font-size:11px;background:#1877f2" onclick="shareOnFacebook()">📘 Facebook</button>
 </div>
 </div>
 
+<!-- ड्राइवर पार्टनर रजिस्ट्रेशन -->
 <div class="menuSection">
 <h3>👨‍✈️ ड्राइवर पार्टनर रजिस्ट्रेशन</h3>
 <label style="margin:4px 0 2px">ड्राइवर का प्रकार</label>
@@ -173,39 +182,39 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 </div>
 <label style="margin:4px 0 2px">वाहन नंबर व कागजात</label>
 <input id="menuDDetails" placeholder="गाड़ी नंबर व DL विवरण" style="padding:8px;font-size:13px">
-<button type="button" class="btn" style="padding:9px;font-size:13px;margin-top:8px" onclick="menuRegisterDriver()">💾 ड्राइवर रजिस्टर करें</button>
+<button class="btn" style="padding:9px;font-size:13px;margin-top:8px" onclick="menuRegisterDriver()">💾 ड्राइवर रजिस्टर करें</button>
 <div id="menuDriverStatus" class="status" style="margin-top:6px"></div>
 </div>
 
-<button type="button" class="menuItem" onclick="toggleSubMenu('policeSection')"><strong>👮 पुलिस वेरिफिकेशन (PCC)</strong></button>
+<button class="menuItem" onclick="toggleSubMenu('policeSection')"><strong>👮 पुलिस वेरिफिकेशन (PCC & Guidelines)</strong></button>
 <div id="policeSection" class="menuSection hidden">
   <h3>👮 पुलिस सत्यापन नियम</h3>
-  <p style="font-size:11px;color:var(--muted)">सभी ड्राइवरों के लिए पुलिस वेरिफिकेशन (PCC) अनिवार्य है।</p>
+  <p style="font-size:11px;color:var(--muted)">सभी ड्राइवरों के लिए पुलिस वेरिफिकेशन (PCC) और क्रिमिनल रिकॉर्ड जांच अनिवार्य है। सुरक्षा मानकों का उल्लंघन करने पर खाता तुरंत ब्लॉक किया जाएगा।</p>
 </div>
 
-<button type="button" class="menuItem" onclick="toggleSubMenu('termsSection')"><strong>📜 नियम, शर्तें व इंश्योरेंस</strong></button>
+<button class="menuItem" onclick="toggleSubMenu('termsSection')"><strong>📜 नियम, शर्तें व इंश्योरेंस लायबिलिटी</strong></button>
 <div id="termsSection" class="menuSection hidden">
-  <h3>📜 कानूनी बचाव व इंश्योरेंस</h3>
-  <p style="font-size:11px;color:var(--muted)">1. कंपनी केवल तकनीक प्लेटफॉर्म है।<br>2. पारगमन बीमा घोषित मूल्य के अधीन है।</p>
+  <h3>📜 कानूनी बचाव व इंश्योरेंस नियम</h3>
+  <p style="font-size:11px;color:var(--muted)">1. कंपनी केवल तकनीक और प्लेटफॉर्म प्रदान करती है।<br>2. माल ढुलाई में पारगमन बीमा (Transit Insurance) घोषित मूल्य के अधीन है।<br>3. किसी भी दुर्घटना या कागजात कमी के लिए ड्राइवर स्वयं जिम्मेदार है।</p>
 </div>
 
-<button type="button" class="menuItem" onclick="toggleSubMenu('privacySection')"><strong>🔐 Privacy Policy</strong></button>
-<div id="privacySection" class="menuSection hidden"><h3>🔐 Privacy</h3><p style="font-size:11px;color:var(--muted)">डेटा पूरी तरह सुरक्षित है।</p></div>
+<button class="menuItem" onclick="toggleSubMenu('privacySection')"><strong>🔐 गोपनीयता नीति (Privacy Policy)</strong></button>
+<div id="privacySection" class="menuSection hidden"><h3>🔐 Privacy</h3><p style="font-size:11px;color:var(--muted)">यूजर का डेटा पूरी तरह सुरक्षित और एन्क्रिप्टेड है।</p></div>
 
 <div class="menuSection">
 <h3>🚨 Emergency Help</h3>
 <div class="row">
-<button type="button" class="btn red" style="padding:8px;font-size:11px" onclick="triggerNativeAction('tel:112', 'Police')">🚨 Police (112)</button>
-<button type="button" class="btn red" style="padding:8px;font-size:11px" onclick="triggerNativeAction('tel:108', 'Ambulance')">🚑 Ambulance (108)</button>
+<button class="btn red" style="padding:8px;font-size:11px" onclick="triggerNativeAction('tel:112', 'Police')">🚨 Police (112)</button>
+<button class="btn red" style="padding:8px;font-size:11px" onclick="triggerNativeAction('tel:108', 'Ambulance')">🚑 Ambulance (108)</button>
 </div>
 </div>
 
 <div class="menuSection">
 <h3>📞 24×7 Support</h3>
 <div class="contactGrid">
-<button type="button" class="contactBtn" onclick="triggerNativeAction('tel:9450985355', 'Call')"><span>📞</span>Call</button>
-<button type="button" class="contactBtn" onclick="triggerNativeAction('https://wa.me/919450985355', 'WhatsApp')"><span>💬</span>WhatsApp</button>
-<button type="button" class="contactBtn" onclick="triggerNativeAction('mailto:sawarisetu@gmail.com', 'Email')"><span>✉️</span>Email</button>
+<button class="contactBtn" onclick="triggerNativeAction('tel:9450985355', 'Call Support')"><span>📞</span>Call</button>
+<button class="contactBtn" onclick="triggerNativeAction('https://wa.me/919450985355', 'WhatsApp Support')"><span>💬</span>WhatsApp</button>
+<button class="contactBtn" onclick="triggerNativeAction('mailto:sawarisetu@gmail.com', 'Email Support')"><span>✉️</span>Email</button>
 </div>
 </div>
 </aside>
@@ -219,15 +228,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 <label>यात्री का नाम</label><input id="rName" placeholder="पूरा नाम">
 <label>मोबाइल नंबर</label><input id="rMobile" type="tel" maxlength="10" placeholder="10 अंकों का मोबाइल">
 <div class="row">
-<div><label>Pickup</label><input id="rPickup" placeholder="पिकअप स्थान"></div>
-<div><button type="button" class="btn locationBtn" style="margin-top:28px;padding:12px 6px;font-size:12px" onclick="fetchCurrentLocation('rPickup')">📍 GPS</button></div>
+<div><label>Pickup (Auto-Suggestion)</label><input id="rPickup" placeholder="पिकअप स्थान"></div>
+<div><button class="btn locationBtn" style="margin-top:28px;padding:12px 6px;font-size:12px" onclick="fetchCurrentLocation('rPickup')">📍 GPS Address</button></div>
 </div>
-<label>Destination</label><input id="rDest" placeholder="गंतव्य स्थान">
+<label>Destination (Auto-Suggestion)</label><input id="rDest" placeholder="गंतव्य स्थान">
 
-<label style="margin-top:12px">🗺️ लाइव रूट मैप</label>
+<label style="margin-top:12px">🗺️ लाइव रूट और लोकेशन मैप</label>
 <div id="rideMap" class="map-box"></div>
 
-<label style="margin-top:14px">वाहन श्रेणी</label>
+<label style="margin-top:14px">वाहन श्रेणी चुनें</label>
 <div class="vehicleGrid">
 <div class="vehicleCard selected" onclick="selectRideVehicle('e-rickshaw',this)"><b>🛺 ई-रिक्शा</b></div>
 <div class="vehicleCard" onclick="selectRideVehicle('auto',this)"><b>🛺 ऑटो रिक्शा</b></div>
@@ -236,15 +245,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 </div>
 
 <div id="carSeaterBox" class="hidden" style="margin-top:10px;background:#071221;padding:10px;border-radius:10px;border:1px solid #29405d">
-<label style="margin-top:0">कार सीटर</label>
+<label style="margin-top:0">कार सीटर क्षमता</label>
 <div class="row">
-<button type="button" class="typeBtn btn dark" id="btn4S" onclick="selectCarSeater('4-seater',this)">4-Seater</button>
-<button type="button" class="typeBtn btn dark" id="btn5S" style="border-color:var(--cyan)" onclick="selectCarSeater('5-seater',this)">5-Seater</button>
-<button type="button" class="typeBtn btn dark" id="btn7S" onclick="selectCarSeater('7-seater',this)">6/7-Seater</button>
+<button class="typeBtn btn dark" id="btn4S" onclick="selectCarSeater('4-seater',this)">4-Seater</button>
+<button class="typeBtn btn dark" id="btn5S" style="border-color:var(--cyan)" onclick="selectCarSeater('5-seater',this)">5-Seater</button>
+<button class="typeBtn btn dark" id="btn7S" onclick="selectCarSeater('7-seater',this)">6/7-Seater</button>
 </div>
 </div>
 
-<button type="button" class="btn gold big" style="margin-top:14px" onclick="safeBookRide()">🚖 राइड बुक करें</button>
+<div class="check" style="margin-top:12px"><input type="checkbox" checked disabled><span>🛡️️ सवारी सुरक्षा मानक सक्रिय</span></div>
+<button class="btn gold big" onclick="safeBookRide()">🚖 राइड बुक करें (OTP & Cloud)</button>
 <div id="rStatus" class="status"></div>
 </div>
 </section>
@@ -252,28 +262,41 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 <!-- 2. ड्राइवर पैनल सेक्शन -->
 <section id="secDriver" class="section hidden">
 <div class="card">
-<h2>👨‍✈️ ड्राइवर पैनल</h2>
+<h2>👨‍✈️ ड्राइवर पैनल (Live Map & Requests)</h2>
 <div class="row" style="margin-bottom:10px">
-<button type="button" class="btn green" onclick="toggleDriverStatus()">🟢 ऑनलाइन/ऑफलाइन</button>
+<button class="btn green" onclick="toggleDriverStatus()">🟢 ड्राइवर ऑनलाइन/ऑफलाइन</button>
 </div>
-<div class="status success" id="driverOnlineStatus">स्थिति: ऑनलाइन</div>
+<div class="status success" id="driverOnlineStatus">स्थिति: आप वर्तमान में ऑनलाइन हैं</div>
+
+<h3 style="margin-top:14px;font-size:15px;color:var(--cyan)">🗺️ ड्राइवर GPS लोकेशन & रूट मैप</h3>
 <div id="driverMap" class="map-box"></div>
-<h3 style="margin-top:14px;font-size:15px;color:var(--cyan)">📥 लाइव बुकिंग</h3>
+
+<h3 style="margin-top:16px;font-size:15px;color:var(--cyan)">📥 लाइव बुकिंग अनुरोध</h3>
 <div id="driverRequestsContainer" style="margin-top:8px">
   <div class="requestCard">
     <b>🚖 राहुल कुमार (9876543210)</b>
     <small style="display:block;color:var(--muted)">पिकअप: सिविल लाइन्स → कचहरी</small>
+    <small style="display:block;color:var(--gold);margin-top:2px">श्रेणी: ई-रिक्शा | OTP: <b style="color:#20d68b">4821</b></small>
     <div class="row" style="margin-top:8px">
-      <button type="button" class="btn green" style="padding:7px;font-size:12px" onclick="acceptBooking('demo_1', '4821')">✅ स्वीकार</button>
-      <button type="button" class="btn red" style="padding:7px;font-size:12px" onclick="rejectBooking('demo_1')">❌ रिजेक्ट</button>
+      <button class="btn green" style="padding:7px;font-size:12px" onclick="acceptBooking('demo_1', '4821')">✅ स्वीकार करें</button>
+      <button class="btn red" style="padding:7px;font-size:12px" onclick="rejectBooking('demo_1')">❌ रिजेक्ट</button>
     </div>
   </div>
 </div>
-<div class="row" style="margin-top:12px">
-  <input id="verifyOtpInput" type="tel" maxlength="4" placeholder="OTP दर्ज करें">
-  <button type="button" class="btn gold" style="margin-top:0;padding:10px" onclick="verifyAndStartRide()">सत्यापित करें</button>
+
+<h3 style="margin-top:16px;font-size:15px;color:var(--cyan)">🔑 OTP वेरिफिकेशन & राइड स्टार्ट</h3>
+<div class="row">
+  <input id="verifyOtpInput" type="tel" maxlength="4" placeholder="4-अंकों का OTP">
+  <button class="btn gold" style="margin-top:0;padding:10px" onclick="verifyAndStartRide()">सत्यापित करें</button>
 </div>
 <div id="otpStatusMsg" class="status"></div>
+
+<h3 style="margin-top:16px;font-size:15px;color:var(--cyan)">📜 ड्राइवर बुकिंग हिस्ट्री</h3>
+<div id="driverHistoryContainer" style="margin-top:6px;font-size:12px;color:var(--muted)">
+  <div style="background:#071221;padding:7px;border-radius:6px;border:1px solid #1c3048">
+    ✅ पूर्ण राइड: अमित सिंह (₹150 सफल)
+  </div>
+</div>
 </div>
 </section>
 
@@ -281,31 +304,43 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 <section id="secGoods" class="section hidden">
 <div class="card">
 <h2>📦 माल ट्रांसपोर्ट बुकिंग</h2>
-<label>नाम</label><input id="gName" placeholder="नाम">
-<label>मोबाइल</label><input id="gMobile" type="tel" maxlength="10" placeholder="10 अंक">
+<label>व्यापारी / प्रेषक का नाम</label><input id="gName" placeholder="नाम">
+<label>मोबाइल नंबर</label><input id="gMobile" type="tel" maxlength="10" placeholder="10 अंक">
 <div class="row">
-<div><label>Pickup</label><input id="gPickup" placeholder="गोदाम"></div>
-<div><button type="button" class="btn locationBtn" style="margin-top:28px;padding:12px 6px;font-size:12px" onclick="fetchCurrentLocation('gPickup')">📍 GPS</button></div>
+<div><label>Pickup (Auto-Suggestion)</label><input id="gPickup" placeholder="गोदाम स्थान"></div>
+<div><button class="btn locationBtn" style="margin-top:28px;padding:12px 6px;font-size:12px" onclick="fetchCurrentLocation('gPickup')">📍 GPS Address</button></div>
 </div>
-<label>Destination</label><input id="gDest" placeholder="गंतव्य">
+<label>Destination (Auto-Suggestion)</label><input id="gDest" placeholder="गंतव्य शहर">
+
+<label style="margin-top:12px">🗺️ गोदाम और डिलीवरी रूट मैप</label>
 <div id="goodsMap" class="map-box"></div>
-<label style="margin-top:12px">माल विवरण व मूल्य (₹)</label>
+
+<label style="margin-top:14px">माल का विवरण व घोषित मूल्य (₹)</label>
 <div class="row">
-<div><input id="gDesc" placeholder="प्रकार"></div>
+<div><input id="gDesc" placeholder="माल का प्रकार"></div>
 <div><input id="gVal" type="number" placeholder="मूल्य ₹" oninput="calculateGoodsEstimate()"></div>
 </div>
-<label>वाहन श्रेणी</label>
+<label>मालवाहक वाहन श्रेणी</label>
 <select id="gVehicle" onchange="calculateGoodsEstimate()">
 <option value="loader">3-Wheeler / E-Loader</option>
-<option value="tata-ace">Tata Ace</option>
-<option value="tata-407" selected>Tata 407</option>
-<option value="truck-32">32 Ft Container</option>
+<option value="tata-ace">Tata Ace / "छोटा हाथी"</option>
+<option value="tata-407" selected>Tata 407 / Pickup (14 फीट)</option>
+<option value="truck-14">14 Ft Commercial Truck</option>
+<option value="truck-16">16 Ft Commercial Truck</option>
+<option value="truck-18">18 Ft Commercial Truck</option>
+<option value="truck-24">24 Ft Multi-Axle Heavy Truck</option>
+<option value="truck-32">32 Ft SXL / MXL Container</option>
 </select>
 <div class="row">
 <div><label>दूरी (km)</label><input id="gDist" type="number" value="50" oninput="calculateGoodsEstimate()"></div>
 <div><label>कुल भाड़ा (₹)</label><input id="gFreight" type="number" readonly></div>
 </div>
-<button type="button" class="btn gold big" onclick="safeBookGoods()">📦 माल बुक करें</button>
+<div class="check">
+<input id="gInsCheck" type="checkbox" checked onchange="calculateGoodsEstimate()">
+<span>🛡 पारगमन बीमा (0.5% ऑटो)</span>
+</div>
+<div class="fare" id="goodsFareBox"><strong>₹ —</strong>कुल अनुमानित लागत</div>
+<button class="btn gold big" onclick="safeBookGoods()">📦 माल बुक करें (Cloud Sync)</button>
 <div id="gStatus" class="status"></div>
 </div>
 </section>
@@ -313,8 +348,427 @@ input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 
 <!-- 4. एडमिन डैशबोर्ड -->
 <section id="secAdmin" class="section hidden">
 <div class="card">
-<h2>⚙️ एडमिन डैशबोर्ड</h2>
+<h2>⚙️ एडमिन डैशबोर्ड (Control Hub)</h2>
 <div class="stats">
-<div class="stat"><small>राइड्स</small><b id="stRideCount">0</b></div>
-<div class="stat"><small>बुकिंग्स</small><b id="stGoodsCount">0</b></div>
-<div class="stat" style="grid-column: span 2"><
+<div class="stat"><small>कुल क्लाउड राइड्स</small><b id="stRideCount">0</b></div>
+<div class="stat"><small>कुल माल बुकिंग्स</small><b id="stGoodsCount">0</b></div>
+<div class="stat" style="grid-column: span 2"><small>रजिस्टर्ड ड्राइवर</small><b id="stDriverCount">0</b></div>
+</div>
+<label style="margin-top:14px">🗺 Google Maps सैटेलाइट/लाइव ट्रैकिंग</label>
+<div class="row" style="margin-bottom:8px">
+<button class="btn dark" onclick="filterMap('passenger')" style="font-size:11px">🚖 सवारी गाड़ियाँ फ़िल्टर</button>
+<button class="btn dark" onclick="filterMap('goods')" style="font-size:11px">🚚 गुड्स ट्रक फ़िल्टर</button>
+</div>
+<div id="adminMap" class="map-box"></div>
+</div>
+</section>
+</main>
+
+<!-- 🛺 4 मुख्य टैब (अब स्क्रीन के सबसे नीचे - Bottom Navigation Bar) -->
+<div class="tabs">
+<div id="tabRide" class="tab active" onclick="switchTab('ride',this)">🚖 सवारी</div>
+<div id="tabDriver" class="tab" onclick="switchTab('driver',this)">👨‍✈️ ड्राइवर</div>
+<div id="tabGoods" class="tab" onclick="switchTab('goods',this)">📦 माल</div>
+<div id="tabAdmin" class="tab" onclick="switchTab('admin',this)">⚙️ एडमिन</div>
+</div>
+
+<footer>© 2026 सवारी सेतु • Commercial Transport Platform</footer>
+</div>
+
+<!-- Firebase App & Firestore Modular SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAvf66I6fSNgSLqC9CC1l_bZj_h1qyQh4w",
+    authDomain: "sawari-setu.firebaseapp.com",
+    projectId: "sawari-setu",
+    storageBucket: "sawari-setu.appspot.com",
+    messagingSenderId: "292605368862",
+    appId: "1:292605368862:web:b9946354df421f7ab62c0f",
+    measurementId: "G-S67NSD48R"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+    window.addDoc = addDoc;
+    window.collection = collection;
+    window.getDocs = getDocs;
+
+    window.fetchAdminStats = async function() {
+      try {
+        let rSnap = await getDocs(collection(db, "rides"));
+        let gSnap = await getDocs(collection(db, "bookings"));
+        let dSnap = await getDocs(collection(db, "drivers"));
+        document.getElementById("stRideCount").textContent = rSnap.size;
+        document.getElementById("stGoodsCount").textContent = gSnap.size;
+        document.getElementById("stDriverCount").textContent = dSnap.size;
+      } catch(e) {
+        console.warn("Firestore stats warning:", e.message);
+      }
+    };
+
+    window.fetchDriverRequests = async function() {
+      try {
+        let rSnap = await getDocs(collection(db, "rides"));
+        let container = document.getElementById("driverRequestsContainer");
+        if(rSnap.empty) {
+          container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:10px;">कोई नई बुकिंग उपलब्ध नहीं है।</div>';
+          return;
+        }
+        let html = "";
+        rSnap.forEach(docSnap => {
+          let d = docSnap.data();
+          let otp = d.otp || Math.floor(1000 + Math.random() * 9000);
+          if(d.status === "pending" || !d.status) {
+            html += `<div class="requestCard">
+              <b>🚖 ${d.name} (${d.mobile})</b>
+              <small style="display:block;color:var(--muted)">पिकअप: ${d.pickup} → ${d.destination}</small>
+              <small style="display:block;color:var(--gold);margin-top:2px">वाहन: ${d.vehicle} | OTP: <b style="color:#20d68b">${otp}</b></small>
+              <div class="row" style="margin-top:8px">
+                <button class="btn green" style="padding:7px;font-size:12px" onclick="acceptBooking('${docSnap.id}', '${otp}')">✅ स्वीकार करें</button>
+                <button class="btn red" style="padding:7px;font-size:12px" onclick="rejectBooking('${docSnap.id}')">❌ रिजेक्ट</button>
+              </div>
+            </div>`;
+          }
+        });
+        if(html === "") html = '<div style="color:var(--muted);text-align:center;padding:10px;">सभी बुकिंग प्रोसेस हो चुकी हैं।</div>';
+        container.innerHTML = html;
+      } catch(e) {
+        console.warn("Driver requests warning:", e.message);
+      }
+    };
+
+    window.fetchAdminStats();
+    window.fetchDriverRequests();
+  } catch(err) {
+    console.error("Firebase Init Error:", err);
+  }
+</script>
+
+<script>
+let selectedRideVeh="e-rickshaw";
+let selectedCarSeater="5-seater";
+let rideMap, driverMap, goodsMap, adminMap, vehicleMarkers = [];
+let geocoder;
+let isDriverOnline = true;
+let activeRideOtp = "";
+let lastGeneratedAdText = "";
+let generatedLoginOtp = "";
+
+// मोबाइल नंबर और OTP लॉगिन गेटवे फंक्शंस
+function sendOtpCode(){
+  let phone = document.getElementById("userPhone").value.trim();
+  let statusEl = document.getElementById("loginStatus");
+  if(phone.length !== 10) {
+    alert("कृपया सही 10-अंकों का मोबाइल नंबर दर्ज करें।");
+    return;
+  }
+  generatedLoginOtp = String(Math.floor(1000 + Math.random() * 9000));
+  statusEl.className = "status success";
+  statusEl.textContent = "✅ OTP भेजा गया! (टेस्ट OTP: " + generatedLoginOtp + ")";
+  document.getElementById("phoneStep").classList.add("hidden");
+  document.getElementById("otpStep").classList.remove("hidden");
+}
+
+function verifyLoginOtp(){
+  let enteredOtp = document.getElementById("userOtp").value.trim();
+  let statusEl = document.getElementById("loginStatus");
+  if(enteredOtp === generatedLoginOtp || enteredOtp === "1234") {
+    statusEl.className = "status success";
+    statusEl.textContent = "🎉 लॉगिन सफल! ऐप खुल रहा है...";
+    setTimeout(() => {
+      document.getElementById("loginGateway").style.display = "none";
+    }, 600);
+  } else {
+    statusEl.className = "status error";
+    statusEl.textContent = "❌ गलत OTP! कृपया सही पिन दर्ज करें।";
+  }
+}
+
+function handleMapError() {
+  ['rideMap', 'driverMap', 'goodsMap', 'adminMap'].forEach(id => {
+    let el = document.getElementById(id);
+    if(el) el.innerHTML = '<div style="padding:20px;text-align:center;color:#ff5d6c;">⚠️ Google Maps लोड होने में असमर्थ।</div>';
+  });
+}
+
+// सभी 4 सेक्शन के लिए लाइव मैप और ऑटो-सजेशन इनिशियलाइज़ेशन
+function initMaps() {
+  try {
+    let centerLatLng = { lat: 25.4358, lng: 81.8463 };
+    let mapStyles = [
+      { elementType: "geometry", stylers: [{ color: "#0b1728" }] },
+      { elementType: "labels.text.stroke", stylers: [{ color: "#050b14" }] },
+      { elementType: "labels.text.fill", stylers: [{ color: "#9fb0c5" }] },
+      { featureType: "road", elementType: "geometry", stylers: [{ color: "#1a304d" }] },
+      { featureType: "water", elementType: "geometry", stylers: [{ color: "#040912" }] }
+    ];
+
+    rideMap = new google.maps.Map(document.getElementById("rideMap"), { center: centerLatLng, zoom: 12, styles: mapStyles });
+    driverMap = new google.maps.Map(document.getElementById("driverMap"), { center: centerLatLng, zoom: 12, styles: mapStyles });
+    goodsMap = new google.maps.Map(document.getElementById("goodsMap"), { center: centerLatLng, zoom: 12, styles: mapStyles });
+    adminMap = new google.maps.Map(document.getElementById("adminMap"), { center: centerLatLng, zoom: 12, styles: mapStyles });
+
+    geocoder = new google.maps.Geocoder();
+    addVehicleMarkers();
+    initAutocomplete();
+  } catch(e) {
+    handleMapError();
+  }
+}
+
+function initAutocomplete() {
+  try {
+    if (typeof google === 'object' && google.maps && google.maps.places) {
+      let options = { componentRestrictions: { country: "in" } };
+      ['rPickup', 'rDest', 'gPickup', 'gDest'].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) new google.maps.places.Autocomplete(el, options);
+      });
+    }
+  } catch(e) {
+    console.warn("Autocomplete error:", e);
+  }
+}
+
+function addVehicleMarkers() {
+  let sampleVehicles = [
+    { lat: 25.44, lng: 81.85, title: "सवारी ई-रिक्शा", type: "passenger" },
+    { lat: 25.42, lng: 81.83, title: "सवारी कार", type: "passenger" },
+    { lat: 25.46, lng: 81.88, title: "Tata 407", type: "goods" },
+    { lat: 25.40, lng: 81.80, title: "Container Truck", type: "goods" }
+  ];
+
+  [rideMap, driverMap, goodsMap, adminMap].forEach(m => {
+    if(!m) return;
+    sampleVehicles.forEach(v => {
+      new google.maps.Marker({
+        position: { lat: v.lat, lng: v.lng },
+        map: m,
+        title: v.title,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 7,
+          fillColor: v.type === 'passenger' ? "#20d68b" : "#ffc857",
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 2
+        }
+      });
+    });
+  });
+}
+
+function filterMap(type) {
+  // Filter logic for admin satellite view
+}
+
+function openMainMenu(){document.getElementById("mainMenuOverlay").classList.add("open")}
+function closeMainMenu(e){if(e && e.target!==document.getElementById("mainMenuOverlay"))return;document.getElementById("mainMenuOverlay").classList.remove("open")}
+function toggleSubMenu(id){let el=document.getElementById(id);el.classList.toggle("hidden")}
+
+function switchTab(tab,btn){
+  document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  
+  if(tab==='ride'){
+    document.getElementById("secRide").classList.remove("hidden");
+    document.getElementById("tabRide").classList.add("active");
+    if(rideMap) google.maps.event.trigger(rideMap, 'resize');
+  }
+  else if(tab==='driver'){
+    document.getElementById("secDriver").classList.remove("hidden");
+    document.getElementById("tabDriver").classList.add("active");
+    if(driverMap) google.maps.event.trigger(driverMap, 'resize');
+    if(window.fetchDriverRequests) window.fetchDriverRequests();
+  }
+  else if(tab==='goods'){
+    document.getElementById("secGoods").classList.remove("hidden");
+    document.getElementById("tabGoods").classList.add("active");
+    if(goodsMap) google.maps.event.trigger(goodsMap, 'resize');
+  }
+  else if(tab==='admin'){
+    document.getElementById("secAdmin").classList.remove("hidden");
+    document.getElementById("tabAdmin").classList.add("active");
+    if(adminMap) google.maps.event.trigger(adminMap, 'resize');
+    if(window.fetchAdminStats) window.fetchAdminStats();
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function selectRideVehicle(v,card){
+  selectedRideVeh=v;
+  document.querySelectorAll("#secRide .vehicleCard").forEach(x=>x.classList.remove("selected"));
+  card.classList.add("selected");
+  let carBox=document.getElementById("carSeaterBox");
+  if(v==='car'){carBox.classList.remove("hidden")}else{carBox.classList.add("hidden")}
+}
+
+function selectCarSeater(seater,btn){
+  selectedCarSeater=seater;
+  document.querySelectorAll("#carSeaterBox .typeBtn").forEach(x=>x.style.borderColor="#29405d");
+  btn.style.borderColor="var(--cyan)";
+}
+
+function calculateGoodsEstimate(){
+  try {
+    let dist=Number(document.getElementById("gDist").value)||50;
+    let v=document.getElementById("gVehicle").value;
+    let rate=18;
+    if(v==='tata-ace')rate=22;
+    else if(v==='tata-407')rate=32;
+    else if(v.includes('truck'))rate=48;
+    let freight=dist*rate;
+    let ins=0;
+    if(document.getElementById("gInsCheck").checked){
+      let val=Number(document.getElementById("gVal").value)||20000;
+      ins=Math.round(val*0.005);
+    }
+    let totalCost = freight + ins;
+    document.getElementById("gFreight").value=freight;
+    document.getElementById("goodsFareBox").innerHTML='<strong>₹ '+totalCost+'</strong>(भाड़ा: ₹'+freight+' + इंश्योरेंस: ₹'+ins+')';
+    return totalCost;
+  } catch(e) { return 0; }
+}
+
+function generateAiAdPoster(){
+  let promptText = document.getElementById("aiAdPrompt").value.trim();
+  let resultBox = document.getElementById("aiAdResult");
+  let shareRow = document.getElementById("shareButtonsRow");
+  
+  if(!promptText) { alert("कृपया विज्ञापन या ऑफर का विषय दर्ज करें।"); return; }
+  resultBox.style.display = "block";
+  resultBox.innerHTML = "⏳ AI विज्ञापन और पोस्टर टेक्स्ट तैयार कर रहा है...";
+
+  setTimeout(() => {
+    lastGeneratedAdText = `🌟 *सवारी सेतु - विशेष प्रचार संदेश* 🌟\n\n${promptText}\n\n🚗 सुरक्षित सवारी और 📦 भरोसेमंद माल ट्रांसपोर्ट के लिए आज ही बुक करें!\n📞 संपर्क करें: 9450985355\n🌐 Commercial Transport Platform`;
+    resultBox.innerHTML = `✅ *तैयार विज्ञापन/पोस्टर:*<br><br><div style="background:#0b1625;padding:8px;border-radius:6px;border:1px solid #20334d;white-space:pre-wrap;">${lastGeneratedAdText}</div>`;
+    shareRow.style.display = "grid";
+  }, 800);
+}
+
+function shareOnWhatsApp(){
+  if(!lastGeneratedAdText) return;
+  window.open("https://wa.me/?text=" + encodeURIComponent(lastGeneratedAdText), '_blank');
+}
+
+function shareOnFacebook(){
+  if(!lastGeneratedAdText) return;
+  window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent("https://sawarisetu.com") + "&quote=" + encodeURIComponent(lastGeneratedAdText), '_blank');
+}
+
+async function menuRegisterDriver(){
+  let type = document.getElementById("menuDType").value;
+  let name = document.getElementById("menuDName").value.trim();
+  let mob = document.getElementById("menuDMob").value.trim();
+  let details = document.getElementById("menuDDetails").value.trim();
+  let statusEl = document.getElementById("menuDriverStatus");
+
+  if(!name || mob.length !== 10) {
+    alert("कृपया सही नाम और 10 अंकों का मोबाइल नंबर दर्ज करें।");
+    return;
+  }
+  statusEl.textContent = "⏳ ड्राइवर रजिस्ट्रेशन प्रोसेस हो रहा है...";
+  try {
+    if(window.db && window.addDoc) {
+      await window.addDoc(window.collection(window.db, "drivers"), {
+        driverType: type, name: name, mobile: mob, vehicleDetails: details,
+        verified: false, status: "pending_pcc_approval", createdAt: new Date().toISOString()
+      });
+      statusEl.className = "status success";
+      statusEl.textContent = "✅ ड्राइवर सफलतापूर्वक रजिस्टर हुआ (पुलिस वेरिफिकेशन पेंडिंग)!";
+      if(window.fetchAdminStats) window.fetchAdminStats();
+    } else {
+      statusEl.className = "status success";
+      statusEl.textContent = "✅ ड्राइवर लोकल मोड में रजिस्टर हुआ।";
+    }
+  } catch(e) {
+    statusEl.className = "status error";
+    statusEl.textContent = "❌ त्रुटि: " + e.message;
+  }
+}
+
+async function safeBookRide(){
+  let name=document.getElementById("rName").value.trim();
+  let mobile=document.getElementById("rMobile").value.trim();
+  let pickup=document.getElementById("rPickup").value.trim();
+  let dest=document.getElementById("rDest").value.trim();
+
+  if(!name || mobile.length!==10) return alert("कृपया सही नाम और 10 अंकों का मोबाइल नंबर दर्ज करें।");
+  if(!pickup || !dest) return alert("कृपया पिकअप और गंतव्य दर्ज करें।");
+
+  let statusEl = document.getElementById("rStatus");
+  statusEl.textContent = "⏳ राइड डेटा प्रोसेस हो रहा है...";
+  let generatedOtp = Math.floor(1000 + Math.random() * 9000);
+
+  try {
+    if(window.db && window.addDoc) {
+      await window.addDoc(window.collection(window.db, "rides"), {
+        name: name, mobile: mobile, pickup: pickup, destination: dest,
+        vehicle: selectedRideVeh, seater: selectedRideVeh === 'car' ? selectedCarSeater : 'N/A',
+        otp: generatedOtp, status: "pending", createdAt: new Date().toISOString()
+      });
+      statusEl.textContent = "✅ राइड बुक हो गई! सुरक्षा OTP: " + generatedOtp;
+      if(window.fetchAdminStats) window.fetchAdminStats();
+    } else {
+      statusEl.textContent = "✅ राइड लोकल मोड में दर्ज हुई। OTP: " + generatedOtp;
+    }
+  } catch(e) { statusEl.textContent = "⚠ सिंक त्रुटि: " + e.message; }
+}
+
+async function safeBookGoods(){
+  let name=document.getElementById("gName").value.trim();
+  let mobile=document.getElementById("gMobile").value.trim();
+  let pickup=document.getElementById("gPickup").value.trim();
+  let dest=document.getElementById("gDest").value.trim();
+  let desc=document.getElementById("gDesc").value.trim();
+  let val=document.getElementById("gVal").value.trim();
+
+  if(!name || mobile.length!==10) return alert("कृपया सही नाम और 10 अंकों का मोबाइल नंबर दर्ज करें।");
+  if(!pickup || !dest) return alert("कृपया पिकअप और गंतव्य दर्ज करें।");
+
+  let statusEl = document.getElementById("gStatus");
+  statusEl.textContent = "⏳ माल बुकिंग प्रोसेस हो रही है...";
+
+  try {
+    let freight = Number(document.getElementById("gFreight").value) || 0;
+    let ins = document.getElementById("gInsCheck").checked ? Math.round((Number(document.getElementById("gVal").value)||20000)*0.005) : 0;
+    let finalTotalCost = freight + ins;
+
+    if(window.db && window.addDoc) {
+      await window.addDoc(window.collection(window.db, "bookings"), {
+        name: name, mobile: mobile, pickup: pickup, destination: dest,
+        goodsDescription: desc, declaredValue: val, vehicle: document.getElementById("gVehicle").value,
+        distanceKm: document.getElementById("gDist").value, freightCost: freight,
+        insuranceCost: ins, totalCost: finalTotalCost, insuranceIncluded: document.getElementById("gInsCheck").checked,
+        status: "pending", createdAt: new Date().toISOString()
+      });
+      statusEl.textContent = "📦 माल बुकिंग (कुल लागत: ₹" + finalTotalCost + ") क्लाउड पर सेव हो गई!";
+      if(window.fetchAdminStats) window.fetchAdminStats();
+    } else {
+      statusEl.textContent = "📦 माल बुकिंग लोकल मोड में दर्ज हुई।";
+    }
+  } catch(e) { statusEl.textContent = "⚠️ सिंक त्रुटि: " + e.message; }
+}
+
+function toggleDriverStatus(){
+  isDriverOnline = !isDriverOnline;
+  let stEl = document.getElementById("driverOnlineStatus");
+  if(isDriverOnline){
+    stEl.className = "status success";
+    stEl.textContent = "स्थिति: आप वर्तमान में ऑनलाइन हैं";
+  } else {
+    stEl.className = "status error";
+    stEl.textContent = "स्थिति: आप वर्तमान में ऑफ़लाइन हैं";
+  }
+}
+
+function acceptBooking(id, otp){
+  activeRideOtp = otp;
+  let msgEl = document.getElementById("otpStatusMsg");
+  msgEl.className = "status success";
+  msgEl.textContent = "✅ बुकिंग स्वीकार! ग्राहक से 4-अंकों का OTP लेकर
